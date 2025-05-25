@@ -6,8 +6,8 @@ class CardInstances extends Table {
 
   // optional: カード個体の属性
   DateTimeColumn get updatedAt => dateTime().nullable()(); // カードの情報が更新された日
-  TextColumn get description => text()(); // カードの説明や状態など
-  
+  TextColumn get description => text().nullable()(); // カードの説明や状態など
+
 
   @override
   Set<Column> get primaryKey => {id};
