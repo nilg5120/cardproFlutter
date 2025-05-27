@@ -19,6 +19,9 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
+    // ✅ テスト用（メモリDBを渡す用）
+  AppDatabase.test(super.executor);
+
   @override
   int get schemaVersion => 1;
 }
