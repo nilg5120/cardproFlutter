@@ -1,16 +1,47 @@
-# cardpro
+# CardPro
 
-A new Flutter project.
+ポケモンカードなどのトレーディングカードを**1枚単位（個体）で管理**し、  
+複数のデッキや保管場所に**共有・配置できるFlutterアプリ**です。
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🧠 コンセプト
 
-A few resources to get you started if this is your first Flutter project:
+- 「このカード、デッキAとBに入ってるけど本当に足りてる？」
+- 「どこに保管してたっけ？引き出し？バインダー？」
+- **物理カードの所在をアプリで一元管理したい！**
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+そんな声に応える、カード整理のためのアプリです。
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 🗂 主な機能
+
+- カードのマスター情報登録（名前・番号・拡張パックなど）
+- 1枚ごとのカード個体を登録（状態・説明・日時など）
+- デッキや引き出しなどの「保管場所（Container）」を作成
+- 各カード個体を保管場所に配置（多対多管理）
+- 所持カードの一覧表示・検索（準備中）
+
+---
+
+## 🧱 技術スタック
+
+| 分類         | 使用技術              |
+|--------------|-----------------------|
+| UI           | Flutter (Material 3)  |
+| DB           | [Drift](https://drift.simonbinder.eu/) + SQLite |
+| 保存先       | `getApplicationDocumentsDirectory()` を利用 |
+| モバイル対応 | Android（iOS未検証）  |
+| デスクトップ | Windows 対応（FFI使用） |
+| 状態管理     | setState（シンプル構成） |
+
+---
+
+## 📁 データ構造（概要）
+
+```text
+PokemonCards         ← カードのマスター情報
+└─ CardInstances     ← 実際のカード個体（状態や説明付き）
+   └─ DeckCardLocations ← 各カードがどのデッキ・引き出しにあるか
+Containers           ← デッキ/バインダー/引き出しなどの保管場所
