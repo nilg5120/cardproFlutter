@@ -22,6 +22,8 @@ void main() {
         rarity: const Value('R'),
         setName: const Value('サンプル'),
         cardnumber: const Value(123),
+        //TODO: effectId は後で実装する
+        effectId: 0, // 仮の値
       ),
     );
 

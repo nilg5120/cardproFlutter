@@ -11,10 +11,13 @@ import 'container_card_locations.dart';
 import 'dart:io'; // ← Platform 判定用
 import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // ← 追加
 
+import 'card_effects.dart';
+
 part 'database.g.dart';
 
 @DriftDatabase(
-  tables: [PokemonCards, CardInstances, Containers, DeckCardLocations],
+  tables: [PokemonCards, CardInstances, Containers, ContainerCardLocations,
+           CardEffects],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());

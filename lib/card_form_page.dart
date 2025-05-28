@@ -38,6 +38,9 @@ class _CardFormPageState extends State<CardFormPage> {
       rarity: drift.Value(rarityController.text),
       setName: drift.Value(setNameController.text),
       cardnumber: drift.Value(int.tryParse(cardNumberController.text)),
+      //TODO: effectId は後で実装する
+      effectId: 0,
+
     );
 
     final inserted = await widget.db.into(widget.db.pokemonCards).insertReturning(master);

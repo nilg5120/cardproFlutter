@@ -62,8 +62,26 @@ class $PokemonCardsTable extends PokemonCards
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _effectIdMeta = const VerificationMeta(
+    'effectId',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, name, rarity, setName, cardnumber];
+  late final GeneratedColumn<int> effectId = GeneratedColumn<int>(
+    'effect_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    rarity,
+    setName,
+    cardnumber,
+    effectId,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -105,6 +123,14 @@ class $PokemonCardsTable extends PokemonCards
         cardnumber.isAcceptableOrUnknown(data['cardnumber']!, _cardnumberMeta),
       );
     }
+    if (data.containsKey('effect_id')) {
+      context.handle(
+        _effectIdMeta,
+        effectId.isAcceptableOrUnknown(data['effect_id']!, _effectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_effectIdMeta);
+    }
     return context;
   }
 
@@ -136,6 +162,11 @@ class $PokemonCardsTable extends PokemonCards
         DriftSqlType.int,
         data['${effectivePrefix}cardnumber'],
       ),
+      effectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}effect_id'],
+          )!,
     );
   }
 
@@ -151,12 +182,14 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
   final String? rarity;
   final String? setName;
   final int? cardnumber;
+  final int effectId;
   const PokemonCard({
     required this.id,
     required this.name,
     this.rarity,
     this.setName,
     this.cardnumber,
+    required this.effectId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -172,6 +205,7 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
     if (!nullToAbsent || cardnumber != null) {
       map['cardnumber'] = Variable<int>(cardnumber);
     }
+    map['effect_id'] = Variable<int>(effectId);
     return map;
   }
 
@@ -189,6 +223,7 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
           cardnumber == null && nullToAbsent
               ? const Value.absent()
               : Value(cardnumber),
+      effectId: Value(effectId),
     );
   }
 
@@ -203,6 +238,7 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
       rarity: serializer.fromJson<String?>(json['rarity']),
       setName: serializer.fromJson<String?>(json['setName']),
       cardnumber: serializer.fromJson<int?>(json['cardnumber']),
+      effectId: serializer.fromJson<int>(json['effectId']),
     );
   }
   @override
@@ -214,6 +250,7 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
       'rarity': serializer.toJson<String?>(rarity),
       'setName': serializer.toJson<String?>(setName),
       'cardnumber': serializer.toJson<int?>(cardnumber),
+      'effectId': serializer.toJson<int>(effectId),
     };
   }
 
@@ -223,12 +260,14 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
     Value<String?> rarity = const Value.absent(),
     Value<String?> setName = const Value.absent(),
     Value<int?> cardnumber = const Value.absent(),
+    int? effectId,
   }) => PokemonCard(
     id: id ?? this.id,
     name: name ?? this.name,
     rarity: rarity.present ? rarity.value : this.rarity,
     setName: setName.present ? setName.value : this.setName,
     cardnumber: cardnumber.present ? cardnumber.value : this.cardnumber,
+    effectId: effectId ?? this.effectId,
   );
   PokemonCard copyWithCompanion(PokemonCardsCompanion data) {
     return PokemonCard(
@@ -238,6 +277,7 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
       setName: data.setName.present ? data.setName.value : this.setName,
       cardnumber:
           data.cardnumber.present ? data.cardnumber.value : this.cardnumber,
+      effectId: data.effectId.present ? data.effectId.value : this.effectId,
     );
   }
 
@@ -248,13 +288,15 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
           ..write('name: $name, ')
           ..write('rarity: $rarity, ')
           ..write('setName: $setName, ')
-          ..write('cardnumber: $cardnumber')
+          ..write('cardnumber: $cardnumber, ')
+          ..write('effectId: $effectId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, rarity, setName, cardnumber);
+  int get hashCode =>
+      Object.hash(id, name, rarity, setName, cardnumber, effectId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -263,7 +305,8 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
           other.name == this.name &&
           other.rarity == this.rarity &&
           other.setName == this.setName &&
-          other.cardnumber == this.cardnumber);
+          other.cardnumber == this.cardnumber &&
+          other.effectId == this.effectId);
 }
 
 class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
@@ -272,12 +315,14 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
   final Value<String?> rarity;
   final Value<String?> setName;
   final Value<int?> cardnumber;
+  final Value<int> effectId;
   const PokemonCardsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.rarity = const Value.absent(),
     this.setName = const Value.absent(),
     this.cardnumber = const Value.absent(),
+    this.effectId = const Value.absent(),
   });
   PokemonCardsCompanion.insert({
     this.id = const Value.absent(),
@@ -285,13 +330,16 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
     this.rarity = const Value.absent(),
     this.setName = const Value.absent(),
     this.cardnumber = const Value.absent(),
-  }) : name = Value(name);
+    required int effectId,
+  }) : name = Value(name),
+       effectId = Value(effectId);
   static Insertable<PokemonCard> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? rarity,
     Expression<String>? setName,
     Expression<int>? cardnumber,
+    Expression<int>? effectId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -299,6 +347,7 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
       if (rarity != null) 'rarity': rarity,
       if (setName != null) 'set_name': setName,
       if (cardnumber != null) 'cardnumber': cardnumber,
+      if (effectId != null) 'effect_id': effectId,
     });
   }
 
@@ -308,6 +357,7 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
     Value<String?>? rarity,
     Value<String?>? setName,
     Value<int?>? cardnumber,
+    Value<int>? effectId,
   }) {
     return PokemonCardsCompanion(
       id: id ?? this.id,
@@ -315,6 +365,7 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
       rarity: rarity ?? this.rarity,
       setName: setName ?? this.setName,
       cardnumber: cardnumber ?? this.cardnumber,
+      effectId: effectId ?? this.effectId,
     );
   }
 
@@ -336,6 +387,9 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
     if (cardnumber.present) {
       map['cardnumber'] = Variable<int>(cardnumber.value);
     }
+    if (effectId.present) {
+      map['effect_id'] = Variable<int>(effectId.value);
+    }
     return map;
   }
 
@@ -346,7 +400,8 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
           ..write('name: $name, ')
           ..write('rarity: $rarity, ')
           ..write('setName: $setName, ')
-          ..write('cardnumber: $cardnumber')
+          ..write('cardnumber: $cardnumber, ')
+          ..write('effectId: $effectId')
           ..write(')'))
         .toString();
   }
@@ -971,12 +1026,12 @@ class ContainersCompanion extends UpdateCompanion<Container> {
   }
 }
 
-class $DeckCardLocationsTable extends DeckCardLocations
-    with TableInfo<$DeckCardLocationsTable, DeckCardLocation> {
+class $ContainerCardLocationsTable extends ContainerCardLocations
+    with TableInfo<$ContainerCardLocationsTable, ContainerCardLocation> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $DeckCardLocationsTable(this.attachedDatabase, [this._alias]);
+  $ContainerCardLocationsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _containerIdMeta = const VerificationMeta(
     'containerId',
   );
@@ -1016,10 +1071,10 @@ class $DeckCardLocationsTable extends DeckCardLocations
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'deck_card_locations';
+  static const String $name = 'container_card_locations';
   @override
   VerificationContext validateIntegrity(
-    Insertable<DeckCardLocation> instance, {
+    Insertable<ContainerCardLocation> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1064,9 +1119,9 @@ class $DeckCardLocationsTable extends DeckCardLocations
     location,
   };
   @override
-  DeckCardLocation map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ContainerCardLocation map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return DeckCardLocation(
+    return ContainerCardLocation(
       containerId:
           attachedDatabase.typeMapping.read(
             DriftSqlType.int,
@@ -1086,17 +1141,17 @@ class $DeckCardLocationsTable extends DeckCardLocations
   }
 
   @override
-  $DeckCardLocationsTable createAlias(String alias) {
-    return $DeckCardLocationsTable(attachedDatabase, alias);
+  $ContainerCardLocationsTable createAlias(String alias) {
+    return $ContainerCardLocationsTable(attachedDatabase, alias);
   }
 }
 
-class DeckCardLocation extends DataClass
-    implements Insertable<DeckCardLocation> {
+class ContainerCardLocation extends DataClass
+    implements Insertable<ContainerCardLocation> {
   final int containerId;
   final String cardInstanceId;
   final String location;
-  const DeckCardLocation({
+  const ContainerCardLocation({
     required this.containerId,
     required this.cardInstanceId,
     required this.location,
@@ -1110,20 +1165,20 @@ class DeckCardLocation extends DataClass
     return map;
   }
 
-  DeckCardLocationsCompanion toCompanion(bool nullToAbsent) {
-    return DeckCardLocationsCompanion(
+  ContainerCardLocationsCompanion toCompanion(bool nullToAbsent) {
+    return ContainerCardLocationsCompanion(
       containerId: Value(containerId),
       cardInstanceId: Value(cardInstanceId),
       location: Value(location),
     );
   }
 
-  factory DeckCardLocation.fromJson(
+  factory ContainerCardLocation.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return DeckCardLocation(
+    return ContainerCardLocation(
       containerId: serializer.fromJson<int>(json['containerId']),
       cardInstanceId: serializer.fromJson<String>(json['cardInstanceId']),
       location: serializer.fromJson<String>(json['location']),
@@ -1139,17 +1194,19 @@ class DeckCardLocation extends DataClass
     };
   }
 
-  DeckCardLocation copyWith({
+  ContainerCardLocation copyWith({
     int? containerId,
     String? cardInstanceId,
     String? location,
-  }) => DeckCardLocation(
+  }) => ContainerCardLocation(
     containerId: containerId ?? this.containerId,
     cardInstanceId: cardInstanceId ?? this.cardInstanceId,
     location: location ?? this.location,
   );
-  DeckCardLocation copyWithCompanion(DeckCardLocationsCompanion data) {
-    return DeckCardLocation(
+  ContainerCardLocation copyWithCompanion(
+    ContainerCardLocationsCompanion data,
+  ) {
+    return ContainerCardLocation(
       containerId:
           data.containerId.present ? data.containerId.value : this.containerId,
       cardInstanceId:
@@ -1162,7 +1219,7 @@ class DeckCardLocation extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('DeckCardLocation(')
+    return (StringBuffer('ContainerCardLocation(')
           ..write('containerId: $containerId, ')
           ..write('cardInstanceId: $cardInstanceId, ')
           ..write('location: $location')
@@ -1175,24 +1232,25 @@ class DeckCardLocation extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is DeckCardLocation &&
+      (other is ContainerCardLocation &&
           other.containerId == this.containerId &&
           other.cardInstanceId == this.cardInstanceId &&
           other.location == this.location);
 }
 
-class DeckCardLocationsCompanion extends UpdateCompanion<DeckCardLocation> {
+class ContainerCardLocationsCompanion
+    extends UpdateCompanion<ContainerCardLocation> {
   final Value<int> containerId;
   final Value<String> cardInstanceId;
   final Value<String> location;
   final Value<int> rowid;
-  const DeckCardLocationsCompanion({
+  const ContainerCardLocationsCompanion({
     this.containerId = const Value.absent(),
     this.cardInstanceId = const Value.absent(),
     this.location = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  DeckCardLocationsCompanion.insert({
+  ContainerCardLocationsCompanion.insert({
     required int containerId,
     required String cardInstanceId,
     required String location,
@@ -1200,7 +1258,7 @@ class DeckCardLocationsCompanion extends UpdateCompanion<DeckCardLocation> {
   }) : containerId = Value(containerId),
        cardInstanceId = Value(cardInstanceId),
        location = Value(location);
-  static Insertable<DeckCardLocation> custom({
+  static Insertable<ContainerCardLocation> custom({
     Expression<int>? containerId,
     Expression<String>? cardInstanceId,
     Expression<String>? location,
@@ -1214,13 +1272,13 @@ class DeckCardLocationsCompanion extends UpdateCompanion<DeckCardLocation> {
     });
   }
 
-  DeckCardLocationsCompanion copyWith({
+  ContainerCardLocationsCompanion copyWith({
     Value<int>? containerId,
     Value<String>? cardInstanceId,
     Value<String>? location,
     Value<int>? rowid,
   }) {
-    return DeckCardLocationsCompanion(
+    return ContainerCardLocationsCompanion(
       containerId: containerId ?? this.containerId,
       cardInstanceId: cardInstanceId ?? this.cardInstanceId,
       location: location ?? this.location,
@@ -1248,11 +1306,267 @@ class DeckCardLocationsCompanion extends UpdateCompanion<DeckCardLocation> {
 
   @override
   String toString() {
-    return (StringBuffer('DeckCardLocationsCompanion(')
+    return (StringBuffer('ContainerCardLocationsCompanion(')
           ..write('containerId: $containerId, ')
           ..write('cardInstanceId: $cardInstanceId, ')
           ..write('location: $location, ')
           ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CardEffectsTable extends CardEffects
+    with TableInfo<$CardEffectsTable, CardEffect> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CardEffectsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, description];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'card_effects';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CardEffect> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CardEffect map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CardEffect(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      name:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name'],
+          )!,
+      description:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}description'],
+          )!,
+    );
+  }
+
+  @override
+  $CardEffectsTable createAlias(String alias) {
+    return $CardEffectsTable(attachedDatabase, alias);
+  }
+}
+
+class CardEffect extends DataClass implements Insertable<CardEffect> {
+  final int id;
+  final String name;
+  final String description;
+  const CardEffect({
+    required this.id,
+    required this.name,
+    required this.description,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['description'] = Variable<String>(description);
+    return map;
+  }
+
+  CardEffectsCompanion toCompanion(bool nullToAbsent) {
+    return CardEffectsCompanion(
+      id: Value(id),
+      name: Value(name),
+      description: Value(description),
+    );
+  }
+
+  factory CardEffect.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CardEffect(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      description: serializer.fromJson<String>(json['description']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'description': serializer.toJson<String>(description),
+    };
+  }
+
+  CardEffect copyWith({int? id, String? name, String? description}) =>
+      CardEffect(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        description: description ?? this.description,
+      );
+  CardEffect copyWithCompanion(CardEffectsCompanion data) {
+    return CardEffect(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      description:
+          data.description.present ? data.description.value : this.description,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardEffect(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, description);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CardEffect &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.description == this.description);
+}
+
+class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String> description;
+  const CardEffectsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+  });
+  CardEffectsCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required String description,
+  }) : name = Value(name),
+       description = Value(description);
+  static Insertable<CardEffect> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? description,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+    });
+  }
+
+  CardEffectsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<String>? description,
+  }) {
+    return CardEffectsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardEffectsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description')
           ..write(')'))
         .toString();
   }
@@ -1264,8 +1578,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PokemonCardsTable pokemonCards = $PokemonCardsTable(this);
   late final $CardInstancesTable cardInstances = $CardInstancesTable(this);
   late final $ContainersTable containers = $ContainersTable(this);
-  late final $DeckCardLocationsTable deckCardLocations =
-      $DeckCardLocationsTable(this);
+  late final $ContainerCardLocationsTable containerCardLocations =
+      $ContainerCardLocationsTable(this);
+  late final $CardEffectsTable cardEffects = $CardEffectsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1274,7 +1589,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     pokemonCards,
     cardInstances,
     containers,
-    deckCardLocations,
+    containerCardLocations,
+    cardEffects,
   ];
 }
 
@@ -1285,6 +1601,7 @@ typedef $$PokemonCardsTableCreateCompanionBuilder =
       Value<String?> rarity,
       Value<String?> setName,
       Value<int?> cardnumber,
+      required int effectId,
     });
 typedef $$PokemonCardsTableUpdateCompanionBuilder =
     PokemonCardsCompanion Function({
@@ -1293,6 +1610,7 @@ typedef $$PokemonCardsTableUpdateCompanionBuilder =
       Value<String?> rarity,
       Value<String?> setName,
       Value<int?> cardnumber,
+      Value<int> effectId,
     });
 
 class $$PokemonCardsTableFilterComposer
@@ -1326,6 +1644,11 @@ class $$PokemonCardsTableFilterComposer
 
   ColumnFilters<int> get cardnumber => $composableBuilder(
     column: $table.cardnumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get effectId => $composableBuilder(
+    column: $table.effectId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1363,6 +1686,11 @@ class $$PokemonCardsTableOrderingComposer
     column: $table.cardnumber,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get effectId => $composableBuilder(
+    column: $table.effectId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PokemonCardsTableAnnotationComposer
@@ -1390,6 +1718,9 @@ class $$PokemonCardsTableAnnotationComposer
     column: $table.cardnumber,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get effectId =>
+      $composableBuilder(column: $table.effectId, builder: (column) => column);
 }
 
 class $$PokemonCardsTableTableManager
@@ -1429,12 +1760,14 @@ class $$PokemonCardsTableTableManager
                 Value<String?> rarity = const Value.absent(),
                 Value<String?> setName = const Value.absent(),
                 Value<int?> cardnumber = const Value.absent(),
+                Value<int> effectId = const Value.absent(),
               }) => PokemonCardsCompanion(
                 id: id,
                 name: name,
                 rarity: rarity,
                 setName: setName,
                 cardnumber: cardnumber,
+                effectId: effectId,
               ),
           createCompanionCallback:
               ({
@@ -1443,12 +1776,14 @@ class $$PokemonCardsTableTableManager
                 Value<String?> rarity = const Value.absent(),
                 Value<String?> setName = const Value.absent(),
                 Value<int?> cardnumber = const Value.absent(),
+                required int effectId,
               }) => PokemonCardsCompanion.insert(
                 id: id,
                 name: name,
                 rarity: rarity,
                 setName: setName,
                 cardnumber: cardnumber,
+                effectId: effectId,
               ),
           withReferenceMapper:
               (p0) =>
@@ -1853,24 +2188,24 @@ typedef $$ContainersTableProcessedTableManager =
       Container,
       PrefetchHooks Function()
     >;
-typedef $$DeckCardLocationsTableCreateCompanionBuilder =
-    DeckCardLocationsCompanion Function({
+typedef $$ContainerCardLocationsTableCreateCompanionBuilder =
+    ContainerCardLocationsCompanion Function({
       required int containerId,
       required String cardInstanceId,
       required String location,
       Value<int> rowid,
     });
-typedef $$DeckCardLocationsTableUpdateCompanionBuilder =
-    DeckCardLocationsCompanion Function({
+typedef $$ContainerCardLocationsTableUpdateCompanionBuilder =
+    ContainerCardLocationsCompanion Function({
       Value<int> containerId,
       Value<String> cardInstanceId,
       Value<String> location,
       Value<int> rowid,
     });
 
-class $$DeckCardLocationsTableFilterComposer
-    extends Composer<_$AppDatabase, $DeckCardLocationsTable> {
-  $$DeckCardLocationsTableFilterComposer({
+class $$ContainerCardLocationsTableFilterComposer
+    extends Composer<_$AppDatabase, $ContainerCardLocationsTable> {
+  $$ContainerCardLocationsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1893,9 +2228,9 @@ class $$DeckCardLocationsTableFilterComposer
   );
 }
 
-class $$DeckCardLocationsTableOrderingComposer
-    extends Composer<_$AppDatabase, $DeckCardLocationsTable> {
-  $$DeckCardLocationsTableOrderingComposer({
+class $$ContainerCardLocationsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ContainerCardLocationsTable> {
+  $$ContainerCardLocationsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1918,9 +2253,9 @@ class $$DeckCardLocationsTableOrderingComposer
   );
 }
 
-class $$DeckCardLocationsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $DeckCardLocationsTable> {
-  $$DeckCardLocationsTableAnnotationComposer({
+class $$ContainerCardLocationsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ContainerCardLocationsTable> {
+  $$ContainerCardLocationsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1941,47 +2276,47 @@ class $$DeckCardLocationsTableAnnotationComposer
       $composableBuilder(column: $table.location, builder: (column) => column);
 }
 
-class $$DeckCardLocationsTableTableManager
+class $$ContainerCardLocationsTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $DeckCardLocationsTable,
-          DeckCardLocation,
-          $$DeckCardLocationsTableFilterComposer,
-          $$DeckCardLocationsTableOrderingComposer,
-          $$DeckCardLocationsTableAnnotationComposer,
-          $$DeckCardLocationsTableCreateCompanionBuilder,
-          $$DeckCardLocationsTableUpdateCompanionBuilder,
+          $ContainerCardLocationsTable,
+          ContainerCardLocation,
+          $$ContainerCardLocationsTableFilterComposer,
+          $$ContainerCardLocationsTableOrderingComposer,
+          $$ContainerCardLocationsTableAnnotationComposer,
+          $$ContainerCardLocationsTableCreateCompanionBuilder,
+          $$ContainerCardLocationsTableUpdateCompanionBuilder,
           (
-            DeckCardLocation,
+            ContainerCardLocation,
             BaseReferences<
               _$AppDatabase,
-              $DeckCardLocationsTable,
-              DeckCardLocation
+              $ContainerCardLocationsTable,
+              ContainerCardLocation
             >,
           ),
-          DeckCardLocation,
+          ContainerCardLocation,
           PrefetchHooks Function()
         > {
-  $$DeckCardLocationsTableTableManager(
+  $$ContainerCardLocationsTableTableManager(
     _$AppDatabase db,
-    $DeckCardLocationsTable table,
+    $ContainerCardLocationsTable table,
   ) : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer:
-              () => $$DeckCardLocationsTableFilterComposer(
+              () => $$ContainerCardLocationsTableFilterComposer(
                 $db: db,
                 $table: table,
               ),
           createOrderingComposer:
-              () => $$DeckCardLocationsTableOrderingComposer(
+              () => $$ContainerCardLocationsTableOrderingComposer(
                 $db: db,
                 $table: table,
               ),
           createComputedFieldComposer:
-              () => $$DeckCardLocationsTableAnnotationComposer(
+              () => $$ContainerCardLocationsTableAnnotationComposer(
                 $db: db,
                 $table: table,
               ),
@@ -1991,7 +2326,7 @@ class $$DeckCardLocationsTableTableManager
                 Value<String> cardInstanceId = const Value.absent(),
                 Value<String> location = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => DeckCardLocationsCompanion(
+              }) => ContainerCardLocationsCompanion(
                 containerId: containerId,
                 cardInstanceId: cardInstanceId,
                 location: location,
@@ -2003,7 +2338,7 @@ class $$DeckCardLocationsTableTableManager
                 required String cardInstanceId,
                 required String location,
                 Value<int> rowid = const Value.absent(),
-              }) => DeckCardLocationsCompanion.insert(
+              }) => ContainerCardLocationsCompanion.insert(
                 containerId: containerId,
                 cardInstanceId: cardInstanceId,
                 location: location,
@@ -2024,25 +2359,191 @@ class $$DeckCardLocationsTableTableManager
       );
 }
 
-typedef $$DeckCardLocationsTableProcessedTableManager =
+typedef $$ContainerCardLocationsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $DeckCardLocationsTable,
-      DeckCardLocation,
-      $$DeckCardLocationsTableFilterComposer,
-      $$DeckCardLocationsTableOrderingComposer,
-      $$DeckCardLocationsTableAnnotationComposer,
-      $$DeckCardLocationsTableCreateCompanionBuilder,
-      $$DeckCardLocationsTableUpdateCompanionBuilder,
+      $ContainerCardLocationsTable,
+      ContainerCardLocation,
+      $$ContainerCardLocationsTableFilterComposer,
+      $$ContainerCardLocationsTableOrderingComposer,
+      $$ContainerCardLocationsTableAnnotationComposer,
+      $$ContainerCardLocationsTableCreateCompanionBuilder,
+      $$ContainerCardLocationsTableUpdateCompanionBuilder,
       (
-        DeckCardLocation,
+        ContainerCardLocation,
         BaseReferences<
           _$AppDatabase,
-          $DeckCardLocationsTable,
-          DeckCardLocation
+          $ContainerCardLocationsTable,
+          ContainerCardLocation
         >,
       ),
-      DeckCardLocation,
+      ContainerCardLocation,
+      PrefetchHooks Function()
+    >;
+typedef $$CardEffectsTableCreateCompanionBuilder =
+    CardEffectsCompanion Function({
+      Value<int> id,
+      required String name,
+      required String description,
+    });
+typedef $$CardEffectsTableUpdateCompanionBuilder =
+    CardEffectsCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<String> description,
+    });
+
+class $$CardEffectsTableFilterComposer
+    extends Composer<_$AppDatabase, $CardEffectsTable> {
+  $$CardEffectsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CardEffectsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CardEffectsTable> {
+  $$CardEffectsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CardEffectsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CardEffectsTable> {
+  $$CardEffectsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+}
+
+class $$CardEffectsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CardEffectsTable,
+          CardEffect,
+          $$CardEffectsTableFilterComposer,
+          $$CardEffectsTableOrderingComposer,
+          $$CardEffectsTableAnnotationComposer,
+          $$CardEffectsTableCreateCompanionBuilder,
+          $$CardEffectsTableUpdateCompanionBuilder,
+          (
+            CardEffect,
+            BaseReferences<_$AppDatabase, $CardEffectsTable, CardEffect>,
+          ),
+          CardEffect,
+          PrefetchHooks Function()
+        > {
+  $$CardEffectsTableTableManager(_$AppDatabase db, $CardEffectsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CardEffectsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$CardEffectsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () =>
+                  $$CardEffectsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> description = const Value.absent(),
+              }) => CardEffectsCompanion(
+                id: id,
+                name: name,
+                description: description,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required String description,
+              }) => CardEffectsCompanion.insert(
+                id: id,
+                name: name,
+                description: description,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CardEffectsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CardEffectsTable,
+      CardEffect,
+      $$CardEffectsTableFilterComposer,
+      $$CardEffectsTableOrderingComposer,
+      $$CardEffectsTableAnnotationComposer,
+      $$CardEffectsTableCreateCompanionBuilder,
+      $$CardEffectsTableUpdateCompanionBuilder,
+      (
+        CardEffect,
+        BaseReferences<_$AppDatabase, $CardEffectsTable, CardEffect>,
+      ),
+      CardEffect,
       PrefetchHooks Function()
     >;
 
@@ -2055,6 +2556,11 @@ class $AppDatabaseManager {
       $$CardInstancesTableTableManager(_db, _db.cardInstances);
   $$ContainersTableTableManager get containers =>
       $$ContainersTableTableManager(_db, _db.containers);
-  $$DeckCardLocationsTableTableManager get deckCardLocations =>
-      $$DeckCardLocationsTableTableManager(_db, _db.deckCardLocations);
+  $$ContainerCardLocationsTableTableManager get containerCardLocations =>
+      $$ContainerCardLocationsTableTableManager(
+        _db,
+        _db.containerCardLocations,
+      );
+  $$CardEffectsTableTableManager get cardEffects =>
+      $$CardEffectsTableTableManager(_db, _db.cardEffects);
 }

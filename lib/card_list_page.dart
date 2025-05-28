@@ -42,6 +42,7 @@ class _CardListPageState extends State<CardListPage> {
                   rarity: drift.Value('C'),
                   setName: drift.Value('スカーレット'),
                   cardnumber: drift.Value(25),
+                  effectId: 0, // 仮の値
                 ),
               ))
               .id;

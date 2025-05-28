@@ -50,9 +50,19 @@ class _DeckListPageState extends State<DeckListPage> {
               return ListTile(
                 title: Text(deck.name ?? '(無名デッキ)'),
                 subtitle: Text(deck.description ?? ''),
+                trailing: ElevatedButton(
+                  onPressed: () {
+                    // TODO: デッキを「使用する」処理を書く
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('${deck.name ?? 'このデッキ'} を使用しました')),
+                    );
+                  },
+                  child: const Text('使用'),
+                ),
               );
             },
           );
+
         },
       ),
       floatingActionButton: FloatingActionButton(
