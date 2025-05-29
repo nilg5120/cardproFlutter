@@ -35,6 +35,12 @@ dependencies:
   path: ^1.8.0
   sqflite_common_ffi: ^2.3.0 # ← これ必要！
 
+  # Clean Architecture関連
+  equatable: ^2.0.5
+  dartz: ^0.10.1
+  get_it: ^7.6.7
+  flutter_bloc: ^8.1.4
+
   # iOSスタイルのアイコン（Cupertino Icons）
   cupertino_icons: ^1.0.8
 

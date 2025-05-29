@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'db/database.dart';
-import 'card_list_page.dart';
-import 'card_form_page.dart';
-import 'deck_list_page.dart';
+import 'package:cardpro/core/di/injection_container.dart' as di;
+import 'package:cardpro/features/cards/presentation/pages/card_list_page.dart';
+import 'package:cardpro/features/cards/presentation/pages/card_form_page.dart';
+import 'package:cardpro/features/decks/presentation/pages/deck_list_page.dart';
 
-
-final db = AppDatabase();
-
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
   runApp(const MyApp());
 }
 
@@ -35,10 +34,10 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   final _pages = [
-    CardListPage(db: db),
-    CardFormPage(db: db),
-    DeckListPage(db: db),
-    Placeholder(), // ここにデッキ/コンテナ一覧画面を追加予定
+    const CardListPage(),
+    const CardFormPage(),
+    const DeckListPage(),
+    const Placeholder(), // ここにデッキ/コンテナ一覧画面を追加予定
   ];
 
   @override
