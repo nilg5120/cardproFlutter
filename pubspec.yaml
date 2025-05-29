@@ -49,6 +49,8 @@ dev_dependencies:
     sdk: flutter
   drift_dev: ^2.15.0
   build_runner: ^2.4.6
+  mockito: ^5.4.4
+  bloc_test: ^9.1.5
 
   # flutter_lints は推奨されるコーディング規約（リント）を提供します。
   # 有効化はルートディレクトリの `analysis_options.yaml` で行います。
