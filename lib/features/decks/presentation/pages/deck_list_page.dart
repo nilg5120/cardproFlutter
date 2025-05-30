@@ -53,7 +53,7 @@ class DeckListPage extends StatelessWidget {
                 : null,
             leading: const Icon(Icons.folder),
             onTap: () {
-              // デッキの詳細画面に遷移する処理（今後実装予定）
+              //TODO: デッキの詳細画面に遷移する処理（今後実装予定）
             },
           ),
         );

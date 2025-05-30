@@ -60,4 +60,33 @@ extension CardQueries on AppDatabase {
           row.readTable(cardInstances),
         )).get();
   }
+
+  // カード効果を取得するメソッド
+  Future<List<CardEffect>> getAllCardEffects() {
+    return select(cardEffects).get();
+  }
+
+  // デフォルトのカード効果を追加するメソッド
+  Future<void> ensureDefaultCardEffectsExist() async {
+    final effectsCount = await cardEffects.count().getSingle();
+    if (effectsCount == 0) {
+      // デフォルトのカード効果を追加
+      await batch((batch) {
+        batch.insertAll(cardEffects, [
+          CardEffectsCompanion.insert(
+            name: '基本効果',
+            description: '特別な効果はありません',
+          ),
+          CardEffectsCompanion.insert(
+            name: 'エネルギー加速',
+            description: 'エネルギーカードを追加で付けることができます',
+          ),
+          CardEffectsCompanion.insert(
+            name: 'ダメージ増加',
+            description: '与えるダメージが増加します',
+          ),
+        ]);
+      });
+    }
+  }
 }

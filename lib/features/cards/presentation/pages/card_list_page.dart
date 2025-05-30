@@ -4,6 +4,7 @@ import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:cardpro/features/cards/presentation/widgets/card_list_item.dart';
 import 'package:cardpro/core/di/injection_container.dart';
+import 'package:cardpro/db/database.dart';
 
 class CardListPage extends StatelessWidget {
   const CardListPage({super.key});
@@ -64,107 +65,149 @@ class CardListPage extends StatelessWidget {
   }
 
   // ダイアログを表示して新しいカードを追加する
-  //Todo: ここは後でカード追加の実装を行う
-void _showAddCardDialog(BuildContext context) {
-  final nameController = TextEditingController();
-  final descriptionController = TextEditingController();
-  final rarityController = TextEditingController();
-  final setNameController = TextEditingController();
-  final cardNumberController = TextEditingController();
-  final effectIdController = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('カードを追加'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'カード名',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: rarityController,
-              decoration: const InputDecoration(
-                labelText: 'レアリティ',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: setNameController,
-              decoration: const InputDecoration(
-                labelText: '拡張パック名',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: cardNumberController,
-              decoration: const InputDecoration(
-                labelText: 'カード番号',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: effectIdController,
-              decoration: const InputDecoration(
-                labelText: 'エフェクトID',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(
-                labelText: '説明',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('キャンセル'),
-        ),
-        TextButton(
-          onPressed: () {
-            final name = nameController.text;
-            final effectId = int.tryParse(effectIdController.text);
-            if (name.isNotEmpty && effectId != null) {
-              context.read<CardBloc>().add(
-                    AddCardEvent(
-                      name: name,
-                      rarity: rarityController.text.isNotEmpty ? rarityController.text : null,
-                      setName: setNameController.text.isNotEmpty ? setNameController.text : null,
-                      cardNumber: int.tryParse(cardNumberController.text),
-                      effectId: effectId,
-                      description: descriptionController.text.isNotEmpty
-                          ? descriptionController.text
-                          : null,
-                    ),
+  void _showAddCardDialog(BuildContext context) {
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+    final rarityController = TextEditingController();
+    final setNameController = TextEditingController();
+    final cardNumberController = TextEditingController();
+    
+    // BlocProviderの子ウィジェットからBlocを取得
+    // FloatingActionButtonのonPressedコールバック内でのcontextはScaffoldのコンテキストであり、
+    // BlocProviderの子ウィジェットのコンテキストではないため、直接取得できない
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        // 新しいBlocProviderを作成して、依存性注入コンテナからBlocを取得
+        return BlocProvider(
+          create: (_) => sl<CardBloc>(),
+          child: Builder(
+            builder: (builderContext) {
+              // カード効果のリストを取得
+              final database = sl<AppDatabase>();
+              return FutureBuilder<List<CardEffect>>(
+                future: database.getAllCardEffects(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const AlertDialog(
+                      content: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  
+                  final cardEffects = snapshot.data ?? [];
+                  int selectedEffectId = cardEffects.isNotEmpty && cardEffects.first != null ? cardEffects.first.id : 1;
+                  
+                  return StatefulBuilder(
+                    builder: (context, setState) {
+                      return AlertDialog(
+                        title: const Text('カードを追加'),
+                        content: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextField(
+                                controller: nameController,
+                                decoration: const InputDecoration(
+                                  labelText: 'カード名',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: rarityController,
+                                decoration: const InputDecoration(
+                                  labelText: 'レアリティ',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: setNameController,
+                                decoration: const InputDecoration(
+                                  labelText: '拡張パック名',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: cardNumberController,
+                                decoration: const InputDecoration(
+                                  labelText: 'カード番号',
+                                  border: OutlineInputBorder(),
+                                ),
+                                keyboardType: TextInputType.number,
+                              ),
+                              const SizedBox(height: 12),
+                              DropdownButtonFormField<int>(
+                                decoration: const InputDecoration(
+                                  labelText: 'カード効果',
+                                  border: OutlineInputBorder(),
+                                ),
+                                value: selectedEffectId,
+                                items: cardEffects.map((effect) {
+                                  return DropdownMenuItem<int>(
+                                    value: effect?.id ?? 1,
+                                    child: Text('${effect?.name ?? "不明"} - ${effect?.description ?? "説明なし"}'),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      selectedEffectId = value;
+                                    });
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: descriptionController,
+                                decoration: const InputDecoration(
+                                  labelText: '説明',
+                                  border: OutlineInputBorder(),
+                                ),
+                                maxLines: 3,
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                            child: const Text('キャンセル'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              final name = nameController.text;
+                              if (name.isNotEmpty) {
+                                // 新しいコンテキストからBlocを取得
+                                builderContext.read<CardBloc>().add(
+                                      AddCardEvent(
+                                        name: name,
+                                        rarity: rarityController.text.isNotEmpty ? rarityController.text : null,
+                                        setName: setNameController.text.isNotEmpty ? setNameController.text : null,
+                                        cardNumber: int.tryParse(cardNumberController.text),
+                                        effectId: selectedEffectId,
+                                        description: descriptionController.text.isNotEmpty
+                                            ? descriptionController.text
+                                            : null,
+                                      ),
+                                    );
+                                Navigator.of(dialogContext).pop();
+                              }
+                            },
+                            child: const Text('追加'),
+                          ),
+                        ],
+                      );
+                    },
                   );
-              Navigator.of(context).pop();
-            }
-          },
-          child: const Text('追加'),
-        ),
-      ],
-    ),
-  );
-}
-
-
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 }

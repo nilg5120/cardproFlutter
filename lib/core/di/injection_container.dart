@@ -20,6 +20,8 @@ final sl = GetIt.instance;
 Future<void> init() async {
   // Database
   final database = AppDatabase();
+  // デフォルトのカード効果を追加
+  await database.ensureDefaultCardEffectsExist();
   sl.registerLazySingleton<AppDatabase>(() => database);
 
   // Features - Cards

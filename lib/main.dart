@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   final _pages = [
     const CardListPage(),
     const DeckListPage(),
-    const Placeholder(), // ここにデッキ/コンテナ一覧画面を追加予定
+    const Placeholder(),
   ];
 
   @override
