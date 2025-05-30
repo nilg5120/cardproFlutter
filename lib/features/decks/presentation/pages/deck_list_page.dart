@@ -64,55 +64,71 @@ class DeckListPage extends StatelessWidget {
   void _showAddDeckDialog(BuildContext context) {
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
-
+    
+    // BlocProviderの子ウィジェットからBlocを取得
+    // FloatingActionButtonのonPressedコールバック内でのcontextはScaffoldのコンテキストであり、
+    // BlocProviderの子ウィジェットのコンテキストではないため、直接取得できない
+    
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('デッキを追加'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'デッキ名',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(
-                labelText: '説明',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('キャンセル'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (nameController.text.isNotEmpty) {
-                context.read<DeckBloc>().add(
-                      AddDeckEvent(
-                        name: nameController.text,
-                        description: descriptionController.text.isNotEmpty
-                            ? descriptionController.text
-                            : null,
+      builder: (dialogContext) {
+        // 新しいBlocProviderを作成して、依存性注入コンテナからBlocを取得
+        return BlocProvider(
+          create: (_) => sl<DeckBloc>(),
+          child: Builder(
+            builder: (builderContext) {
+              return AlertDialog(
+                title: const Text('デッキを追加'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'デッキ名',
+                        border: OutlineInputBorder(),
                       ),
-                    );
-                Navigator.of(context).pop();
-              }
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: descriptionController,
+                      decoration: const InputDecoration(
+                        labelText: '説明',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: const Text('キャンセル'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      if (nameController.text.isNotEmpty) {
+                        // 新しいコンテキストからBlocを取得
+                        builderContext.read<DeckBloc>().add(
+                          AddDeckEvent(
+                            name: nameController.text,
+                            description: descriptionController.text.isNotEmpty
+                                ? descriptionController.text
+                                : null,
+                          ),
+                        );
+                        Navigator.of(dialogContext).pop();
+                      }
+                    },
+                    child: const Text('追加'),
+                  ),
+                ],
+              );
             },
-            child: const Text('追加'),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
+
 }

@@ -28,6 +28,10 @@ class CardListPage extends StatelessWidget {
             return const Center(child: Text('カードを読み込んでください'));
           },
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _showAddCardDialog(context),
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
@@ -58,4 +62,109 @@ class CardListPage extends StatelessWidget {
       },
     );
   }
+
+  // ダイアログを表示して新しいカードを追加する
+  //Todo: ここは後でカード追加の実装を行う
+void _showAddCardDialog(BuildContext context) {
+  final nameController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final rarityController = TextEditingController();
+  final setNameController = TextEditingController();
+  final cardNumberController = TextEditingController();
+  final effectIdController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('カードを追加'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'カード名',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: rarityController,
+              decoration: const InputDecoration(
+                labelText: 'レアリティ',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: setNameController,
+              decoration: const InputDecoration(
+                labelText: '拡張パック名',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: cardNumberController,
+              decoration: const InputDecoration(
+                labelText: 'カード番号',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: effectIdController,
+              decoration: const InputDecoration(
+                labelText: 'エフェクトID',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: '説明',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('キャンセル'),
+        ),
+        TextButton(
+          onPressed: () {
+            final name = nameController.text;
+            final effectId = int.tryParse(effectIdController.text);
+            if (name.isNotEmpty && effectId != null) {
+              context.read<CardBloc>().add(
+                    AddCardEvent(
+                      name: name,
+                      rarity: rarityController.text.isNotEmpty ? rarityController.text : null,
+                      setName: setNameController.text.isNotEmpty ? setNameController.text : null,
+                      cardNumber: int.tryParse(cardNumberController.text),
+                      effectId: effectId,
+                      description: descriptionController.text.isNotEmpty
+                          ? descriptionController.text
+                          : null,
+                    ),
+                  );
+              Navigator.of(context).pop();
+            }
+          },
+          child: const Text('追加'),
+        ),
+      ],
+    ),
+  );
+}
+
+
 }

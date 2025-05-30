@@ -1,5 +1,4 @@
 import 'package:cardpro/db/database.dart';
-import 'package:cardpro/features/cards/data/models/card_model.dart';
 import 'package:cardpro/features/cards/data/models/card_instance_model.dart';
 import 'package:cardpro/features/cards/data/models/card_with_instance_model.dart';
 import 'package:drift/drift.dart';

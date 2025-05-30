@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cardpro/core/di/injection_container.dart' as di;
 import 'package:cardpro/features/cards/presentation/pages/card_list_page.dart';
-import 'package:cardpro/features/cards/presentation/pages/card_form_page.dart';
 import 'package:cardpro/features/decks/presentation/pages/deck_list_page.dart';
 
 void main() async {
@@ -35,7 +34,6 @@ class _HomePageState extends State<HomePage> {
 
   final _pages = [
     const CardListPage(),
-    const CardFormPage(),
     const DeckListPage(),
     const Placeholder(), // ここにデッキ/コンテナ一覧画面を追加予定
   ];
@@ -51,10 +49,6 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.view_list),
             label: 'カード一覧',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: '追加',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.folder),
