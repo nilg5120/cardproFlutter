@@ -6,6 +6,7 @@ import 'package:cardpro/features/cards/domain/usecases/get_cards.dart';
 import 'package:cardpro/features/cards/domain/usecases/add_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/delete_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card.dart';
+import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:cardpro/features/decks/data/datasources/deck_local_data_source.dart';
 import 'package:cardpro/features/decks/data/repositories/deck_repository_impl.dart';
@@ -32,6 +33,7 @@ Future<void> init() async {
       addCard: sl(),
       deleteCard: sl(),
       editCard: sl(),
+      editCardFull: sl(),
     ),
   );
 
@@ -40,6 +42,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AddCard(sl()));
   sl.registerLazySingleton(() => DeleteCard(sl()));
   sl.registerLazySingleton(() => EditCard(sl()));
+  sl.registerLazySingleton(() => EditCardFull(sl()));
 
   // Repository
   sl.registerLazySingleton<CardRepository>(

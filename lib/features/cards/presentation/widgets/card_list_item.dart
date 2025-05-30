@@ -4,7 +4,7 @@ import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
 class CardListItem extends StatelessWidget {
   final CardWithInstance card;
   final VoidCallback onDelete;
-  final Function(String) onEdit;
+  final Function(String, {String? rarity, String? setName, int? cardNumber}) onEdit;
 
   const CardListItem({
     super.key,
@@ -97,35 +97,130 @@ class CardListItem extends StatelessWidget {
     );
   }
 
+  // カード情報編集ダイアログを表示
   void _showEditDialog(BuildContext context) {
-    final controller = TextEditingController(
+    final descriptionController = TextEditingController(
       text: card.instance.description ?? '',
     );
+    final nameController = TextEditingController(
+      text: card.card.name,
+    );
+    final rarityController = TextEditingController(
+      text: card.card.rarity ?? '',
+    );
+    final setNameController = TextEditingController(
+      text: card.card.setName ?? '',
+    );
+    final cardNumberController = TextEditingController(
+      text: card.card.cardNumber?.toString() ?? '',
+    );
+
+    // 変更されたかどうかを追跡するフラグ
+    bool rarityChanged = false;
+    bool setNameChanged = false;
+    bool cardNumberChanged = false;
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('メモを編集'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            hintText: 'メモを入力してください',
-          ),
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('キャンセル'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              onEdit(controller.text);
-            },
-            child: const Text('保存'),
-          ),
-        ],
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('カード情報を編集'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'カード名',
+                      border: OutlineInputBorder(),
+                    ),
+                    readOnly: true, // カード名は編集不可
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: rarityController,
+                    decoration: const InputDecoration(
+                      labelText: 'レアリティ',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        rarityChanged = true;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: setNameController,
+                    decoration: const InputDecoration(
+                      labelText: '拡張パック名',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        setNameChanged = true;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: cardNumberController,
+                    decoration: const InputDecoration(
+                      labelText: 'カード番号',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      setState(() {
+                        cardNumberChanged = true;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(
+                      labelText: 'メモ',
+                      border: OutlineInputBorder(),
+                      hintText: 'メモを入力してください',
+                    ),
+                    maxLines: 3,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('キャンセル'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  
+                  // 変更されたフィールドのみを渡す
+                  final String? rarity = rarityChanged ? rarityController.text.isEmpty ? null : rarityController.text : null;
+                  final String? setName = setNameChanged ? setNameController.text.isEmpty ? null : setNameController.text : null;
+                  final int? cardNumber = cardNumberChanged ? int.tryParse(cardNumberController.text) : null;
+                  
+                  if (rarityChanged || setNameChanged || cardNumberChanged) {
+                    onEdit(
+                      descriptionController.text,
+                      rarity: rarity,
+                      setName: setName,
+                      cardNumber: cardNumber,
+                    );
+                  } else {
+                    onEdit(descriptionController.text);
+                  }
+                },
+                child: const Text('保存'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

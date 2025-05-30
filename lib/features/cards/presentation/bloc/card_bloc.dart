@@ -1,11 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:cardpro/features/cards/domain/entities/card.dart';
 import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
 import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
 import 'package:cardpro/features/cards/domain/usecases/get_cards.dart';
 import 'package:cardpro/features/cards/domain/usecases/add_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/delete_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card.dart';
+import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart';
 
 // Events
 abstract class CardEvent extends Equatable {
@@ -60,6 +62,27 @@ class EditCardEvent extends CardEvent {
   List<Object> get props => [instance, description];
 }
 
+class EditCardFullEvent extends CardEvent {
+  final Card card;
+  final CardInstance instance;
+  final String? rarity;
+  final String? setName;
+  final int? cardNumber;
+  final String? description;
+
+  const EditCardFullEvent({
+    required this.card,
+    required this.instance,
+    required this.rarity,
+    required this.setName,
+    required this.cardNumber,
+    required this.description,
+  });
+
+  @override
+  List<Object?> get props => [card, instance, rarity, setName, cardNumber, description];
+}
+
 // States
 abstract class CardState extends Equatable {
   const CardState();
@@ -96,17 +119,20 @@ class CardBloc extends Bloc<CardEvent, CardState> {
   final AddCard addCard;
   final DeleteCard deleteCard;
   final EditCard editCard;
+  final EditCardFull editCardFull;
 
   CardBloc({
     required this.getCards,
     required this.addCard,
     required this.deleteCard,
     required this.editCard,
+    required this.editCardFull,
   }) : super(CardInitial()) {
     on<GetCardsEvent>(_onGetCards);
     on<AddCardEvent>(_onAddCard);
     on<DeleteCardEvent>(_onDeleteCard);
     on<EditCardEvent>(_onEditCard);
+    on<EditCardFullEvent>(_onEditCardFull);
   }
 
   Future<void> _onGetCards(GetCardsEvent event, Emitter<CardState> emit) async {
@@ -151,6 +177,23 @@ class CardBloc extends Bloc<CardEvent, CardState> {
       description: event.description,
     );
     final result = await editCard(params);
+    result.fold(
+      (failure) => emit(CardError(failure.message)),
+      (_) => add(GetCardsEvent()),
+    );
+  }
+
+  Future<void> _onEditCardFull(EditCardFullEvent event, Emitter<CardState> emit) async {
+    emit(CardLoading());
+    final params = EditCardFullParams(
+      card: event.card,
+      instance: event.instance,
+      rarity: event.rarity,
+      setName: event.setName,
+      cardNumber: event.cardNumber,
+      description: event.description,
+    );
+    final result = await editCardFull(params);
     result.fold(
       (failure) => emit(CardError(failure.message)),
       (_) => add(GetCardsEvent()),

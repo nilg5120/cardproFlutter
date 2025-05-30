@@ -51,13 +51,26 @@ class CardListPage extends StatelessWidget {
           onDelete: () {
             context.read<CardBloc>().add(DeleteCardEvent(card.instance));
           },
-          onEdit: (description) {
-            context.read<CardBloc>().add(
-                  EditCardEvent(
-                    instance: card.instance,
-                    description: description,
-                  ),
-                );
+          onEdit: (description, {String? rarity, String? setName, int? cardNumber}) {
+            if (rarity != null || setName != null || cardNumber != null) {
+              context.read<CardBloc>().add(
+                    EditCardFullEvent(
+                      card: card.card,
+                      instance: card.instance,
+                      rarity: rarity ?? card.card.rarity,
+                      setName: setName ?? card.card.setName,
+                      cardNumber: cardNumber ?? card.card.cardNumber,
+                      description: description,
+                    ),
+                  );
+            } else {
+              context.read<CardBloc>().add(
+                    EditCardEvent(
+                      instance: card.instance,
+                      description: description,
+                    ),
+                  );
+            }
           },
         );
       },
@@ -96,7 +109,7 @@ class CardListPage extends StatelessWidget {
                   }
                   
                   final cardEffects = snapshot.data ?? [];
-                  int selectedEffectId = cardEffects.isNotEmpty && cardEffects.first != null ? cardEffects.first.id : 1;
+                  int selectedEffectId = cardEffects.isNotEmpty ? cardEffects.first.id : 1;
                   
                   return StatefulBuilder(
                     builder: (context, setState) {
@@ -147,8 +160,8 @@ class CardListPage extends StatelessWidget {
                                 value: selectedEffectId,
                                 items: cardEffects.map((effect) {
                                   return DropdownMenuItem<int>(
-                                    value: effect?.id ?? 1,
-                                    child: Text('${effect?.name ?? "不明"} - ${effect?.description ?? "説明なし"}'),
+                                    value: effect.id,
+                                    child: Text('${effect.name} - ${effect.description}'),
                                   );
                                 }).toList(),
                                 onChanged: (value) {

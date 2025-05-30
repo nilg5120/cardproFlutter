@@ -1,5 +1,6 @@
 import 'package:cardpro/db/database.dart';
 import 'package:cardpro/features/cards/data/models/card_instance_model.dart';
+import 'package:cardpro/features/cards/data/models/card_model.dart';
 import 'package:cardpro/features/cards/data/models/card_with_instance_model.dart';
 import 'package:drift/drift.dart';
 
@@ -15,6 +16,14 @@ abstract class CardLocalDataSource {
   });
   Future<void> deleteCard(CardInstanceModel instance);
   Future<void> editCard(CardInstanceModel instance, String description);
+  Future<void> editCardFull({
+    required CardModel card,
+    required CardInstanceModel instance,
+    required String? rarity,
+    required String? setName,
+    required int? cardNumber,
+    required String? description,
+  });
 }
 
 class CardLocalDataSourceImpl implements CardLocalDataSource {
@@ -86,6 +95,37 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
 
   @override
   Future<void> editCard(CardInstanceModel instance, String description) async {
+    await (database.update(database.cardInstances)
+          ..where((tbl) => tbl.id.equals(instance.id)))
+        .write(
+      CardInstancesCompanion(
+        description: Value(description),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  @override
+  Future<void> editCardFull({
+    required CardModel card,
+    required CardInstanceModel instance,
+    required String? rarity,
+    required String? setName,
+    required int? cardNumber,
+    required String? description,
+  }) async {
+    // カード情報を更新
+    await (database.update(database.pokemonCards)
+          ..where((tbl) => tbl.id.equals(card.id)))
+        .write(
+      PokemonCardsCompanion(
+        rarity: Value(rarity),
+        setName: Value(setName),
+        cardnumber: Value(cardNumber),
+      ),
+    );
+
+    // インスタンス情報を更新
     await (database.update(database.cardInstances)
           ..where((tbl) => tbl.id.equals(instance.id)))
         .write(
