@@ -13,6 +13,8 @@ import 'package:cardpro/features/decks/data/repositories/deck_repository_impl.da
 import 'package:cardpro/features/decks/domain/repositories/deck_repository.dart';
 import 'package:cardpro/features/decks/domain/usecases/get_decks.dart';
 import 'package:cardpro/features/decks/domain/usecases/add_deck.dart';
+import 'package:cardpro/features/decks/domain/usecases/delete_deck.dart';
+import 'package:cardpro/features/decks/domain/usecases/edit_deck.dart';
 import 'package:cardpro/features/decks/presentation/bloc/deck_bloc.dart';
 import 'package:cardpro/db/database.dart';
 
@@ -60,12 +62,16 @@ Future<void> init() async {
     () => DeckBloc(
       getDecks: sl(),
       addDeck: sl(),
+      deleteDeck: sl(),
+      editDeck: sl(),
     ),
   );
 
   // Use cases
   sl.registerLazySingleton(() => GetDecks(sl()));
   sl.registerLazySingleton(() => AddDeck(sl()));
+  sl.registerLazySingleton(() => DeleteDeck(sl()));
+  sl.registerLazySingleton(() => EditDeck(sl()));
 
   // Repository
   sl.registerLazySingleton<DeckRepository>(

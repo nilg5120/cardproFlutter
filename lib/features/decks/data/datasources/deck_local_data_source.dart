@@ -8,6 +8,14 @@ abstract class DeckLocalDataSource {
     required String name,
     required String? description,
   });
+  Future<void> deleteDeck({
+    required int id,
+  });
+  Future<ContainerModel> editDeck({
+    required int id,
+    required String name,
+    required String? description,
+  });
 }
 
 class DeckLocalDataSourceImpl implements DeckLocalDataSource {
@@ -36,5 +44,27 @@ class DeckLocalDataSourceImpl implements DeckLocalDataSource {
           ),
         );
     return ContainerModel.fromDrift(deck);
+  }
+
+  @override
+  Future<void> deleteDeck({required int id}) async {
+    await (database.delete(database.containers)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  @override
+  Future<ContainerModel> editDeck({
+    required int id,
+    required String name,
+    required String? description,
+  }) async {
+    await (database.update(database.containers)..where((tbl) => tbl.id.equals(id))).write(
+      ContainersCompanion(
+        name: Value(name),
+        description: Value(description),
+      ),
+    );
+    
+    final updatedDeck = await (database.select(database.containers)..where((tbl) => tbl.id.equals(id))).getSingle();
+    return ContainerModel.fromDrift(updatedDeck);
   }
 }

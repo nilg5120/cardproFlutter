@@ -44,14 +44,6 @@ void main() {
     bloc.close();
   });
 
-  final testCard = Card(
-    id: 1,
-    name: 'テストカード',
-    rarity: 'R',
-    setName: 'テストセット',
-    cardNumber: 123,
-    effectId: 1,
-  );
 
   final testCardInstance = CardInstance(
     id: 1,

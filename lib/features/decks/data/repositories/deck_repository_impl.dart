@@ -34,4 +34,32 @@ class DeckRepositoryImpl implements DeckRepository {
       return Left(DatabaseFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> deleteDeck({required int id}) async {
+    try {
+      await localDataSource.deleteDeck(id: id);
+      return const Right(null);
+    } catch (e) {
+      return Left(DatabaseFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Container>> editDeck({
+    required int id,
+    required String name,
+    required String? description,
+  }) async {
+    try {
+      final deck = await localDataSource.editDeck(
+        id: id,
+        name: name,
+        description: description,
+      );
+      return Right(deck);
+    } catch (e) {
+      return Left(DatabaseFailure(message: e.toString()));
+    }
+  }
 }
