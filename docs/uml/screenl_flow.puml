@@ -1,0 +1,16 @@
+@startuml
+title カード管理アプリ - 画面遷移図
+
+[*] --> HomeScreen : アプリ起動
+HomeScreen --> CardListScreen : カード一覧を見る
+CardListScreen --> AddCardDialog : ＋ボタンを押す
+AddCardDialog --> CardListScreen : カード追加後戻る
+
+CardListScreen --> CardDetailScreen : カードをタップ
+CardDetailScreen --> CardListScreen : 戻る
+
+HomeScreen --> DeckListScreen : デッキ一覧を見る
+DeckListScreen --> DeckDetailScreen : デッキ選択
+DeckDetailScreen --> CardListScreen : デッキ内カード一覧
+
+@enduml

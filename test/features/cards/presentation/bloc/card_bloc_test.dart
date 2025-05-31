@@ -5,6 +5,7 @@ import 'package:cardpro/features/cards/domain/usecases/get_cards.dart';
 import 'package:cardpro/features/cards/domain/usecases/add_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/delete_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card.dart';
+import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:cardpro/features/cards/domain/entities/card.dart';
 import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
@@ -15,24 +16,27 @@ import 'package:bloc_test/bloc_test.dart';
 
 import 'card_bloc_test.mocks.dart';
 
-@GenerateMocks([GetCards, AddCard, DeleteCard, EditCard])
+@GenerateMocks([GetCards, AddCard, DeleteCard, EditCard, EditCardFull])
 void main() {
   late CardBloc bloc;
   late MockGetCards mockGetCards;
   late MockAddCard mockAddCard;
   late MockDeleteCard mockDeleteCard;
   late MockEditCard mockEditCard;
+  late MockEditCardFull mockEditCardFull;
 
   setUp(() {
     mockGetCards = MockGetCards();
     mockAddCard = MockAddCard();
     mockDeleteCard = MockDeleteCard();
     mockEditCard = MockEditCard();
+    mockEditCardFull = MockEditCardFull();
     bloc = CardBloc(
       getCards: mockGetCards,
       addCard: mockAddCard,
       deleteCard: mockDeleteCard,
       editCard: mockEditCard,
+      editCardFull: mockEditCardFull,
     );
   });
 

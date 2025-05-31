@@ -15,6 +15,8 @@ import 'package:cardpro/features/cards/domain/repositories/card_repository.dart'
 import 'package:cardpro/features/cards/domain/usecases/add_card.dart' as _i8;
 import 'package:cardpro/features/cards/domain/usecases/delete_card.dart' as _i9;
 import 'package:cardpro/features/cards/domain/usecases/edit_card.dart' as _i11;
+import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart'
+    as _i12;
 import 'package:cardpro/features/cards/domain/usecases/get_cards.dart' as _i4;
 import 'package:dartz/dartz.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
@@ -169,6 +171,41 @@ class MockEditCard extends _i1.Mock implements _i11.EditCard {
 
   @override
   _i5.Future<_i3.Either<_i6.Failure, void>> call(_i11.EditCardParams? params) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [params]),
+            returnValue: _i5.Future<_i3.Either<_i6.Failure, void>>.value(
+              _FakeEither_1<_i6.Failure, void>(
+                this,
+                Invocation.method(#call, [params]),
+              ),
+            ),
+          )
+          as _i5.Future<_i3.Either<_i6.Failure, void>>);
+}
+
+/// A class which mocks [EditCardFull].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockEditCardFull extends _i1.Mock implements _i12.EditCardFull {
+  MockEditCardFull() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i2.CardRepository get repository =>
+      (super.noSuchMethod(
+            Invocation.getter(#repository),
+            returnValue: _FakeCardRepository_0(
+              this,
+              Invocation.getter(#repository),
+            ),
+          )
+          as _i2.CardRepository);
+
+  @override
+  _i5.Future<_i3.Either<_i6.Failure, void>> call(
+    _i12.EditCardFullParams? params,
+  ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
             returnValue: _i5.Future<_i3.Either<_i6.Failure, void>>.value(

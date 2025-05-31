@@ -6,6 +6,7 @@
 import 'dart:async' as _i4;
 
 import 'package:cardpro/core/error/failures.dart' as _i5;
+import 'package:cardpro/features/cards/domain/entities/card.dart' as _i8;
 import 'package:cardpro/features/cards/domain/entities/card_instance.dart'
     as _i7;
 import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart'
@@ -118,6 +119,40 @@ class MockCardRepository extends _i1.Mock implements _i3.CardRepository {
               _FakeEither_0<_i5.Failure, void>(
                 this,
                 Invocation.method(#editCard, [instance, description]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, void>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, void>> editCardFull({
+    required _i8.Card? card,
+    required _i7.CardInstance? instance,
+    required String? rarity,
+    required String? setName,
+    required int? cardNumber,
+    required String? description,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#editCardFull, [], {
+              #card: card,
+              #instance: instance,
+              #rarity: rarity,
+              #setName: setName,
+              #cardNumber: cardNumber,
+              #description: description,
+            }),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, void>>.value(
+              _FakeEither_0<_i5.Failure, void>(
+                this,
+                Invocation.method(#editCardFull, [], {
+                  #card: card,
+                  #instance: instance,
+                  #rarity: rarity,
+                  #setName: setName,
+                  #cardNumber: cardNumber,
+                  #description: description,
+                }),
               ),
             ),
           )

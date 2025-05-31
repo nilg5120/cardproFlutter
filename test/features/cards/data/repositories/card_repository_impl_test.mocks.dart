@@ -9,6 +9,7 @@ import 'package:cardpro/features/cards/data/datasources/card_local_data_source.d
     as _i3;
 import 'package:cardpro/features/cards/data/models/card_instance_model.dart'
     as _i5;
+import 'package:cardpro/features/cards/data/models/card_model.dart' as _i6;
 import 'package:cardpro/features/cards/data/models/card_with_instance_model.dart'
     as _i2;
 import 'package:mockito/mockito.dart' as _i1;
@@ -102,6 +103,29 @@ class MockCardLocalDataSource extends _i1.Mock
   ) =>
       (super.noSuchMethod(
             Invocation.method(#editCard, [instance, description]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> editCardFull({
+    required _i6.CardModel? card,
+    required _i5.CardInstanceModel? instance,
+    required String? rarity,
+    required String? setName,
+    required int? cardNumber,
+    required String? description,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#editCardFull, [], {
+              #card: card,
+              #instance: instance,
+              #rarity: rarity,
+              #setName: setName,
+              #cardNumber: cardNumber,
+              #description: description,
+            }),
             returnValue: _i4.Future<void>.value(),
             returnValueForMissingStub: _i4.Future<void>.value(),
           )
