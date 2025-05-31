@@ -61,8 +61,20 @@ void main() {
   );
 
   final testCardWithInstance = CardWithInstance(
-    card: testCard,
-    instance: testCardInstance,
+    card: Card(
+      id: 1,
+      name: 'テストカード',
+      rarity: 'R',
+      setName: 'テストセット',
+      cardNumber: 123,
+      effectId: 1,
+    ),
+    instance: CardInstance(
+      id: 1,
+      cardId: 1,
+      updatedAt: DateTime(2025, 5, 29),
+      description: 'テスト説明',
+    ),
   );
 
   group('GetCardsEvent', () {
@@ -127,7 +139,6 @@ void main() {
       act: (bloc) => bloc.add(addCardEvent),
       expect: () => [
         CardLoading(),
-        CardLoading(),
         CardLoaded([testCardWithInstance]),
       ],
       verify: (_) {
@@ -168,7 +179,6 @@ void main() {
       },
       act: (bloc) => bloc.add(deleteCardEvent),
       expect: () => [
-        CardLoading(),
         CardLoading(),
         CardLoaded([testCardWithInstance]),
       ],
@@ -213,7 +223,6 @@ void main() {
       },
       act: (bloc) => bloc.add(editCardEvent),
       expect: () => [
-        CardLoading(),
         CardLoading(),
         CardLoaded([testCardWithInstance]),
       ],

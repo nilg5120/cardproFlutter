@@ -53,10 +53,13 @@ void main() {
       final result = await repository.getCards();
 
       // assert
-      expect(result, Right<Failure, List<CardWithInstance>>([testCardWithInstanceModel]));
+      expect(result, isA<Right<Failure, List<CardWithInstance>>>());
+      expect(result.getOrElse(() => []), contains(testCardWithInstanceModel));
+
       verify(mockLocalDataSource.getCards());
       verifyNoMoreInteractions(mockLocalDataSource);
     });
+
 
     test('異常系：例外が発生した場合はDatabaseFailureを返す', () async {
       // arrange

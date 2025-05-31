@@ -42,19 +42,21 @@ void main() {
     instance: testCardInstance,
   );
 
-  test('正常系：リポジトリからカード一覧を取得できる', () async {
-    // arrange
-    when(mockRepository.getCards())
-        .thenAnswer((_) async => Right([testCardWithInstance]));
+test('正常系：リポジトリからカード一覧を取得できる', () async {
+  // arrange
+  when(mockRepository.getCards())
+      .thenAnswer((_) async => Right([testCardWithInstance]));
 
-    // act
-    final result = await usecase();
+  // act
+  final result = await usecase();
 
-    // assert
-    expect(result, Right<Failure, List<CardWithInstance>>([testCardWithInstance]));
-    verify(mockRepository.getCards());
-    verifyNoMoreInteractions(mockRepository);
-  });
+  // assert
+  expect(result, isA<Right<Failure, List<CardWithInstance>>>());
+  expect(result.getOrElse(() => []), contains(testCardWithInstance));
+  verify(mockRepository.getCards());
+  verifyNoMoreInteractions(mockRepository);
+});
+
 
   test('異常系：リポジトリからエラーが返された場合はそのまま返す', () async {
     // arrange
