@@ -97,7 +97,6 @@ class CardListItem extends StatelessWidget {
     );
   }
 
-  // カード情報編集ダイアログを表示
   void _showEditDialog(BuildContext context) {
     final descriptionController = TextEditingController(
       text: card.instance.description ?? '',
@@ -115,7 +114,6 @@ class CardListItem extends StatelessWidget {
       text: card.card.cardNumber?.toString() ?? '',
     );
 
-    // 変更されたかどうかを追跡するフラグ
     bool rarityChanged = false;
     bool setNameChanged = false;
     bool cardNumberChanged = false;
@@ -136,7 +134,7 @@ class CardListItem extends StatelessWidget {
                       labelText: 'カード名',
                       border: OutlineInputBorder(),
                     ),
-                    readOnly: true, // カード名は編集不可
+                    readOnly: true,
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -199,12 +197,11 @@ class CardListItem extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  
-                  // 変更されたフィールドのみを渡す
+
                   final String? rarity = rarityChanged ? rarityController.text.isEmpty ? null : rarityController.text : null;
                   final String? setName = setNameChanged ? setNameController.text.isEmpty ? null : setNameController.text : null;
                   final int? cardNumber = cardNumberChanged ? int.tryParse(cardNumberController.text) : null;
-                  
+
                   if (rarityChanged || setNameChanged || cardNumberChanged) {
                     onEdit(
                       descriptionController.text,

@@ -1306,11 +1306,11 @@ class $ContainerCardLocationsTable extends ContainerCardLocations
     'cardInstanceId',
   );
   @override
-  late final GeneratedColumn<String> cardInstanceId = GeneratedColumn<String>(
+  late final GeneratedColumn<int> cardInstanceId = GeneratedColumn<int>(
     'card_instance_id',
     aliasedName,
     false,
-    type: DriftSqlType.string,
+    type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _locationMeta = const VerificationMeta(
@@ -1388,7 +1388,7 @@ class $ContainerCardLocationsTable extends ContainerCardLocations
           )!,
       cardInstanceId:
           attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
+            DriftSqlType.int,
             data['${effectivePrefix}card_instance_id'],
           )!,
       location:
@@ -1408,7 +1408,7 @@ class $ContainerCardLocationsTable extends ContainerCardLocations
 class ContainerCardLocation extends DataClass
     implements Insertable<ContainerCardLocation> {
   final int containerId;
-  final String cardInstanceId;
+  final int cardInstanceId;
   final String location;
   const ContainerCardLocation({
     required this.containerId,
@@ -1419,7 +1419,7 @@ class ContainerCardLocation extends DataClass
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['container_id'] = Variable<int>(containerId);
-    map['card_instance_id'] = Variable<String>(cardInstanceId);
+    map['card_instance_id'] = Variable<int>(cardInstanceId);
     map['location'] = Variable<String>(location);
     return map;
   }
@@ -1439,7 +1439,7 @@ class ContainerCardLocation extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ContainerCardLocation(
       containerId: serializer.fromJson<int>(json['containerId']),
-      cardInstanceId: serializer.fromJson<String>(json['cardInstanceId']),
+      cardInstanceId: serializer.fromJson<int>(json['cardInstanceId']),
       location: serializer.fromJson<String>(json['location']),
     );
   }
@@ -1448,14 +1448,14 @@ class ContainerCardLocation extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'containerId': serializer.toJson<int>(containerId),
-      'cardInstanceId': serializer.toJson<String>(cardInstanceId),
+      'cardInstanceId': serializer.toJson<int>(cardInstanceId),
       'location': serializer.toJson<String>(location),
     };
   }
 
   ContainerCardLocation copyWith({
     int? containerId,
-    String? cardInstanceId,
+    int? cardInstanceId,
     String? location,
   }) => ContainerCardLocation(
     containerId: containerId ?? this.containerId,
@@ -1500,7 +1500,7 @@ class ContainerCardLocation extends DataClass
 class ContainerCardLocationsCompanion
     extends UpdateCompanion<ContainerCardLocation> {
   final Value<int> containerId;
-  final Value<String> cardInstanceId;
+  final Value<int> cardInstanceId;
   final Value<String> location;
   final Value<int> rowid;
   const ContainerCardLocationsCompanion({
@@ -1511,7 +1511,7 @@ class ContainerCardLocationsCompanion
   });
   ContainerCardLocationsCompanion.insert({
     required int containerId,
-    required String cardInstanceId,
+    required int cardInstanceId,
     required String location,
     this.rowid = const Value.absent(),
   }) : containerId = Value(containerId),
@@ -1519,7 +1519,7 @@ class ContainerCardLocationsCompanion
        location = Value(location);
   static Insertable<ContainerCardLocation> custom({
     Expression<int>? containerId,
-    Expression<String>? cardInstanceId,
+    Expression<int>? cardInstanceId,
     Expression<String>? location,
     Expression<int>? rowid,
   }) {
@@ -1533,7 +1533,7 @@ class ContainerCardLocationsCompanion
 
   ContainerCardLocationsCompanion copyWith({
     Value<int>? containerId,
-    Value<String>? cardInstanceId,
+    Value<int>? cardInstanceId,
     Value<String>? location,
     Value<int>? rowid,
   }) {
@@ -1552,7 +1552,7 @@ class ContainerCardLocationsCompanion
       map['container_id'] = Variable<int>(containerId.value);
     }
     if (cardInstanceId.present) {
-      map['card_instance_id'] = Variable<String>(cardInstanceId.value);
+      map['card_instance_id'] = Variable<int>(cardInstanceId.value);
     }
     if (location.present) {
       map['location'] = Variable<String>(location.value);
@@ -2576,14 +2576,14 @@ typedef $$ContainersTableProcessedTableManager =
 typedef $$ContainerCardLocationsTableCreateCompanionBuilder =
     ContainerCardLocationsCompanion Function({
       required int containerId,
-      required String cardInstanceId,
+      required int cardInstanceId,
       required String location,
       Value<int> rowid,
     });
 typedef $$ContainerCardLocationsTableUpdateCompanionBuilder =
     ContainerCardLocationsCompanion Function({
       Value<int> containerId,
-      Value<String> cardInstanceId,
+      Value<int> cardInstanceId,
       Value<String> location,
       Value<int> rowid,
     });
@@ -2602,7 +2602,7 @@ class $$ContainerCardLocationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get cardInstanceId => $composableBuilder(
+  ColumnFilters<int> get cardInstanceId => $composableBuilder(
     column: $table.cardInstanceId,
     builder: (column) => ColumnFilters(column),
   );
@@ -2627,7 +2627,7 @@ class $$ContainerCardLocationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get cardInstanceId => $composableBuilder(
+  ColumnOrderings<int> get cardInstanceId => $composableBuilder(
     column: $table.cardInstanceId,
     builder: (column) => ColumnOrderings(column),
   );
@@ -2652,7 +2652,7 @@ class $$ContainerCardLocationsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get cardInstanceId => $composableBuilder(
+  GeneratedColumn<int> get cardInstanceId => $composableBuilder(
     column: $table.cardInstanceId,
     builder: (column) => column,
   );
@@ -2708,7 +2708,7 @@ class $$ContainerCardLocationsTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> containerId = const Value.absent(),
-                Value<String> cardInstanceId = const Value.absent(),
+                Value<int> cardInstanceId = const Value.absent(),
                 Value<String> location = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ContainerCardLocationsCompanion(
@@ -2720,7 +2720,7 @@ class $$ContainerCardLocationsTableTableManager
           createCompanionCallback:
               ({
                 required int containerId,
-                required String cardInstanceId,
+                required int cardInstanceId,
                 required String location,
                 Value<int> rowid = const Value.absent(),
               }) => ContainerCardLocationsCompanion.insert(

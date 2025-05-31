@@ -2,7 +2,7 @@ import 'package:drift/drift.dart';
 
 class ContainerCardLocations extends Table {
   IntColumn get containerId => integer()();          // Containers.id
-  TextColumn get cardInstanceId => text()();   // CardInstances.id
+  IntColumn get cardInstanceId => integer()();   // CardInstances.id
   TextColumn get location => text()();         // 'main', 'side' など
 
   @override
