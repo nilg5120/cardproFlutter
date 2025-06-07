@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
+import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
 import 'package:cardpro/db/database.dart';
 import 'package:cardpro/core/di/injection_container.dart';
 

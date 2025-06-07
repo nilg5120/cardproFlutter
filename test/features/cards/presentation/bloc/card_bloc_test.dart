@@ -7,6 +7,7 @@ import 'package:cardpro/features/cards/domain/usecases/delete_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
+import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
 import 'package:cardpro/features/cards/domain/entities/card.dart';
 import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
 import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
