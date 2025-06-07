@@ -7,8 +7,7 @@ import 'package:cardpro/features/decks/domain/usecases/delete_deck.dart';
 import 'package:cardpro/features/decks/domain/usecases/edit_deck.dart';
 import 'package:cardpro/features/decks/presentation/bloc/deck_event.dart';
 
-
-// States
+/// デッキ一覧管理に関する状態（State）のベースクラス
 abstract class DeckState extends Equatable {
   const DeckState();
 
@@ -16,10 +15,13 @@ abstract class DeckState extends Equatable {
   List<Object?> get props => [];
 }
 
+/// 初期状態
 class DeckInitial extends DeckState {}
 
+/// 読み込み中状態（ローディングインジケータ表示用）
 class DeckLoading extends DeckState {}
 
+/// デッキ一覧の取得に成功した状態
 class DeckLoaded extends DeckState {
   final List<Container> decks;
 
@@ -29,6 +31,7 @@ class DeckLoaded extends DeckState {
   List<Object> get props => [decks];
 }
 
+/// エラー発生時の状態
 class DeckError extends DeckState {
   final String message;
 
@@ -38,34 +41,38 @@ class DeckError extends DeckState {
   List<Object> get props => [message];
 }
 
-// BLoC
+/// デッキ機能のビジネスロジックを管理する BLoC クラス
 class DeckBloc extends Bloc<DeckEvent, DeckState> {
   final GetDecks getDecks;
   final AddDeck addDeck;
   final DeleteDeck deleteDeck;
   final EditDeck editDeck;
 
+  /// コンストラクタ：ユースケースを注入
   DeckBloc({
     required this.getDecks,
     required this.addDeck,
     required this.deleteDeck,
     required this.editDeck,
   }) : super(DeckInitial()) {
+    // イベントごとの処理を登録
     on<GetDecksEvent>(_onGetDecks);
     on<AddDeckEvent>(_onAddDeck);
     on<DeleteDeckEvent>(_onDeleteDeck);
     on<EditDeckEvent>(_onEditDeck);
   }
 
+  /// デッキ一覧取得イベントの処理
   Future<void> _onGetDecks(GetDecksEvent event, Emitter<DeckState> emit) async {
-    emit(DeckLoading());
-    final result = await getDecks();
+    emit(DeckLoading()); // ローディング状態に
+    final result = await getDecks(); // ユースケースを実行
     result.fold(
-      (failure) => emit(DeckError(failure.message)),
-      (decks) => emit(DeckLoaded(decks)),
+      (failure) => emit(DeckError(failure.message)), // 失敗時
+      (decks) => emit(DeckLoaded(decks)),            // 成功時
     );
   }
 
+  /// デッキ追加イベントの処理
   Future<void> _onAddDeck(AddDeckEvent event, Emitter<DeckState> emit) async {
     emit(DeckLoading());
     final params = AddDeckParams(
@@ -75,20 +82,22 @@ class DeckBloc extends Bloc<DeckEvent, DeckState> {
     final result = await addDeck(params);
     result.fold(
       (failure) => emit(DeckError(failure.message)),
-      (_) => add(GetDecksEvent()),
+      (_) => add(GetDecksEvent()), // 成功後、一覧再取得
     );
   }
 
+  /// デッキ削除イベントの処理
   Future<void> _onDeleteDeck(DeleteDeckEvent event, Emitter<DeckState> emit) async {
     emit(DeckLoading());
     final params = DeleteDeckParams(id: event.id);
     final result = await deleteDeck(params);
     result.fold(
       (failure) => emit(DeckError(failure.message)),
-      (_) => add(GetDecksEvent()),
+      (_) => add(GetDecksEvent()), // 成功後、一覧再取得
     );
   }
 
+  /// デッキ編集イベントの処理
   Future<void> _onEditDeck(EditDeckEvent event, Emitter<DeckState> emit) async {
     emit(DeckLoading());
     final params = EditDeckParams(
@@ -99,7 +108,7 @@ class DeckBloc extends Bloc<DeckEvent, DeckState> {
     final result = await editDeck(params);
     result.fold(
       (failure) => emit(DeckError(failure.message)),
-      (_) => add(GetDecksEvent()),
+      (_) => add(GetDecksEvent()), // 成功後、一覧再取得
     );
   }
 }
