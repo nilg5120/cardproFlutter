@@ -12,28 +12,40 @@ class CardListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<CardBloc>()..add(GetCardsEvent()),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('カード一覧'),
-        ),
-        body: BlocBuilder<CardBloc, CardState>(
-          builder: (context, state) {
-            if (state is CardLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is CardLoaded) {
-              return _buildCardList(context, state.cards);
-            } else if (state is CardError) {
-              return Center(child: Text(state.message));
-            }
-            return const Center(child: Text('カードを読み込んでください'));
-          },
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showAddCardDialog(context),
-          child: const Icon(Icons.add),
-        ),
+    // 既存のBlocProviderがあるかチェック
+    try {
+      // 既存のBlocProviderがある場合はそれを使用
+      BlocProvider.of<CardBloc>(context, listen: false);
+      return _buildScaffold(context);
+    } catch (_) {
+      // 既存のBlocProviderがない場合は新しく作成
+      return BlocProvider(
+        create: (_) => sl<CardBloc>()..add(GetCardsEvent()),
+        child: _buildScaffold(context),
+      );
+    }
+  }
+  
+  Widget _buildScaffold(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('カード一覧'),
+      ),
+      body: BlocBuilder<CardBloc, CardState>(
+        builder: (context, state) {
+          if (state is CardLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is CardLoaded) {
+            return _buildCardList(context, state.cards);
+          } else if (state is CardError) {
+            return Center(child: Text(state.message));
+          }
+          return const Center(child: Text('カードを読み込んでください'));
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddCardDialog(context),
+        child: const Icon(Icons.add),
       ),
     );
   }
