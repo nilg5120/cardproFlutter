@@ -5,7 +5,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
-import 'package:cardpro/features/cards/presentation/pages/card_list_page.dart';
 
 import 'card_list_page_test.mocks.dart';
 
