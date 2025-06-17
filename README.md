@@ -7,6 +7,10 @@
 ### プロジェクト構造
 
 ```
+doc/
+├── uml/                      # ユーザーマニュアル
+│   ├── screen_flow.puml          # 画面遷移図
+cardpro_requirements.md          # 要件定義書
 lib/
 ├── core/                      # コア機能（共通ユーティリティ、エラーハンドリングなど）
 │   ├── di/                    # 依存性注入
