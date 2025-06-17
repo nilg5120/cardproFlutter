@@ -12,5 +12,19 @@ CardDetailScreen --> CardListScreen : 戻る
 HomeScreen --> DeckListScreen : デッキ一覧を見る
 DeckListScreen --> DeckDetailScreen : デッキ選択
 DeckDetailScreen --> CardListScreen : デッキ内カード一覧
+title デッキ使用フロー（カード移動操作あり）
+
+[*] --> デッキ一覧画面
+
+デッキ一覧画面 --> デッキ詳細画面 : デッキを選択
+デッキ詳細画面 --> 補完チェック処理 : 「使用する」ボタン押下
+
+補完チェック処理 --> 移動指示表示画面 : 不足カードの補完指示を生成
+
+移動指示表示画面 --> カード移動操作中 : ユーザーが実物カードを移動
+カード移動操作中 --> 使用状態確定画面 : 「カード移動が完了しました」押下
+
+使用状態確定画面 --> [*] : デッキ使用状態がアクティブに
+
 
 @enduml
