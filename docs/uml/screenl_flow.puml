@@ -1,4 +1,4 @@
-@startuml screen_flow
+@startuml
 title カード管理アプリ - 画面遷移図
 
 [*] --> HomeScreen : アプリ起動
@@ -12,6 +12,10 @@ CardDetailScreen --> CardListScreen : 戻る
 HomeScreen --> DeckListScreen : デッキ一覧を見る
 DeckListScreen --> DeckDetailScreen : デッキ選択
 DeckDetailScreen --> CardListScreen : デッキ内カード一覧
+
+@enduml
+
+@startuml
 title デッキ使用フロー（カード移動操作あり）
 
 [*] --> デッキ一覧画面
@@ -25,6 +29,5 @@ title デッキ使用フロー（カード移動操作あり）
 カード移動操作中 --> 使用状態確定画面 : 「カード移動が完了しました」押下
 
 使用状態確定画面 --> [*] : デッキ使用状態がアクティブに
-
 
 @enduml
