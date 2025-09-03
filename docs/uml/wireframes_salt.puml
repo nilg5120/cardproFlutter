@@ -1,0 +1,80 @@
+@startuml
+title CardPro Wireframes (PlantUML Salt)
+
+' Home
+salt
+{
+  {T
+    Home
+  }
+  [ Cards ]  [ Decks ]
+}
+
+newpage
+title Cards - List
+salt
+{
+  {T Cards}
+  {#table
+    + Name | + Rarity | + Set | + Memo
+    (sample) Pikachu | C | SV | ...
+  }
+  [ + Add ]  [ Refresh ]
+}
+
+newpage
+title Cards - Add/Edit Dialog
+salt
+{
+  {T Add / Edit Card}
+  Name        | [_____________________]
+  Rarity      | [________]
+  Set         | [_____________________]
+  Effect      | {^ v} [ Select Effect ]
+  Memo        |
+              | {#
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                }
+  [ Cancel ]  [ Save ]
+}
+
+newpage
+title Decks - List
+salt
+{
+  {T Decks}
+  {#table
+    + Name | + Description | + Type | + Cards
+    Grass Deck | test deck | deck | 60
+  }
+  [ + Add ]  [ Refresh ]
+}
+
+newpage
+title Deck - Detail
+salt
+{
+  {T Deck: (selected)}
+  {#table
+    + Name | + Location | + Memo
+    Pikachu | main | ...
+    Professor Oak | side | ...
+  }
+  [ + Add Card ]  [ Edit Deck ]  [ Delete Deck ]  [ Use Deck ]
+}
+
+newpage
+title Deck Usage - Move Instructions
+salt
+{
+  {T Move Instructions}
+  {#table
+    + Card | + From | + To | + Count | + Location
+    Professor Oak | Storage | Deck A | 1 | main
+    Komala | Deck B | Storage | 2 | side
+  }
+  [ Move Completed ]  [ Recompute ]  [ Cancel ]
+}
+
+@enduml
+
