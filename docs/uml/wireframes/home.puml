@@ -1,0 +1,13 @@
+@startuml
+title Home
+
+salt
+{
+  {T
+    Home
+  }
+  [ Cards ]  [ Decks ]
+}
+
+@enduml
+

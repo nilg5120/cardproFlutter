@@ -1,0 +1,15 @@
+@startuml
+title Decks - List
+
+salt
+{
+  {T Decks}
+  {#table
+    + Name | + Description | + Type | + Cards
+    Grass Deck | test deck | deck | 60
+  }
+  [ + Add ]  [ Refresh ]
+}
+
+@enduml
+

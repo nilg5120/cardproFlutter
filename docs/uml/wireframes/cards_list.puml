@@ -1,0 +1,15 @@
+@startuml
+title Cards - List
+
+salt
+{
+  {T Cards}
+  {#table
+    + Name | + Rarity | + Set | + Memo
+    (sample) Pikachu | C | SV | ...
+  }
+  [ + Add ]  [ Refresh ]
+}
+
+@enduml
+

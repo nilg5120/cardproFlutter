@@ -1,0 +1,16 @@
+@startuml
+title Deck Usage - Move Instructions
+
+salt
+{
+  {T Move Instructions}
+  {#table
+    + Card | + From | + To | + Count | + Location
+    Professor Oak | Storage | Deck A | 1 | main
+    Komala | Deck B | Storage | 2 | side
+  }
+  [ Move Completed ]  [ Recompute ]  [ Cancel ]
+}
+
+@enduml
+

@@ -1,0 +1,16 @@
+@startuml
+title Deck - Detail
+
+salt
+{
+  {T Deck: (selected)}
+  {#table
+    + Name | + Location | + Memo
+    Pikachu | main | ...
+    Professor Oak | side | ...
+  }
+  [ + Add Card ]  [ Edit Deck ]  [ Delete Deck ]  [ Use Deck ]
+}
+
+@enduml
+

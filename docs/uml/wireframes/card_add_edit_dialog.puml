@@ -1,0 +1,19 @@
+@startuml
+title Cards - Add/Edit Dialog
+
+salt
+{
+  {T Add / Edit Card}
+  Name        | [_____________________]
+  Rarity      | [________]
+  Set         | [_____________________]
+  Effect      | {^ v} [ Select Effect ]
+  Memo        |
+              | {#
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                }
+  [ Cancel ]  [ Save ]
+}
+
+@enduml
+

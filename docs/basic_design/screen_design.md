@@ -12,7 +12,14 @@
 - デッキ使用（補完指示）: 物理移動の補助指示の提示と完了操作
 
 参考資料: `docs/ux_scenarios/deck_card_move_flow.md`, `docs/wireframe.html`
-ワイヤーフレーム: `docs/uml/wireframes_salt.puml`
+ワイヤーフレーム（個別ファイル）:
+- Home: `docs/uml/wireframes/home.puml`
+- Cards（一覧）: `docs/uml/wireframes/cards_list.puml`
+- Cards（追加/編集ダイアログ）: `docs/uml/wireframes/card_add_edit_dialog.puml`
+- Decks（一覧）: `docs/uml/wireframes/decks_list.puml`
+- Deck（詳細）: `docs/uml/wireframes/deck_detail.puml`
+- Deck Usage（移動指示）: `docs/uml/wireframes/deck_usage_move_instructions.puml`
+（全画面まとめ版: `docs/uml/wireframes_salt.puml`）
 
 ## 3. 画面遷移
 - ホーム → カード一覧 / デッキ一覧
