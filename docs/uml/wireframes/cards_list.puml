@@ -1,14 +1,14 @@
 @startuml
-title Cards - List
+title カード一覧画面
 
 salt
 {
-  {T Cards}
+  {T カード一覧}
   {#table
-    + Name | + Rarity | + Set | + Memo
-    (sample) Pikachu | C | SV | ...
+    + 名前 | + レアリティ | + セット | + メモ
+    (sample) ピカチュウ | C | SV | ...
   }
-  [ + Add ]  [ Refresh ]
+  [ 新規追加 ] | [ 更新 ] | [ 削除 ] | [ インポート ] | [ エクスポート ]
 }
 
 @enduml

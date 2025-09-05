@@ -1,12 +1,21 @@
 @startuml
-title Home
+title ホーム画面
 
 salt
 {
   {T
-    Home
+    CardProForMTG
   }
-  [ Cards ]  [ Decks ]
+    --
+  {T お知らせ}
+  {SI
+    ・アプリ更新のお知らせ (v1.2)
+    .
+    "                         "
+  }
+  --
+  ' 下段: フッターボタン（常に移動可能）
+  [ ホーム ] | [ カード ] | [ デッキ ] | [ 設定 ]
 }
 
 @enduml

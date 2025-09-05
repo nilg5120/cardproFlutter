@@ -1,15 +1,18 @@
 @startuml
-title Decks - List
+title デッキ一覧画面
 
 salt
 {
-  {T Decks}
-  {#table
-    + Name | + Description | + Type | + Cards
-    Grass Deck | test deck | deck | 60
-  }
-  [ + Add ]  [ Refresh ]
+  [ 新しいデッキ ] | [デッキ1] | [デッキ2] | [デッキ3]
+  | [デッキ4] | [デッキ5] | [デッキ6] | [デッキ~]
+  --
+
+  ' 中段: デッキ操作ボタン（選択時に移動可能）
+  [コピー] | [インポート] | [お気に入り] | [エクスポート] | [削除]
+
+  --
+  ' 下段: フッターボタン（常に移動可能）
+  [ ホーム ] | [ カード ] | [ デッキ ] | [ 設定 ]
 }
 
 @enduml
-

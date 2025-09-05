@@ -1,18 +1,19 @@
 @startuml
-title Cards - Add/Edit Dialog
+title カード追加・編集ダイアログ
 
 salt
 {
   {T Add / Edit Card}
-  Name        | [_____________________]
-  Rarity      | [________]
-  Set         | [_____________________]
-  Effect      | {^ v} [ Select Effect ]
-  Memo        |
+  名前        | [_____________________]
+  レアリティ      | [________]
+  セット         | [_____________________]
+  コレクター番号 | [_____________________]
+  効果      | {^ v} [ Select Effect ]
+  メモ        |
               | {#
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                 }
-  [ Cancel ]  [ Save ]
+  [ Cancel ] | [ Save ]
 }
 
 @enduml

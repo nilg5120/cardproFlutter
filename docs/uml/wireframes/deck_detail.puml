@@ -1,15 +1,15 @@
 @startuml
-title Deck - Detail
+title デッキ詳細画面
 
 salt
 {
-  {T Deck: (selected)}
+  {T デッキ: (選択中)}
   {#table
-    + Name | + Location | + Memo
-    Pikachu | main | ...
-    Professor Oak | side | ...
+    + 名前 | + 所在地 | + メモ
+    ピカチュウ | メイン | ...
+    オーキド博士 | サイド | ...
   }
-  [ + Add Card ]  [ Edit Deck ]  [ Delete Deck ]  [ Use Deck ]
+  [ + カードを追加 ] | [ デッキを編集 ] | [ デッキを削除 ] | [ デッキを使用 ]
 }
 
 @enduml
