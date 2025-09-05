@@ -61,3 +61,13 @@
 ## 7. データ初期化
 - `ensureDefaultCardEffectsExist()` でデフォルト効果を投入
 - 初期カード投入は任意のインポート（将来導入）
+
+## 8. インポート機構
+- ファイル形式: CSV(UTF-8) で `name,rarity,setName,cardNumber,effectId,description` を列挙
+- バリデーション:
+  - `name` と `effectId` の存在確認
+  - `cardNumber` は0以上の整数
+  - 不正行はエラーとして全体をロールバック
+- エラー処理/リトライ:
+  - 読み込み失敗等のI/O例外は指数バックオフ(1s/2s/4s)で3回まで再試行
+  - バリデーションエラーは再試行せずエラー内容を返却
