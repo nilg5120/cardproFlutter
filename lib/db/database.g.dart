@@ -259,12 +259,11 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
   }
 }
 
-class $PokemonCardsTable extends PokemonCards
-    with TableInfo<$PokemonCardsTable, PokemonCard> {
+class $MtgCardsTable extends MtgCards with TableInfo<$MtgCardsTable, MtgCard> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $PokemonCardsTable(this.attachedDatabase, [this._alias]);
+  $MtgCardsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -345,10 +344,10 @@ class $PokemonCardsTable extends PokemonCards
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'pokemon_cards';
+  static const String $name = 'mtg_cards';
   @override
   VerificationContext validateIntegrity(
-    Insertable<PokemonCard> instance, {
+    Insertable<MtgCard> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -396,9 +395,9 @@ class $PokemonCardsTable extends PokemonCards
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  PokemonCard map(Map<String, dynamic> data, {String? tablePrefix}) {
+  MtgCard map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return PokemonCard(
+    return MtgCard(
       id:
           attachedDatabase.typeMapping.read(
             DriftSqlType.int,
@@ -430,19 +429,19 @@ class $PokemonCardsTable extends PokemonCards
   }
 
   @override
-  $PokemonCardsTable createAlias(String alias) {
-    return $PokemonCardsTable(attachedDatabase, alias);
+  $MtgCardsTable createAlias(String alias) {
+    return $MtgCardsTable(attachedDatabase, alias);
   }
 }
 
-class PokemonCard extends DataClass implements Insertable<PokemonCard> {
+class MtgCard extends DataClass implements Insertable<MtgCard> {
   final int id;
   final String name;
   final String? rarity;
   final String? setName;
   final int? cardnumber;
   final int effectId;
-  const PokemonCard({
+  const MtgCard({
     required this.id,
     required this.name,
     this.rarity,
@@ -468,8 +467,8 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
     return map;
   }
 
-  PokemonCardsCompanion toCompanion(bool nullToAbsent) {
-    return PokemonCardsCompanion(
+  MtgCardsCompanion toCompanion(bool nullToAbsent) {
+    return MtgCardsCompanion(
       id: Value(id),
       name: Value(name),
       rarity:
@@ -486,12 +485,12 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
     );
   }
 
-  factory PokemonCard.fromJson(
+  factory MtgCard.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return PokemonCard(
+    return MtgCard(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       rarity: serializer.fromJson<String?>(json['rarity']),
@@ -513,14 +512,14 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
     };
   }
 
-  PokemonCard copyWith({
+  MtgCard copyWith({
     int? id,
     String? name,
     Value<String?> rarity = const Value.absent(),
     Value<String?> setName = const Value.absent(),
     Value<int?> cardnumber = const Value.absent(),
     int? effectId,
-  }) => PokemonCard(
+  }) => MtgCard(
     id: id ?? this.id,
     name: name ?? this.name,
     rarity: rarity.present ? rarity.value : this.rarity,
@@ -528,8 +527,8 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
     cardnumber: cardnumber.present ? cardnumber.value : this.cardnumber,
     effectId: effectId ?? this.effectId,
   );
-  PokemonCard copyWithCompanion(PokemonCardsCompanion data) {
-    return PokemonCard(
+  MtgCard copyWithCompanion(MtgCardsCompanion data) {
+    return MtgCard(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       rarity: data.rarity.present ? data.rarity.value : this.rarity,
@@ -542,7 +541,7 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
 
   @override
   String toString() {
-    return (StringBuffer('PokemonCard(')
+    return (StringBuffer('MtgCard(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('rarity: $rarity, ')
@@ -559,7 +558,7 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is PokemonCard &&
+      (other is MtgCard &&
           other.id == this.id &&
           other.name == this.name &&
           other.rarity == this.rarity &&
@@ -568,14 +567,14 @@ class PokemonCard extends DataClass implements Insertable<PokemonCard> {
           other.effectId == this.effectId);
 }
 
-class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
+class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
   final Value<int> id;
   final Value<String> name;
   final Value<String?> rarity;
   final Value<String?> setName;
   final Value<int?> cardnumber;
   final Value<int> effectId;
-  const PokemonCardsCompanion({
+  const MtgCardsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.rarity = const Value.absent(),
@@ -583,7 +582,7 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
     this.cardnumber = const Value.absent(),
     this.effectId = const Value.absent(),
   });
-  PokemonCardsCompanion.insert({
+  MtgCardsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.rarity = const Value.absent(),
@@ -592,7 +591,7 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
     required int effectId,
   }) : name = Value(name),
        effectId = Value(effectId);
-  static Insertable<PokemonCard> custom({
+  static Insertable<MtgCard> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? rarity,
@@ -610,7 +609,7 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
     });
   }
 
-  PokemonCardsCompanion copyWith({
+  MtgCardsCompanion copyWith({
     Value<int>? id,
     Value<String>? name,
     Value<String?>? rarity,
@@ -618,7 +617,7 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
     Value<int?>? cardnumber,
     Value<int>? effectId,
   }) {
-    return PokemonCardsCompanion(
+    return MtgCardsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       rarity: rarity ?? this.rarity,
@@ -654,7 +653,7 @@ class PokemonCardsCompanion extends UpdateCompanion<PokemonCard> {
 
   @override
   String toString() {
-    return (StringBuffer('PokemonCardsCompanion(')
+    return (StringBuffer('MtgCardsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('rarity: $rarity, ')
@@ -1579,7 +1578,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $CardEffectsTable cardEffects = $CardEffectsTable(this);
-  late final $PokemonCardsTable pokemonCards = $PokemonCardsTable(this);
+  late final $MtgCardsTable mtgCards = $MtgCardsTable(this);
   late final $CardInstancesTable cardInstances = $CardInstancesTable(this);
   late final $ContainersTable containers = $ContainersTable(this);
   late final $ContainerCardLocationsTable containerCardLocations =
@@ -1590,7 +1589,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     cardEffects,
-    pokemonCards,
+    mtgCards,
     cardInstances,
     containers,
     containerCardLocations,
@@ -1614,22 +1613,20 @@ final class $$CardEffectsTableReferences
     extends BaseReferences<_$AppDatabase, $CardEffectsTable, CardEffect> {
   $$CardEffectsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$PokemonCardsTable, List<PokemonCard>>
-  _pokemonCardsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.pokemonCards,
-    aliasName: $_aliasNameGenerator(
-      db.cardEffects.id,
-      db.pokemonCards.effectId,
-    ),
+  static MultiTypedResultKey<$MtgCardsTable, List<MtgCard>> _mtgCardsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.mtgCards,
+    aliasName: $_aliasNameGenerator(db.cardEffects.id, db.mtgCards.effectId),
   );
 
-  $$PokemonCardsTableProcessedTableManager get pokemonCardsRefs {
-    final manager = $$PokemonCardsTableTableManager(
+  $$MtgCardsTableProcessedTableManager get mtgCardsRefs {
+    final manager = $$MtgCardsTableTableManager(
       $_db,
-      $_db.pokemonCards,
+      $_db.mtgCards,
     ).filter((f) => f.effectId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_pokemonCardsRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(_mtgCardsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -1660,22 +1657,22 @@ class $$CardEffectsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  Expression<bool> pokemonCardsRefs(
-    Expression<bool> Function($$PokemonCardsTableFilterComposer f) f,
+  Expression<bool> mtgCardsRefs(
+    Expression<bool> Function($$MtgCardsTableFilterComposer f) f,
   ) {
-    final $$PokemonCardsTableFilterComposer composer = $composerBuilder(
+    final $$MtgCardsTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.pokemonCards,
+      referencedTable: $db.mtgCards,
       getReferencedColumn: (t) => t.effectId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$PokemonCardsTableFilterComposer(
+          }) => $$MtgCardsTableFilterComposer(
             $db: $db,
-            $table: $db.pokemonCards,
+            $table: $db.mtgCards,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -1731,22 +1728,22 @@ class $$CardEffectsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  Expression<T> pokemonCardsRefs<T extends Object>(
-    Expression<T> Function($$PokemonCardsTableAnnotationComposer a) f,
+  Expression<T> mtgCardsRefs<T extends Object>(
+    Expression<T> Function($$MtgCardsTableAnnotationComposer a) f,
   ) {
-    final $$PokemonCardsTableAnnotationComposer composer = $composerBuilder(
+    final $$MtgCardsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.pokemonCards,
+      referencedTable: $db.mtgCards,
       getReferencedColumn: (t) => t.effectId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$PokemonCardsTableAnnotationComposer(
+          }) => $$MtgCardsTableAnnotationComposer(
             $db: $db,
-            $table: $db.pokemonCards,
+            $table: $db.mtgCards,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -1770,7 +1767,7 @@ class $$CardEffectsTableTableManager
           $$CardEffectsTableUpdateCompanionBuilder,
           (CardEffect, $$CardEffectsTableReferences),
           CardEffect,
-          PrefetchHooks Function({bool pokemonCardsRefs})
+          PrefetchHooks Function({bool mtgCardsRefs})
         > {
   $$CardEffectsTableTableManager(_$AppDatabase db, $CardEffectsTable table)
     : super(
@@ -1814,29 +1811,29 @@ class $$CardEffectsTableTableManager
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({pokemonCardsRefs = false}) {
+          prefetchHooksCallback: ({mtgCardsRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (pokemonCardsRefs) db.pokemonCards],
+              explicitlyWatchedTables: [if (mtgCardsRefs) db.mtgCards],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
-                  if (pokemonCardsRefs)
+                  if (mtgCardsRefs)
                     await $_getPrefetchedData<
                       CardEffect,
                       $CardEffectsTable,
-                      PokemonCard
+                      MtgCard
                     >(
                       currentTable: table,
                       referencedTable: $$CardEffectsTableReferences
-                          ._pokemonCardsRefsTable(db),
+                          ._mtgCardsRefsTable(db),
                       managerFromTypedResult:
                           (p0) =>
                               $$CardEffectsTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).pokemonCardsRefs,
+                              ).mtgCardsRefs,
                       referencedItemsForCurrentItem:
                           (item, referencedItems) => referencedItems.where(
                             (e) => e.effectId == item.id,
@@ -1863,10 +1860,10 @@ typedef $$CardEffectsTableProcessedTableManager =
       $$CardEffectsTableUpdateCompanionBuilder,
       (CardEffect, $$CardEffectsTableReferences),
       CardEffect,
-      PrefetchHooks Function({bool pokemonCardsRefs})
+      PrefetchHooks Function({bool mtgCardsRefs})
     >;
-typedef $$PokemonCardsTableCreateCompanionBuilder =
-    PokemonCardsCompanion Function({
+typedef $$MtgCardsTableCreateCompanionBuilder =
+    MtgCardsCompanion Function({
       Value<int> id,
       required String name,
       Value<String?> rarity,
@@ -1874,8 +1871,8 @@ typedef $$PokemonCardsTableCreateCompanionBuilder =
       Value<int?> cardnumber,
       required int effectId,
     });
-typedef $$PokemonCardsTableUpdateCompanionBuilder =
-    PokemonCardsCompanion Function({
+typedef $$MtgCardsTableUpdateCompanionBuilder =
+    MtgCardsCompanion Function({
       Value<int> id,
       Value<String> name,
       Value<String?> rarity,
@@ -1884,13 +1881,13 @@ typedef $$PokemonCardsTableUpdateCompanionBuilder =
       Value<int> effectId,
     });
 
-final class $$PokemonCardsTableReferences
-    extends BaseReferences<_$AppDatabase, $PokemonCardsTable, PokemonCard> {
-  $$PokemonCardsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$MtgCardsTableReferences
+    extends BaseReferences<_$AppDatabase, $MtgCardsTable, MtgCard> {
+  $$MtgCardsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $CardEffectsTable _effectIdTable(_$AppDatabase db) =>
       db.cardEffects.createAlias(
-        $_aliasNameGenerator(db.pokemonCards.effectId, db.cardEffects.id),
+        $_aliasNameGenerator(db.mtgCards.effectId, db.cardEffects.id),
       );
 
   $$CardEffectsTableProcessedTableManager get effectId {
@@ -1908,9 +1905,9 @@ final class $$PokemonCardsTableReferences
   }
 }
 
-class $$PokemonCardsTableFilterComposer
-    extends Composer<_$AppDatabase, $PokemonCardsTable> {
-  $$PokemonCardsTableFilterComposer({
+class $$MtgCardsTableFilterComposer
+    extends Composer<_$AppDatabase, $MtgCardsTable> {
+  $$MtgCardsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1966,9 +1963,9 @@ class $$PokemonCardsTableFilterComposer
   }
 }
 
-class $$PokemonCardsTableOrderingComposer
-    extends Composer<_$AppDatabase, $PokemonCardsTable> {
-  $$PokemonCardsTableOrderingComposer({
+class $$MtgCardsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MtgCardsTable> {
+  $$MtgCardsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2024,9 +2021,9 @@ class $$PokemonCardsTableOrderingComposer
   }
 }
 
-class $$PokemonCardsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $PokemonCardsTable> {
-  $$PokemonCardsTableAnnotationComposer({
+class $$MtgCardsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MtgCardsTable> {
+  $$MtgCardsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2074,33 +2071,32 @@ class $$PokemonCardsTableAnnotationComposer
   }
 }
 
-class $$PokemonCardsTableTableManager
+class $$MtgCardsTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $PokemonCardsTable,
-          PokemonCard,
-          $$PokemonCardsTableFilterComposer,
-          $$PokemonCardsTableOrderingComposer,
-          $$PokemonCardsTableAnnotationComposer,
-          $$PokemonCardsTableCreateCompanionBuilder,
-          $$PokemonCardsTableUpdateCompanionBuilder,
-          (PokemonCard, $$PokemonCardsTableReferences),
-          PokemonCard,
+          $MtgCardsTable,
+          MtgCard,
+          $$MtgCardsTableFilterComposer,
+          $$MtgCardsTableOrderingComposer,
+          $$MtgCardsTableAnnotationComposer,
+          $$MtgCardsTableCreateCompanionBuilder,
+          $$MtgCardsTableUpdateCompanionBuilder,
+          (MtgCard, $$MtgCardsTableReferences),
+          MtgCard,
           PrefetchHooks Function({bool effectId})
         > {
-  $$PokemonCardsTableTableManager(_$AppDatabase db, $PokemonCardsTable table)
+  $$MtgCardsTableTableManager(_$AppDatabase db, $MtgCardsTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer:
-              () => $$PokemonCardsTableFilterComposer($db: db, $table: table),
+              () => $$MtgCardsTableFilterComposer($db: db, $table: table),
           createOrderingComposer:
-              () => $$PokemonCardsTableOrderingComposer($db: db, $table: table),
+              () => $$MtgCardsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer:
-              () =>
-                  $$PokemonCardsTableAnnotationComposer($db: db, $table: table),
+              () => $$MtgCardsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
@@ -2109,7 +2105,7 @@ class $$PokemonCardsTableTableManager
                 Value<String?> setName = const Value.absent(),
                 Value<int?> cardnumber = const Value.absent(),
                 Value<int> effectId = const Value.absent(),
-              }) => PokemonCardsCompanion(
+              }) => MtgCardsCompanion(
                 id: id,
                 name: name,
                 rarity: rarity,
@@ -2125,7 +2121,7 @@ class $$PokemonCardsTableTableManager
                 Value<String?> setName = const Value.absent(),
                 Value<int?> cardnumber = const Value.absent(),
                 required int effectId,
-              }) => PokemonCardsCompanion.insert(
+              }) => MtgCardsCompanion.insert(
                 id: id,
                 name: name,
                 rarity: rarity,
@@ -2139,7 +2135,7 @@ class $$PokemonCardsTableTableManager
                       .map(
                         (e) => (
                           e.readTable(table),
-                          $$PokemonCardsTableReferences(db, table, e),
+                          $$MtgCardsTableReferences(db, table, e),
                         ),
                       )
                       .toList(),
@@ -2167,12 +2163,10 @@ class $$PokemonCardsTableTableManager
                       state.withJoin(
                             currentTable: table,
                             currentColumn: table.effectId,
-                            referencedTable: $$PokemonCardsTableReferences
+                            referencedTable: $$MtgCardsTableReferences
                                 ._effectIdTable(db),
                             referencedColumn:
-                                $$PokemonCardsTableReferences
-                                    ._effectIdTable(db)
-                                    .id,
+                                $$MtgCardsTableReferences._effectIdTable(db).id,
                           )
                           as T;
                 }
@@ -2188,18 +2182,18 @@ class $$PokemonCardsTableTableManager
       );
 }
 
-typedef $$PokemonCardsTableProcessedTableManager =
+typedef $$MtgCardsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $PokemonCardsTable,
-      PokemonCard,
-      $$PokemonCardsTableFilterComposer,
-      $$PokemonCardsTableOrderingComposer,
-      $$PokemonCardsTableAnnotationComposer,
-      $$PokemonCardsTableCreateCompanionBuilder,
-      $$PokemonCardsTableUpdateCompanionBuilder,
-      (PokemonCard, $$PokemonCardsTableReferences),
-      PokemonCard,
+      $MtgCardsTable,
+      MtgCard,
+      $$MtgCardsTableFilterComposer,
+      $$MtgCardsTableOrderingComposer,
+      $$MtgCardsTableAnnotationComposer,
+      $$MtgCardsTableCreateCompanionBuilder,
+      $$MtgCardsTableUpdateCompanionBuilder,
+      (MtgCard, $$MtgCardsTableReferences),
+      MtgCard,
       PrefetchHooks Function({bool effectId})
     >;
 typedef $$CardInstancesTableCreateCompanionBuilder =
@@ -2771,8 +2765,8 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$CardEffectsTableTableManager get cardEffects =>
       $$CardEffectsTableTableManager(_db, _db.cardEffects);
-  $$PokemonCardsTableTableManager get pokemonCards =>
-      $$PokemonCardsTableTableManager(_db, _db.pokemonCards);
+  $$MtgCardsTableTableManager get mtgCards =>
+      $$MtgCardsTableTableManager(_db, _db.mtgCards);
   $$CardInstancesTableTableManager get cardInstances =>
       $$CardInstancesTableTableManager(_db, _db.cardInstances);
   $$ContainersTableTableManager get containers =>

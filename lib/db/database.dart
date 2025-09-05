@@ -37,7 +37,7 @@ class AppDatabase extends _$AppDatabase {
         },
         onUpgrade: (m, from, to) async {
           if (from == 1) {
-            await m.customStatement('ALTER TABLE pokemon_cards RENAME TO mtg_cards');
+            await customStatement('ALTER TABLE pokemon_cards RENAME TO mtg_cards');
           }
         },
       );
