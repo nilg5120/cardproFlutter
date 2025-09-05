@@ -16,8 +16,8 @@ void main() {
 
   test('カードを登録して取得できる', () async {
     // マスター登録
-    final cardId = await db.into(db.pokemonCards).insertReturning(
-      PokemonCardsCompanion.insert(
+    final cardId = await db.into(db.mtgCards).insertReturning(
+      MtgCardsCompanion.insert(
         name: 'テストカード',
         rarity: const Value('R'),
         setName: const Value('サンプル'),

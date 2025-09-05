@@ -141,7 +141,7 @@ Then 「不足: X枚」「候補: 未所属Y枚/他デッキZ枚」を表示す�
 | `app_settings` | `id PK(=1)`, `ruleset_json`, `locale`, `theme` | ルール集合をJSONで保持 |
 
 ### 11.2 参照整合性
-- `card_instances.card_id` は `pokemon_cards.id` に必須参照
+- `card_instances.card_id` は `mtg_cards.id` に必須参照
 - `container_card_locations.card_instance_id` は UNIQUE（多重所属防止）
 - 参照削除時の動作: `ON DELETE RESTRICT`（安全優先）
 

@@ -4,7 +4,7 @@ import 'package:drift_sqflite/drift_sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
-import 'pokemon_cards.dart';
+import 'mtg_cards.dart';
 import 'card_instances.dart';
 import 'containers.dart';
 import 'container_card_locations.dart';
@@ -18,7 +18,7 @@ import 'card_effects.dart';
 part 'database.g.dart';
 
 @DriftDatabase(
-  tables: [PokemonCards, CardInstances, Containers, ContainerCardLocations,
+  tables: [MtgCards, CardInstances, Containers, ContainerCardLocations,
            CardEffects],
 )
 class AppDatabase extends _$AppDatabase {
@@ -28,7 +28,19 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.test(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) async {
+          await m.createAll();
+        },
+        onUpgrade: (m, from, to) async {
+          if (from == 1) {
+            await m.customStatement('ALTER TABLE pokemon_cards RENAME TO mtg_cards');
+          }
+        },
+      );
 }
 
 LazyDatabase _openConnection() {
@@ -55,37 +67,37 @@ extension SeedData on AppDatabase {
     await ensureDefaultCardEffectsExist();
 
     // Seed cards and instances if none exist
-    final cardsCount = await pokemonCards.count().getSingle();
+    final cardsCount = await mtgCards.count().getSingle();
     if (cardsCount == 0) {
       // Use the first available effect as a default
       final effect = await (select(cardEffects)..limit(1)).getSingle();
 
-      final pikachu = await into(pokemonCards).insertReturning(
-        PokemonCardsCompanion.insert(
-          name: 'ピカチュウ',
+      final bolt = await into(mtgCards).insertReturning(
+        MtgCardsCompanion.insert(
+          name: '稲妻', // Lightning Bolt
           rarity: const Value('C'),
-          setName: const Value('Base'),
-          cardnumber: const Value(25),
+          setName: const Value('Alpha'),
+          cardnumber: const Value(116),
           effectId: effect.id,
         ),
       );
 
-      final charmander = await into(pokemonCards).insertReturning(
-        PokemonCardsCompanion.insert(
-          name: 'ヒトカゲ',
-          rarity: const Value('C'),
-          setName: const Value('Base'),
-          cardnumber: const Value(4),
+      final counterspell = await into(mtgCards).insertReturning(
+        MtgCardsCompanion.insert(
+          name: '対抗呪文', // Counterspell
+          rarity: const Value('U'),
+          setName: const Value('Alpha'),
+          cardnumber: const Value(69),
           effectId: effect.id,
         ),
       );
 
-      final squirtle = await into(pokemonCards).insertReturning(
-        PokemonCardsCompanion.insert(
-          name: 'ゼニガメ',
+      final llanowar = await into(mtgCards).insertReturning(
+        MtgCardsCompanion.insert(
+          name: 'ラノワールのエルフ', // Llanowar Elves
           rarity: const Value('C'),
-          setName: const Value('Base'),
-          cardnumber: const Value(7),
+          setName: const Value('Alpha'),
+          cardnumber: const Value(213),
           effectId: effect.id,
         ),
       );
@@ -94,17 +106,17 @@ extension SeedData on AppDatabase {
       await batch((b) {
         b.insertAll(cardInstances, [
           CardInstancesCompanion.insert(
-            cardId: pikachu.id,
+            cardId: bolt.id,
             description: const Value('初期カード'),
             updatedAt: Value(now),
           ),
           CardInstancesCompanion.insert(
-            cardId: charmander.id,
+            cardId: counterspell.id,
             description: const Value('初期カード'),
             updatedAt: Value(now),
           ),
           CardInstancesCompanion.insert(
-            cardId: squirtle.id,
+            cardId: llanowar.id,
             description: const Value('初期カード'),
             updatedAt: Value(now),
           ),
@@ -146,13 +158,13 @@ extension SeedData on AppDatabase {
 }
 
 extension CardQueries on AppDatabase {
-  Future<List<(PokemonCard, CardInstance)>> getCardWithMaster() {
+  Future<List<(MtgCard, CardInstance)>> getCardWithMaster() {
     final query = select(cardInstances).join([
-      innerJoin(pokemonCards, pokemonCards.id.equalsExp(cardInstances.cardId)),
+      innerJoin(mtgCards, mtgCards.id.equalsExp(cardInstances.cardId)),
     ]);
 
     return query.map((row) => (
-          row.readTable(pokemonCards),
+          row.readTable(mtgCards),
           row.readTable(cardInstances),
         )).get();
   }

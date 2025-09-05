@@ -49,7 +49,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     required String? description,
   }) async {
     // Check if card already exists
-    final existingCard = await (database.select(database.pokemonCards)
+    final existingCard = await (database.select(database.mtgCards)
           ..where((tbl) =>
               tbl.name.equals(name) &
               tbl.setName.equals(setName ?? '') &
@@ -58,8 +58,8 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
 
     // Insert or get existing card
     final cardId = existingCard?.id ??
-        (await database.into(database.pokemonCards).insertReturning(
-              PokemonCardsCompanion.insert(
+        (await database.into(database.mtgCards).insertReturning(
+              MtgCardsCompanion.insert(
                 name: name,
                 rarity: Value(rarity),
                 setName: Value(setName),
@@ -79,7 +79,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
         );
 
     // Get the inserted card and instance
-    final card = await (database.select(database.pokemonCards)
+    final card = await (database.select(database.mtgCards)
           ..where((tbl) => tbl.id.equals(cardId)))
         .getSingle();
     
@@ -115,10 +115,10 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     required String? description,
   }) async {
     // カード情報を更新
-    await (database.update(database.pokemonCards)
+    await (database.update(database.mtgCards)
           ..where((tbl) => tbl.id.equals(card.id)))
         .write(
-      PokemonCardsCompanion(
+      MtgCardsCompanion(
         rarity: Value(rarity),
         setName: Value(setName),
         cardnumber: Value(cardNumber),
