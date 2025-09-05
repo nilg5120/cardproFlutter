@@ -49,6 +49,102 @@ LazyDatabase _openConnection() {
 }
 
 
+extension SeedData on AppDatabase {
+  Future<void> ensureInitialCardsAndDeckExist() async {
+    // Ensure effects exist first
+    await ensureDefaultCardEffectsExist();
+
+    // Seed cards and instances if none exist
+    final cardsCount = await pokemonCards.count().getSingle();
+    if (cardsCount == 0) {
+      // Use the first available effect as a default
+      final effect = await (select(cardEffects)..limit(1)).getSingle();
+
+      final pikachu = await into(pokemonCards).insertReturning(
+        PokemonCardsCompanion.insert(
+          name: 'ピカチュウ',
+          rarity: const Value('C'),
+          setName: const Value('Base'),
+          cardnumber: const Value(25),
+          effectId: effect.id,
+        ),
+      );
+
+      final charmander = await into(pokemonCards).insertReturning(
+        PokemonCardsCompanion.insert(
+          name: 'ヒトカゲ',
+          rarity: const Value('C'),
+          setName: const Value('Base'),
+          cardnumber: const Value(4),
+          effectId: effect.id,
+        ),
+      );
+
+      final squirtle = await into(pokemonCards).insertReturning(
+        PokemonCardsCompanion.insert(
+          name: 'ゼニガメ',
+          rarity: const Value('C'),
+          setName: const Value('Base'),
+          cardnumber: const Value(7),
+          effectId: effect.id,
+        ),
+      );
+
+      final now = DateTime.now();
+      await batch((b) {
+        b.insertAll(cardInstances, [
+          CardInstancesCompanion.insert(
+            cardId: pikachu.id,
+            description: const Value('初期カード'),
+            updatedAt: Value(now),
+          ),
+          CardInstancesCompanion.insert(
+            cardId: charmander.id,
+            description: const Value('初期カード'),
+            updatedAt: Value(now),
+          ),
+          CardInstancesCompanion.insert(
+            cardId: squirtle.id,
+            description: const Value('初期カード'),
+            updatedAt: Value(now),
+          ),
+        ]);
+      });
+    }
+
+    // Seed a default deck and put some cards in it if no decks exist
+    final decks = await (select(containers)
+          ..where((t) => t.containerType.equals('deck')))
+        .get();
+    if (decks.isEmpty) {
+      final deck = await into(containers).insertReturning(
+        ContainersCompanion.insert(
+          name: const Value('初期デッキ'),
+          description: const Value('自動作成されたデッキ'),
+          containerType: 'deck',
+        ),
+      );
+
+      final instances = await select(cardInstances).get();
+      final selected = instances.take(3).toList();
+      if (selected.isNotEmpty) {
+        await batch((b) {
+          b.insertAll(
+            containerCardLocations,
+            selected
+                .map((ci) => ContainerCardLocationsCompanion.insert(
+                      containerId: deck.id,
+                      cardInstanceId: ci.id,
+                      location: 'main',
+                    ))
+                .toList(),
+          );
+        });
+      }
+    }
+  }
+}
+
 extension CardQueries on AppDatabase {
   Future<List<(PokemonCard, CardInstance)>> getCardWithMaster() {
     final query = select(cardInstances).join([

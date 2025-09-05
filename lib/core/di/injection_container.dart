@@ -25,6 +25,8 @@ Future<void> init() async {
   final database = AppDatabase();
   // デフォルトのカード効果を追加
   await database.ensureDefaultCardEffectsExist();
+  // 初期カードと初期デッキを用意
+  await database.ensureInitialCardsAndDeckExist();
   sl.registerLazySingleton<AppDatabase>(() => database);
 
   // Features - Cards
