@@ -12,12 +12,12 @@ class CardListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Try using an existing BlocProvider if available (e.g. from parent)
+    // 上位ツリーに既存の BlocProvider があればそれを利用する
     try {
       BlocProvider.of<CardBloc>(context, listen: false);
       return _buildScaffold(context);
     } catch (_) {
-      // Otherwise create a local provider
+      // なければローカルに BlocProvider を作成する
       return BlocProvider(
         create: (_) => sl<CardBloc>()..add(GetCardsEvent()),
         child: _buildScaffold(context),
@@ -53,14 +53,14 @@ class CardListPage extends StatelessWidget {
               ),
             );
           } else if (state is CardInitial) {
-            // Trigger load on first frame
+            // 初回フレーム描画後に読み込みをトリガーする
             WidgetsBinding.instance.addPostFrameCallback((_) {
               context.read<CardBloc>().add(GetCardsEvent());
             });
             return const Center(child: CircularProgressIndicator());
           }
 
-          return const Center(child: Text('Please load cards'));
+          return const Center(child: Text('カードを読み込んでください'));
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -72,7 +72,7 @@ class CardListPage extends StatelessWidget {
 
   Widget _buildCardList(BuildContext context, List<CardWithInstance> cards) {
     if (cards.isEmpty) {
-      return const Center(child: Text('No cards'));
+      return const Center(child: Text('カードがありません'));
     }
 
     return ListView.builder(
@@ -120,4 +120,3 @@ class CardListPage extends StatelessWidget {
     );
   }
 }
-

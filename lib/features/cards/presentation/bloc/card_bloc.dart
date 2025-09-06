@@ -8,7 +8,7 @@ import 'package:cardpro/features/cards/domain/usecases/edit_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
 
-/// --- States ---
+/// --- ステート定義 ---
 
 abstract class CardState extends Equatable {
   const CardState();

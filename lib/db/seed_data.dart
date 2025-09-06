@@ -5,11 +5,11 @@ extension SeedData on AppDatabase {
     try {
       debugPrint('Seeding initial data...');
 
-      // Ensure effects exist first
+      // まずカード効果（エフェクト）が存在することを保証する
       await ensureDefaultCardEffectsExist();
       debugPrint('Card effects ensured.');
 
-      // Seed cards if none exist
+      // カードが1枚も無い場合はサンプルカードを投入する
       final existingCards = await select(mtgCards).get();
       debugPrint('Existing cards: ${existingCards.length}');
 
@@ -56,7 +56,7 @@ extension SeedData on AppDatabase {
         );
         debugPrint('Created card: Llanowar Elves (ID: ${llanowar.id})');
 
-        // Create instances for the created cards
+        // いま作成したカードのインスタンスを作成する
         final now = DateTime.now();
         await batch((b) {
           b.insertAll(cardInstances, [
@@ -80,7 +80,7 @@ extension SeedData on AppDatabase {
         debugPrint('Created initial card instances.');
       }
 
-      // Ensure at least some instances exist even if cards already existed
+      // 既存カードのみでインスタンスが無い場合でも最低限のインスタンスを作成する
       final instancesCount = await cardInstances.count().getSingle();
       debugPrint('Existing instances: $instancesCount');
       if (instancesCount == 0) {
@@ -106,7 +106,7 @@ extension SeedData on AppDatabase {
         }
       }
 
-      // Seed a default deck if none exist
+      // デッキが存在しない場合はデフォルトデッキを作成し、カードを追加する
       final decks = await (select(containers)
             ..where((t) => t.containerType.equals('deck')))
           .get();

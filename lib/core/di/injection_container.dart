@@ -2,7 +2,7 @@ import 'package:get_it/get_it.dart';
 
 import 'package:cardpro/db/database.dart';
 
-// Cards
+// カード関連
 import 'package:cardpro/features/cards/data/datasources/card_local_data_source.dart';
 import 'package:cardpro/features/cards/data/repositories/card_repository_impl.dart';
 import 'package:cardpro/features/cards/domain/repositories/card_repository.dart';
@@ -13,7 +13,7 @@ import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart';
 import 'package:cardpro/features/cards/domain/usecases/get_cards.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 
-// Decks
+// デッキ関連
 import 'package:cardpro/features/decks/data/datasources/deck_local_data_source.dart';
 import 'package:cardpro/features/decks/data/repositories/deck_repository_impl.dart';
 import 'package:cardpro/features/decks/domain/repositories/deck_repository.dart';
@@ -26,16 +26,15 @@ import 'package:cardpro/features/decks/presentation/bloc/deck_bloc.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  // Database
+  // データベース
   final database = AppDatabase();
-  // Seed defaults
-  // Note: keep prints in English/ASCII to avoid encoding issues on some shells.
-  // This does not impact app behavior.
-  // Initialize default effects and initial data
+  // 初期データ投入
+  // 補足: 一部のシェル環境ではエンコーディング問題を避けるため、print文は英数字中心にしています（動作へ影響なし）。
+  // デフォルトのカード効果と初期カード/デッキを作成
   await database.ensureDefaultCardEffectsExist();
   await database.ensureInitialCardsAndDeckExist();
 
-  // Quick counts for sanity
+  // 簡易的な件数確認用ログ
   final cardsCount = await (database.select(database.mtgCards)..limit(1000))
       .get()
       .then((l) => l.length);
@@ -48,7 +47,7 @@ Future<void> init() async {
 
   sl.registerLazySingleton<AppDatabase>(() => database);
 
-  // Features - Cards
+  // 機能 - カード
   // BLoC
   sl.registerFactory(
     () => CardBloc(
@@ -60,24 +59,24 @@ Future<void> init() async {
     ),
   );
 
-  // Use cases
+  // ユースケース
   sl.registerLazySingleton(() => GetCards(sl()));
   sl.registerLazySingleton(() => AddCard(sl()));
   sl.registerLazySingleton(() => DeleteCard(sl()));
   sl.registerLazySingleton(() => EditCard(sl()));
   sl.registerLazySingleton(() => EditCardFull(sl()));
 
-  // Repository
+  // リポジトリ
   sl.registerLazySingleton<CardRepository>(
     () => CardRepositoryImpl(localDataSource: sl()),
   );
 
-  // Data sources
+  // データソース
   sl.registerLazySingleton<CardLocalDataSource>(
     () => CardLocalDataSourceImpl(database: sl()),
   );
 
-  // Features - Decks
+  // 機能 - デッキ
   // BLoC
   sl.registerFactory(
     () => DeckBloc(
@@ -88,20 +87,19 @@ Future<void> init() async {
     ),
   );
 
-  // Use cases
+  // ユースケース
   sl.registerLazySingleton(() => GetDecks(sl()));
   sl.registerLazySingleton(() => AddDeck(sl()));
   sl.registerLazySingleton(() => DeleteDeck(sl()));
   sl.registerLazySingleton(() => EditDeck(sl()));
 
-  // Repository
+  // リポジトリ
   sl.registerLazySingleton<DeckRepository>(
     () => DeckRepositoryImpl(localDataSource: sl()),
   );
 
-  // Data sources
+  // データソース
   sl.registerLazySingleton<DeckLocalDataSource>(
     () => DeckLocalDataSourceImpl(database: sl()),
   );
 }
-

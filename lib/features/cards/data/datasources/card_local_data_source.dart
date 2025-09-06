@@ -54,7 +54,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     required int effectId,
     required String? description,
   }) async {
-    // Check if card already exists
+    // 既存カードの重複チェック（同名・同セット・同カード番号）
     final existingCard = await (database.select(database.mtgCards)
           ..where((tbl) =>
               tbl.name.equals(name) &
@@ -62,7 +62,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
               tbl.cardnumber.equals(cardNumber ?? 0)))
         .getSingleOrNull();
 
-    // Insert or get existing card
+    // 新規カードを挿入、もしくは既存カードのIDを利用
     final cardId = existingCard?.id ??
         (await database.into(database.mtgCards).insertReturning(
               MtgCardsCompanion.insert(
@@ -75,7 +75,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
             ))
             .id;
 
-    // Insert card instance
+    // カードインスタンスを挿入
     final instanceId = await database.into(database.cardInstances).insertReturning(
           CardInstancesCompanion.insert(
             cardId: cardId,
@@ -84,7 +84,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
           ),
         );
 
-    // Get the inserted card and instance
+    // 直近のカード・インスタンスを取得して返却
     final card = await (database.select(database.mtgCards)
           ..where((tbl) => tbl.id.equals(cardId)))
         .getSingle();

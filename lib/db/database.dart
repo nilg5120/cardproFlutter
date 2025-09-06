@@ -29,7 +29,7 @@ part 'seed_data.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-  // Named constructor for tests to inject an in-memory executor
+  // テスト用: メモリDBのエグゼキュータを差し込むための名前付きコンストラクタ
   AppDatabase.test(super.executor);
 
   @override
@@ -39,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async {
           await m.createAll();
-          // Seed baseline data on first creation
+          // 初回作成時にベースラインの初期データを投入
           await ensureDefaultCardEffectsExist();
           await ensureInitialCardsAndDeckExist();
         },
@@ -67,7 +67,7 @@ LazyDatabase _openConnection() {
   });
 }
 
-// Seeding-related extension moved to part file: seed_data.dart
+// 初期データ投入（Seed）関連の拡張は seed_data.dart に分離
 
 extension CardQueries on AppDatabase {
   Future<List<(MtgCard, CardInstance)>> getCardWithMaster() {
