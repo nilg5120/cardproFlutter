@@ -12,6 +12,7 @@ import 'package:cardpro/features/cards/domain/usecases/edit_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart';
 import 'package:cardpro/features/cards/domain/usecases/get_cards.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
+import 'package:cardpro/features/cards/data/datasources/scryfall_api.dart';
 
 // デッキ関連
 import 'package:cardpro/features/decks/data/datasources/deck_local_data_source.dart';
@@ -75,6 +76,9 @@ Future<void> init() async {
   sl.registerLazySingleton<CardLocalDataSource>(
     () => CardLocalDataSourceImpl(database: sl()),
   );
+
+  // Remote API clients
+  sl.registerLazySingleton<ScryfallApi>(() => ScryfallApi());
 
   // 機能 - デッキ
   // BLoC

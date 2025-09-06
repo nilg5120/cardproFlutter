@@ -1,6 +1,5 @@
 import 'package:cardpro/core/error/failures.dart';
 import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
-import 'package:cardpro/features/cards/domain/repositories/card_repository.dart';
 import 'package:cardpro/features/cards/domain/usecases/delete_card.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';

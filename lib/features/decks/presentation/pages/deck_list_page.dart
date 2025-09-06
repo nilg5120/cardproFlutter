@@ -51,15 +51,6 @@ class DeckListPage extends StatelessWidget {
           onDelete: () {
             context.read<DeckBloc>().add(DeleteDeckEvent(id: deck.id));
           },
-          onEdit: (String? name, String? description) {
-            context.read<DeckBloc>().add(
-              EditDeckEvent(
-                id: deck.id,
-                name: name ?? deck.name ?? "",
-                description: description,
-              ),
-            );
-          },
         );
       },
     );
@@ -122,4 +113,3 @@ class DeckListPage extends StatelessWidget {
     );
   }
 }
-
