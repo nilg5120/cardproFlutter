@@ -5,16 +5,16 @@ extension SeedData on AppDatabase {
     try {
       debugPrint('Seeding initial data...');
 
-      // まずカード効果（エフェクト）が存在することを保証する
+      // Ensure card effects exist first
       await ensureDefaultCardEffectsExist();
       debugPrint('Card effects ensured.');
 
-      // カードが1枚も無い場合はサンプルカードを投入する
+      // Create initial 10 cards if none exist
       final existingCards = await select(mtgCards).get();
       debugPrint('Existing cards: ${existingCards.length}');
 
       if (existingCards.isEmpty) {
-        debugPrint('Creating initial cards...');
+        debugPrint('Creating initial cards (10 types)...');
 
         final effects = await select(cardEffects).get();
         if (effects.isEmpty) {
@@ -23,69 +23,57 @@ extension SeedData on AppDatabase {
         final effect = effects.first;
         debugPrint('Using effect: ${effect.name} (ID: ${effect.id})');
 
-        final bolt = await into(mtgCards).insertReturning(
-          MtgCardsCompanion.insert(
-            name: 'Lightning Bolt',
-            rarity: const Value('C'),
-            setName: const Value('Alpha'),
-            cardnumber: const Value(116),
-            effectId: effect.id,
-          ),
-        );
-        debugPrint('Created card: Lightning Bolt (ID: ${bolt.id})');
+        final insertedCards = <MtgCard>[];
 
-        final counterspell = await into(mtgCards).insertReturning(
-          MtgCardsCompanion.insert(
-            name: 'Counterspell',
-            rarity: const Value('U'),
-            setName: const Value('Alpha'),
-            cardnumber: const Value(69),
-            effectId: effect.id,
-          ),
-        );
-        debugPrint('Created card: Counterspell (ID: ${counterspell.id})');
+        Future<MtgCard> addCard(String name, String rarity, int number) async {
+          final card = await into(mtgCards).insertReturning(
+            MtgCardsCompanion.insert(
+              name: name,
+              rarity: Value(rarity),
+              setName: const Value('Alpha'),
+              cardnumber: Value(number),
+              effectId: effect.id,
+            ),
+          );
+          debugPrint('Created card: $name (ID: ${card.id})');
+          return card;
+        }
 
-        final llanowar = await into(mtgCards).insertReturning(
-          MtgCardsCompanion.insert(
-            name: 'Llanowar Elves',
-            rarity: const Value('C'),
-            setName: const Value('Alpha'),
-            cardnumber: const Value(213),
-            effectId: effect.id,
-          ),
-        );
-        debugPrint('Created card: Llanowar Elves (ID: ${llanowar.id})');
+        insertedCards.add(await addCard('Lightning Bolt', 'C', 116));
+        insertedCards.add(await addCard('Counterspell', 'U', 69));
+        insertedCards.add(await addCard('Llanowar Elves', 'C', 213));
+        insertedCards.add(await addCard('Serra Angel', 'U', 34));
+        insertedCards.add(await addCard('Giant Growth', 'C', 188));
+        insertedCards.add(await addCard('Dark Ritual', 'C', 104));
+        insertedCards.add(await addCard('Shivan Dragon', 'R', 163));
+        insertedCards.add(await addCard('Swords to Plowshares', 'U', 33));
+        insertedCards.add(await addCard('Ancestral Recall', 'R', 17));
+        insertedCards.add(await addCard('Black Lotus', 'R', 233));
 
-        // いま作成したカードのインスタンスを作成する
         final now = DateTime.now();
         await batch((b) {
-          b.insertAll(cardInstances, [
-            CardInstancesCompanion.insert(
-              cardId: bolt.id,
-              description: const Value('Initial card'),
-              updatedAt: Value(now),
-            ),
-            CardInstancesCompanion.insert(
-              cardId: counterspell.id,
-              description: const Value('Initial card'),
-              updatedAt: Value(now),
-            ),
-            CardInstancesCompanion.insert(
-              cardId: llanowar.id,
-              description: const Value('Initial card'),
-              updatedAt: Value(now),
-            ),
-          ]);
+          b.insertAll(
+            cardInstances,
+            insertedCards
+                .map(
+                  (c) => CardInstancesCompanion.insert(
+                    cardId: c.id,
+                    description: const Value('Initial card'),
+                    updatedAt: Value(now),
+                  ),
+                )
+                .toList(),
+          );
         });
-        debugPrint('Created initial card instances.');
+        debugPrint('Created initial card instances (10).');
       }
 
-      // 既存カードのみでインスタンスが無い場合でも最低限のインスタンスを作成する
+      // Ensure at least one instance exists for existing cards
       final instancesCount = await cardInstances.count().getSingle();
       debugPrint('Existing instances: $instancesCount');
       if (instancesCount == 0) {
         debugPrint('Creating instances for existing cards...');
-        final cards = await (select(mtgCards)..limit(3)).get();
+        final cards = await (select(mtgCards)..limit(10)).get();
         final now = DateTime.now();
         if (cards.isNotEmpty) {
           await batch((b) {
@@ -106,43 +94,63 @@ extension SeedData on AppDatabase {
         }
       }
 
-      // デッキが存在しない場合はデフォルトデッキを作成し、カードを追加する
+      // Create 2 default decks if none exist and assign cards
       final decks = await (select(containers)
             ..where((t) => t.containerType.equals('deck')))
           .get();
       debugPrint('Existing decks: ${decks.length}');
 
       if (decks.isEmpty) {
-        debugPrint('Creating default deck...');
+        debugPrint('Creating default decks (2)...');
 
-        final deck = await into(containers).insertReturning(
+        final deckA = await into(containers).insertReturning(
           ContainersCompanion.insert(
-            name: const Value('Default Deck'),
-            description: const Value('Auto-created deck'),
+            name: const Value('Default Deck A'),
+            description: const Value('Auto-created deck A'),
             containerType: 'deck',
           ),
         );
-        debugPrint('Created deck (ID: ${deck.id})');
+        final deckB = await into(containers).insertReturning(
+          ContainersCompanion.insert(
+            name: const Value('Default Deck B'),
+            description: const Value('Auto-created deck B'),
+            containerType: 'deck',
+          ),
+        );
+        debugPrint('Created decks A(ID: ${deckA.id}) and B(ID: ${deckB.id})');
 
         final instances = await select(cardInstances).get();
-        final selected = instances.take(3).toList();
-        debugPrint('Adding ${selected.length} cards to the deck...');
+        final firstHalf = instances.take(5).toList();
+        final secondHalf = instances.skip(5).take(5).toList();
+        debugPrint('Assigning ${firstHalf.length} to Deck A, ${secondHalf.length} to Deck B');
 
-        if (selected.isNotEmpty) {
-          await batch((b) {
+        await batch((b) {
+          if (firstHalf.isNotEmpty) {
             b.insertAll(
               containerCardLocations,
-              selected
+              firstHalf
                   .map((ci) => ContainerCardLocationsCompanion.insert(
-                        containerId: deck.id,
+                        containerId: deckA.id,
                         cardInstanceId: ci.id,
                         location: 'main',
                       ))
                   .toList(),
             );
-          });
-          debugPrint('Added cards to the deck.');
-        }
+          }
+          if (secondHalf.isNotEmpty) {
+            b.insertAll(
+              containerCardLocations,
+              secondHalf
+                  .map((ci) => ContainerCardLocationsCompanion.insert(
+                        containerId: deckB.id,
+                        cardInstanceId: ci.id,
+                        location: 'main',
+                      ))
+                  .toList(),
+            );
+          }
+        });
+        debugPrint('Added cards to both decks.');
       }
 
       debugPrint('Seeding complete.');
@@ -175,3 +183,4 @@ extension SeedData on AppDatabase {
     }
   }
 }
+
