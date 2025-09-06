@@ -3,8 +3,7 @@ import 'package:cardpro/features/decks/presentation/bloc/deck_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cardpro/core/di/injection_container.dart' as di;
-import 'package:cardpro/features/cards/presentation/pages/card_list_page.dart';
-import 'package:cardpro/features/decks/presentation/pages/deck_list_page.dart';
+import 'package:cardpro/features/home/presentation/pages/home_page.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:cardpro/features/decks/presentation/bloc/deck_bloc.dart';
 
@@ -32,44 +31,6 @@ class MyApp extends StatelessWidget {
         title: 'CardPro',
         theme: ThemeData(useMaterial3: true),
         home: const HomePage(),
-      ),
-    );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
-
-  final _pages = [
-    const CardListPage(),
-    const DeckListPage(),
-    const Placeholder(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.view_list),
-            label: 'カード一覧',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.folder),
-            label: 'コンテナ',
-          ),
-        ],
       ),
     );
   }
