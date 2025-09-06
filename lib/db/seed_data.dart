@@ -120,15 +120,20 @@ extension SeedData on AppDatabase {
         debugPrint('Created decks A(ID: ${deckA.id}) and B(ID: ${deckB.id})');
 
         final instances = await select(cardInstances).get();
-        final firstHalf = instances.take(5).toList();
-        final secondHalf = instances.skip(5).take(5).toList();
-        debugPrint('Assigning ${firstHalf.length} to Deck A, ${secondHalf.length} to Deck B');
+        final deckAList = instances.take(8).toList();
+        final remainingForB = instances.skip(8).take(2).toList();
+        // pick 3 from deck A to also include in deck B (dup across decks)
+        final duplicatesFromA = deckAList.take(3).toList();
+        final deckBList = [...remainingForB, ...duplicatesFromA];
+
+        debugPrint('Assigning to Deck A: ${deckAList.length}');
+        debugPrint('Assigning to Deck B: ${deckBList.length} (includes ${duplicatesFromA.length} duplicates from A)');
 
         await batch((b) {
-          if (firstHalf.isNotEmpty) {
+          if (deckAList.isNotEmpty) {
             b.insertAll(
               containerCardLocations,
-              firstHalf
+              deckAList
                   .map((ci) => ContainerCardLocationsCompanion.insert(
                         containerId: deckA.id,
                         cardInstanceId: ci.id,
@@ -137,10 +142,10 @@ extension SeedData on AppDatabase {
                   .toList(),
             );
           }
-          if (secondHalf.isNotEmpty) {
+          if (deckBList.isNotEmpty) {
             b.insertAll(
               containerCardLocations,
-              secondHalf
+              deckBList
                   .map((ci) => ContainerCardLocationsCompanion.insert(
                         containerId: deckB.id,
                         cardInstanceId: ci.id,
@@ -150,7 +155,7 @@ extension SeedData on AppDatabase {
             );
           }
         });
-        debugPrint('Added cards to both decks.');
+        debugPrint('Added cards to both decks with overlap.');
       }
 
       debugPrint('Seeding complete.');
@@ -183,4 +188,3 @@ extension SeedData on AppDatabase {
     }
   }
 }
-

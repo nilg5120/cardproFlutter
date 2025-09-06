@@ -1,4 +1,5 @@
 import 'package:cardpro/features/decks/domain/entities/container.dart' as deck_entity;
+import 'package:cardpro/features/decks/presentation/pages/deck_detail_page.dart';
 import 'package:flutter/material.dart';
 
 class DeckListItem extends StatelessWidget {
@@ -38,7 +39,13 @@ class DeckListItem extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit),
-                      onPressed: () => _showEditDialog(context),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => DeckDetailPage(deck: deck),
+                          ),
+                        );
+                      },
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete),
@@ -83,58 +90,6 @@ class DeckListItem extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context) {
-    final descriptionController =
-        TextEditingController(text: deck.description ?? '');
-    final nameController = TextEditingController(text: deck.name ?? '');
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Deck'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Deck Name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter a description',
-                ),
-                maxLines: 3,
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              onEdit(
-                nameController.text.isEmpty ? null : nameController.text,
-                descriptionController.text.isEmpty
-                    ? null
-                    : descriptionController.text,
-              );
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
+    // Deprecated: now navigate to detail page for editing.
   }
 }
-

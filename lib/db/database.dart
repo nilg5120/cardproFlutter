@@ -87,3 +87,65 @@ extension CardQueries on AppDatabase {
     return select(cardEffects).get();
   }
 }
+
+extension DeckQueries on AppDatabase {
+  Future<List<(MtgCard, CardInstance, ContainerCardLocation)>> getCardsInDeck(int containerId) {
+    final query = select(containerCardLocations).join([
+      innerJoin(cardInstances, cardInstances.id.equalsExp(containerCardLocations.cardInstanceId)),
+      innerJoin(mtgCards, mtgCards.id.equalsExp(cardInstances.cardId)),
+    ])
+      ..where(containerCardLocations.containerId.equals(containerId));
+
+    return query
+        .map((row) => (
+              row.readTable(mtgCards),
+              row.readTable(cardInstances),
+              row.readTable(containerCardLocations),
+            ))
+        .get();
+  }
+
+  Future<List<(MtgCard, CardInstance)>> getUnassignedCardInstances() {
+    final query = select(cardInstances).join([
+      innerJoin(mtgCards, mtgCards.id.equalsExp(cardInstances.cardId)),
+      leftOuterJoin(
+        containerCardLocations,
+        containerCardLocations.cardInstanceId.equalsExp(cardInstances.id),
+      ),
+    ])
+      ..where(containerCardLocations.cardInstanceId.isNull());
+
+    return query
+        .map((row) => (
+              row.readTable(mtgCards),
+              row.readTable(cardInstances),
+            ))
+        .get();
+  }
+
+  Future<void> addCardToDeck({
+    required int containerId,
+    required int cardInstanceId,
+    String location = 'main',
+  }) async {
+    await into(containerCardLocations).insert(
+      ContainerCardLocationsCompanion.insert(
+        containerId: containerId,
+        cardInstanceId: cardInstanceId,
+        location: location,
+      ),
+      mode: InsertMode.insertOrIgnore,
+    );
+  }
+
+  Future<void> removeCardFromDeck({
+    required int containerId,
+    required int cardInstanceId,
+  }) async {
+    await (delete(containerCardLocations)
+          ..where((t) =>
+              t.containerId.equals(containerId) &
+              t.cardInstanceId.equals(cardInstanceId)))
+        .go();
+  }
+}
