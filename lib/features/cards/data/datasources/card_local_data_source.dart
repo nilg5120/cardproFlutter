@@ -33,10 +33,16 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
 
   @override
   Future<List<CardWithInstanceModel>> getCards() async {
+    print('🔍 カードデータ取得開始');
     final results = await database.getCardWithMaster();
-    return results
+    print('📊 取得したカード数: ${results.length}');
+    
+    final cardModels = results
         .map((tuple) => CardWithInstanceModel.fromDrift(tuple.$1, tuple.$2))
         .toList();
+    
+    print('✅ カードモデル変換完了: ${cardModels.length}件');
+    return cardModels;
   }
 
   @override

@@ -1,19 +1,19 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:mockito/annotations.dart';
-import 'package:cardpro/features/cards/domain/usecases/get_cards.dart';
+import 'package:bloc_test/bloc_test.dart';
+import 'package:cardpro/core/error/failures.dart';
+import 'package:cardpro/features/cards/domain/entities/card.dart' as card_entity;
+import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
+import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
 import 'package:cardpro/features/cards/domain/usecases/add_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/delete_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart';
+import 'package:cardpro/features/cards/domain/usecases/get_cards.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
-import 'package:cardpro/features/cards/domain/entities/card.dart';
-import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
-import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
-import 'package:cardpro/core/error/failures.dart';
 import 'package:dartz/dartz.dart';
-import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 
 import 'card_bloc_test.mocks.dart';
 
@@ -45,20 +45,12 @@ void main() {
     bloc.close();
   });
 
-
-  final testCardInstance = CardInstance(
-    id: 1,
-    cardId: 1,
-    updatedAt: DateTime(2025, 5, 29),
-    description: 'テスト説明',
-  );
-
   final testCardWithInstance = CardWithInstance(
-    card: Card(
+    card: card_entity.Card(
       id: 1,
-      name: 'テストカード',
+      name: 'Test Card',
       rarity: 'R',
-      setName: 'テストセット',
+      setName: 'Sample',
       cardNumber: 123,
       effectId: 1,
     ),
@@ -66,17 +58,17 @@ void main() {
       id: 1,
       cardId: 1,
       updatedAt: DateTime(2025, 5, 29),
-      description: 'テスト説明',
+      description: 'Test description',
     ),
   );
 
   group('GetCardsEvent', () {
-    test('初期状態はCardInitial', () {
+    test('initial state is CardInitial', () {
       expect(bloc.state, CardInitial());
     });
 
     blocTest<CardBloc, CardState>(
-      '正常系：カード一覧を取得できる',
+      'emits CardLoaded on success',
       build: () {
         when(mockGetCards())
             .thenAnswer((_) async => Right([testCardWithInstance]));
@@ -87,41 +79,37 @@ void main() {
         CardLoading(),
         CardLoaded([testCardWithInstance]),
       ],
-      verify: (_) {
-        verify(mockGetCards());
-      },
+      verify: (_) => verify(mockGetCards()),
     );
 
     blocTest<CardBloc, CardState>(
-      '異常系：エラーが発生した場合はCardErrorを返す',
+      'emits CardError on failure',
       build: () {
         when(mockGetCards())
-            .thenAnswer((_) async => Left(DatabaseFailure(message: 'エラー')));
+            .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
         return bloc;
       },
       act: (bloc) => bloc.add(GetCardsEvent()),
       expect: () => [
         CardLoading(),
-        CardError('エラー'),
+        const CardError('Error'),
       ],
-      verify: (_) {
-        verify(mockGetCards());
-      },
+      verify: (_) => verify(mockGetCards()),
     );
   });
 
   group('AddCardEvent', () {
     final addCardEvent = AddCardEvent(
-      name: 'テストカード',
+      name: 'Test Card',
       rarity: 'R',
-      setName: 'テストセット',
+      setName: 'Sample',
       cardNumber: 123,
       effectId: 1,
-      description: 'テスト説明',
+      description: 'Test description',
     );
 
     blocTest<CardBloc, CardState>(
-      '正常系：カードを追加できる',
+      'loads and then reloads list on success',
       build: () {
         when(mockAddCard(any))
             .thenAnswer((_) async => Right(testCardWithInstance));
@@ -141,28 +129,26 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      '異常系：エラーが発生した場合はCardErrorを返す',
+      'emits CardError on failure',
       build: () {
         when(mockAddCard(any))
-            .thenAnswer((_) async => Left(DatabaseFailure(message: 'エラー')));
+            .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
         return bloc;
       },
       act: (bloc) => bloc.add(addCardEvent),
       expect: () => [
         CardLoading(),
-        CardError('エラー'),
+        const CardError('Error'),
       ],
-      verify: (_) {
-        verify(mockAddCard(any));
-      },
+      verify: (_) => verify(mockAddCard(any)),
     );
   });
 
   group('DeleteCardEvent', () {
-    final deleteCardEvent = DeleteCardEvent(testCardInstance);
+    final deleteCardEvent = DeleteCardEvent(testCardWithInstance.instance);
 
     blocTest<CardBloc, CardState>(
-      '正常系：カードを削除できる',
+      'loads and then reloads list on success',
       build: () {
         when(mockDeleteCard(any))
             .thenAnswer((_) async => const Right(null));
@@ -182,31 +168,29 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      '異常系：エラーが発生した場合はCardErrorを返す',
+      'emits CardError on failure',
       build: () {
         when(mockDeleteCard(any))
-            .thenAnswer((_) async => Left(DatabaseFailure(message: 'エラー')));
+            .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
         return bloc;
       },
       act: (bloc) => bloc.add(deleteCardEvent),
       expect: () => [
         CardLoading(),
-        CardError('エラー'),
+        const CardError('Error'),
       ],
-      verify: (_) {
-        verify(mockDeleteCard(any));
-      },
+      verify: (_) => verify(mockDeleteCard(any)),
     );
   });
 
   group('EditCardEvent', () {
     final editCardEvent = EditCardEvent(
-      instance: testCardInstance,
-      description: '新しい説明',
+      instance: testCardWithInstance.instance,
+      description: 'New description',
     );
 
     blocTest<CardBloc, CardState>(
-      '正常系：カードを編集できる',
+      'loads and then reloads list on success',
       build: () {
         when(mockEditCard(any))
             .thenAnswer((_) async => const Right(null));
@@ -226,20 +210,19 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      '異常系：エラーが発生した場合はCardErrorを返す',
+      'emits CardError on failure',
       build: () {
         when(mockEditCard(any))
-            .thenAnswer((_) async => Left(DatabaseFailure(message: 'エラー')));
+            .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
         return bloc;
       },
       act: (bloc) => bloc.add(editCardEvent),
       expect: () => [
         CardLoading(),
-        CardError('エラー'),
+        const CardError('Error'),
       ],
-      verify: (_) {
-        verify(mockEditCard(any));
-      },
+      verify: (_) => verify(mockEditCard(any)),
     );
   });
 }
+

@@ -1,11 +1,12 @@
+import 'package:cardpro/core/error/failures.dart';
+import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
+import 'package:cardpro/features/cards/domain/repositories/card_repository.dart';
+import 'package:cardpro/features/cards/domain/usecases/delete_card.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:cardpro/features/cards/domain/usecases/delete_card.dart';
-import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
-import 'package:cardpro/core/error/failures.dart';
-import 'package:dartz/dartz.dart';
 
-import 'get_cards_test.mocks.dart'; // 既存のモックを再利用
+import 'get_cards_test.mocks.dart';
 
 void main() {
   late DeleteCard usecase;
@@ -20,35 +21,30 @@ void main() {
     id: 1,
     cardId: 1,
     updatedAt: DateTime(2025, 5, 29),
-    description: 'テスト説明',
+    description: 'Test description',
   );
 
-  test('正常系：リポジトリを通じてカードを削除できる', () async {
-    // arrange
+  test('deletes a card via repository', () async {
     when(mockRepository.deleteCard(testCardInstance))
         .thenAnswer((_) async => const Right(null));
 
-    // act
     final result = await usecase(testCardInstance);
 
-    // assert
     expect(result, const Right<Failure, void>(null));
     verify(mockRepository.deleteCard(testCardInstance));
     verifyNoMoreInteractions(mockRepository);
   });
 
-  test('異常系：リポジトリからエラーが返された場合はそのまま返す', () async {
-    // arrange
-    final failure = DatabaseFailure(message: 'データベースエラー');
+  test('propagates repository failure', () async {
+    final failure = DatabaseFailure(message: 'DB error');
     when(mockRepository.deleteCard(testCardInstance))
         .thenAnswer((_) async => Left(failure));
 
-    // act
     final result = await usecase(testCardInstance);
 
-    // assert
     expect(result, Left<Failure, void>(failure));
     verify(mockRepository.deleteCard(testCardInstance));
     verifyNoMoreInteractions(mockRepository);
   });
 }
+

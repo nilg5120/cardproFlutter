@@ -1,30 +1,34 @@
 // lib/db/database.dart
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift_sqflite/drift_sqflite.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
-
-import 'mtg_cards.dart';
-import 'card_instances.dart';
-import 'containers.dart';
-import 'container_card_locations.dart';
-import 'dart:io'; // ← Platform 判定用
-import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // ← 追加
-import 'package:flutter/foundation.dart'; // これを追加！
-
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'card_effects.dart';
+import 'card_instances.dart';
+import 'container_card_locations.dart';
+import 'containers.dart';
+import 'mtg_cards.dart';
 
 part 'database.g.dart';
 
 @DriftDatabase(
-  tables: [MtgCards, CardInstances, Containers, ContainerCardLocations,
-           CardEffects],
+  tables: [
+    MtgCards,
+    CardInstances,
+    Containers,
+    ContainerCardLocations,
+    CardEffects,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-    // ✅ テスト用（メモリDBを渡す用）
+  // Named constructor for tests to inject an in-memory executor
   AppDatabase.test(super.executor);
 
   @override
@@ -37,7 +41,9 @@ class AppDatabase extends _$AppDatabase {
         },
         onUpgrade: (m, from, to) async {
           if (from == 1) {
-            await customStatement('ALTER TABLE pokemon_cards RENAME TO mtg_cards');
+            await customStatement(
+              'ALTER TABLE pokemon_cards RENAME TO mtg_cards',
+            );
           }
         },
       );
@@ -52,107 +58,134 @@ LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dir = await getApplicationDocumentsDirectory();
     final dbPath = p.join(dir.path, 'cards.db');
-
-    // 👇 パスの確認用に出力
-    debugPrint('📁 DBパス: $dbPath');
-
+    debugPrint('DB path: $dbPath');
     return SqfliteQueryExecutor(path: dbPath, logStatements: true);
   });
 }
 
-
 extension SeedData on AppDatabase {
   Future<void> ensureInitialCardsAndDeckExist() async {
-    // Ensure effects exist first
-    await ensureDefaultCardEffectsExist();
+    try {
+      debugPrint('Seeding initial data...');
 
-    // Seed cards and instances if none exist
-    final cardsCount = await mtgCards.count().getSingle();
-    if (cardsCount == 0) {
-      // Use the first available effect as a default
-      final effect = await (select(cardEffects)..limit(1)).getSingle();
+      // Ensure effects exist first
+      await ensureDefaultCardEffectsExist();
+      debugPrint('Card effects ensured.');
 
-      final bolt = await into(mtgCards).insertReturning(
-        MtgCardsCompanion.insert(
-          name: '稲妻', // Lightning Bolt
-          rarity: const Value('C'),
-          setName: const Value('Alpha'),
-          cardnumber: const Value(116),
-          effectId: effect.id,
-        ),
-      );
+      // Seed cards and instances if none exist
+      final existingCards = await select(mtgCards).get();
+      debugPrint('Existing cards: ${existingCards.length}');
 
-      final counterspell = await into(mtgCards).insertReturning(
-        MtgCardsCompanion.insert(
-          name: '対抗呪文', // Counterspell
-          rarity: const Value('U'),
-          setName: const Value('Alpha'),
-          cardnumber: const Value(69),
-          effectId: effect.id,
-        ),
-      );
+      if (existingCards.isEmpty) {
+        debugPrint('Creating initial cards...');
 
-      final llanowar = await into(mtgCards).insertReturning(
-        MtgCardsCompanion.insert(
-          name: 'ラノワールのエルフ', // Llanowar Elves
-          rarity: const Value('C'),
-          setName: const Value('Alpha'),
-          cardnumber: const Value(213),
-          effectId: effect.id,
-        ),
-      );
+        final effects = await select(cardEffects).get();
+        if (effects.isEmpty) {
+          throw Exception('No card effects found');
+        }
+        final effect = effects.first;
+        debugPrint('Using effect: ${effect.name} (ID: ${effect.id})');
 
-      final now = DateTime.now();
-      await batch((b) {
-        b.insertAll(cardInstances, [
-          CardInstancesCompanion.insert(
-            cardId: bolt.id,
-            description: const Value('初期カード'),
-            updatedAt: Value(now),
+        final bolt = await into(mtgCards).insertReturning(
+          MtgCardsCompanion.insert(
+            name: 'Lightning Bolt',
+            rarity: const Value('C'),
+            setName: const Value('Alpha'),
+            cardnumber: const Value(116),
+            effectId: effect.id,
           ),
-          CardInstancesCompanion.insert(
-            cardId: counterspell.id,
-            description: const Value('初期カード'),
-            updatedAt: Value(now),
-          ),
-          CardInstancesCompanion.insert(
-            cardId: llanowar.id,
-            description: const Value('初期カード'),
-            updatedAt: Value(now),
-          ),
-        ]);
-      });
-    }
+        );
+        debugPrint('Created card: Lightning Bolt (ID: ${bolt.id})');
 
-    // Seed a default deck and put some cards in it if no decks exist
-    final decks = await (select(containers)
-          ..where((t) => t.containerType.equals('deck')))
-        .get();
-    if (decks.isEmpty) {
-      final deck = await into(containers).insertReturning(
-        ContainersCompanion.insert(
-          name: const Value('初期デッキ'),
-          description: const Value('自動作成されたデッキ'),
-          containerType: 'deck',
-        ),
-      );
+        final counterspell = await into(mtgCards).insertReturning(
+          MtgCardsCompanion.insert(
+            name: 'Counterspell',
+            rarity: const Value('U'),
+            setName: const Value('Alpha'),
+            cardnumber: const Value(69),
+            effectId: effect.id,
+          ),
+        );
+        debugPrint('Created card: Counterspell (ID: ${counterspell.id})');
 
-      final instances = await select(cardInstances).get();
-      final selected = instances.take(3).toList();
-      if (selected.isNotEmpty) {
+        final llanowar = await into(mtgCards).insertReturning(
+          MtgCardsCompanion.insert(
+            name: 'Llanowar Elves',
+            rarity: const Value('C'),
+            setName: const Value('Alpha'),
+            cardnumber: const Value(213),
+            effectId: effect.id,
+          ),
+        );
+        debugPrint('Created card: Llanowar Elves (ID: ${llanowar.id})');
+
+        final now = DateTime.now();
         await batch((b) {
-          b.insertAll(
-            containerCardLocations,
-            selected
-                .map((ci) => ContainerCardLocationsCompanion.insert(
-                      containerId: deck.id,
-                      cardInstanceId: ci.id,
-                      location: 'main',
-                    ))
-                .toList(),
-          );
+          b.insertAll(cardInstances, [
+            CardInstancesCompanion.insert(
+              cardId: bolt.id,
+              description: const Value('Initial card'),
+              updatedAt: Value(now),
+            ),
+            CardInstancesCompanion.insert(
+              cardId: counterspell.id,
+              description: const Value('Initial card'),
+              updatedAt: Value(now),
+            ),
+            CardInstancesCompanion.insert(
+              cardId: llanowar.id,
+              description: const Value('Initial card'),
+              updatedAt: Value(now),
+            ),
+          ]);
         });
+        debugPrint('Created initial card instances.');
       }
+
+      // Seed a default deck if none exist
+      final decks = await (select(containers)
+            ..where((t) => t.containerType.equals('deck')))
+          .get();
+      debugPrint('Existing decks: ${decks.length}');
+
+      if (decks.isEmpty) {
+        debugPrint('Creating default deck...');
+
+        final deck = await into(containers).insertReturning(
+          ContainersCompanion.insert(
+            name: const Value('Default Deck'),
+            description: const Value('Auto-created deck'),
+            containerType: 'deck',
+          ),
+        );
+        debugPrint('Created deck (ID: ${deck.id})');
+
+        final instances = await select(cardInstances).get();
+        final selected = instances.take(3).toList();
+        debugPrint('Adding ${selected.length} cards to the deck...');
+
+        if (selected.isNotEmpty) {
+          await batch((b) {
+            b.insertAll(
+              containerCardLocations,
+              selected
+                  .map((ci) => ContainerCardLocationsCompanion.insert(
+                        containerId: deck.id,
+                        cardInstanceId: ci.id,
+                        location: 'main',
+                      ))
+                  .toList(),
+            );
+          });
+          debugPrint('Added cards to the deck.');
+        }
+      }
+
+      debugPrint('Seeding complete.');
+    } catch (e, stackTrace) {
+      debugPrint('Seeding error: $e');
+      debugPrint('Stack trace: $stackTrace');
+      rethrow;
     }
   }
 }
@@ -163,35 +196,34 @@ extension CardQueries on AppDatabase {
       innerJoin(mtgCards, mtgCards.id.equalsExp(cardInstances.cardId)),
     ]);
 
-    return query.map((row) => (
-          row.readTable(mtgCards),
-          row.readTable(cardInstances),
-        )).get();
+    return query
+        .map((row) => (
+              row.readTable(mtgCards),
+              row.readTable(cardInstances),
+            ))
+        .get();
   }
 
-  // カード効果を取得するメソッド
   Future<List<CardEffect>> getAllCardEffects() {
     return select(cardEffects).get();
   }
 
-  // デフォルトのカード効果を追加するメソッド
   Future<void> ensureDefaultCardEffectsExist() async {
     final effectsCount = await cardEffects.count().getSingle();
     if (effectsCount == 0) {
-      // デフォルトのカード効果を追加
       await batch((batch) {
         batch.insertAll(cardEffects, [
           CardEffectsCompanion.insert(
-            name: '基本効果',
-            description: '特別な効果はありません',
+            name: 'Basic',
+            description: 'No special effect',
           ),
           CardEffectsCompanion.insert(
-            name: 'エネルギー加速',
-            description: 'エネルギーカードを追加で付けることができます',
+            name: 'Energy Boost',
+            description: 'Gain additional energy',
           ),
           CardEffectsCompanion.insert(
-            name: 'ダメージ増加',
-            description: '与えるダメージが増加します',
+            name: 'Damage Up',
+            description: 'Increase dealt damage',
           ),
         ]);
       });

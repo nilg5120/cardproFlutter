@@ -1,35 +1,34 @@
-import 'package:cardpro/features/cards/presentation/widgets/add_card_dialog.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cardpro/core/di/injection_container.dart';
 import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
+import 'package:cardpro/features/cards/presentation/widgets/add_card_dialog.dart';
 import 'package:cardpro/features/cards/presentation/widgets/card_list_item.dart';
-import 'package:cardpro/core/di/injection_container.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CardListPage extends StatelessWidget {
   const CardListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 既存のBlocProviderがあるかチェック
+    // Try using an existing BlocProvider if available (e.g. from parent)
     try {
-      // 既存のBlocProviderがある場合はそれを使用
       BlocProvider.of<CardBloc>(context, listen: false);
       return _buildScaffold(context);
     } catch (_) {
-      // 既存のBlocProviderがない場合は新しく作成
+      // Otherwise create a local provider
       return BlocProvider(
         create: (_) => sl<CardBloc>()..add(GetCardsEvent()),
         child: _buildScaffold(context),
       );
     }
   }
-  
+
   Widget _buildScaffold(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('カード一覧'),
+        title: const Text('Cards'),
       ),
       body: BlocBuilder<CardBloc, CardState>(
         builder: (context, state) {
@@ -38,9 +37,30 @@ class CardListPage extends StatelessWidget {
           } else if (state is CardLoaded) {
             return _buildCardList(context, state.cards);
           } else if (state is CardError) {
-            return Center(child: Text(state.message));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Error: ${state.message}'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<CardBloc>().add(GetCardsEvent());
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          } else if (state is CardInitial) {
+            // Trigger load on first frame
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.read<CardBloc>().add(GetCardsEvent());
+            });
+            return const Center(child: CircularProgressIndicator());
           }
-          return const Center(child: Text('カードを読み込んでください'));
+
+          return const Center(child: Text('Please load cards'));
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -52,7 +72,7 @@ class CardListPage extends StatelessWidget {
 
   Widget _buildCardList(BuildContext context, List<CardWithInstance> cards) {
     if (cards.isEmpty) {
-      return const Center(child: Text('カードがありません'));
+      return const Center(child: Text('No cards'));
     }
 
     return ListView.builder(
@@ -89,6 +109,7 @@ class CardListPage extends StatelessWidget {
       },
     );
   }
+
   void _showAddCardDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -99,3 +120,4 @@ class CardListPage extends StatelessWidget {
     );
   }
 }
+

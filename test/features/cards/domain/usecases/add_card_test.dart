@@ -1,13 +1,14 @@
+import 'package:cardpro/core/error/failures.dart';
+import 'package:cardpro/features/cards/domain/entities/card.dart' as card_entity;
+import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
+import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
+import 'package:cardpro/features/cards/domain/repositories/card_repository.dart';
+import 'package:cardpro/features/cards/domain/usecases/add_card.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:cardpro/features/cards/domain/usecases/add_card.dart';
-import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
-import 'package:cardpro/features/cards/domain/entities/card.dart';
-import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
-import 'package:cardpro/core/error/failures.dart';
-import 'package:dartz/dartz.dart';
 
-import 'get_cards_test.mocks.dart'; // 既存のモックを再利用
+import 'get_cards_test.mocks.dart';
 
 void main() {
   late AddCard usecase;
@@ -18,11 +19,11 @@ void main() {
     usecase = AddCard(mockRepository);
   });
 
-  final testCard = Card(
+  final testCard = card_entity.Card(
     id: 1,
-    name: 'テストカード',
+    name: 'Test Card',
     rarity: 'R',
-    setName: 'テストセット',
+    setName: 'Sample',
     cardNumber: 123,
     effectId: 1,
   );
@@ -31,7 +32,7 @@ void main() {
     id: 1,
     cardId: 1,
     updatedAt: DateTime(2025, 5, 29),
-    description: 'テスト説明',
+    description: 'Test description',
   );
 
   final testCardWithInstance = CardWithInstance(
@@ -40,66 +41,61 @@ void main() {
   );
 
   final testParams = AddCardParams(
-    name: 'テストカード',
+    name: 'Test Card',
     rarity: 'R',
-    setName: 'テストセット',
+    setName: 'Sample',
     cardNumber: 123,
     effectId: 1,
-    description: 'テスト説明',
+    description: 'Test description',
   );
 
-  test('正常系：リポジトリを通じてカードを追加できる', () async {
-    // arrange
+  test('adds a card via repository', () async {
     when(mockRepository.addCard(
-      name: 'テストカード',
+      name: 'Test Card',
       rarity: 'R',
-      setName: 'テストセット',
+      setName: 'Sample',
       cardNumber: 123,
       effectId: 1,
-      description: 'テスト説明',
+      description: 'Test description',
     )).thenAnswer((_) async => Right(testCardWithInstance));
 
-    // act
     final result = await usecase(testParams);
 
-    // assert
     expect(result, Right<Failure, CardWithInstance>(testCardWithInstance));
     verify(mockRepository.addCard(
-      name: 'テストカード',
+      name: 'Test Card',
       rarity: 'R',
-      setName: 'テストセット',
+      setName: 'Sample',
       cardNumber: 123,
       effectId: 1,
-      description: 'テスト説明',
+      description: 'Test description',
     ));
     verifyNoMoreInteractions(mockRepository);
   });
 
-  test('異常系：リポジトリからエラーが返された場合はそのまま返す', () async {
-    // arrange
-    final failure = DatabaseFailure(message: 'データベースエラー');
+  test('propagates repository failure', () async {
+    final failure = DatabaseFailure(message: 'DB error');
     when(mockRepository.addCard(
-      name: 'テストカード',
+      name: 'Test Card',
       rarity: 'R',
-      setName: 'テストセット',
+      setName: 'Sample',
       cardNumber: 123,
       effectId: 1,
-      description: 'テスト説明',
+      description: 'Test description',
     )).thenAnswer((_) async => Left(failure));
 
-    // act
     final result = await usecase(testParams);
 
-    // assert
     expect(result, Left<Failure, CardWithInstance>(failure));
     verify(mockRepository.addCard(
-      name: 'テストカード',
+      name: 'Test Card',
       rarity: 'R',
-      setName: 'テストセット',
+      setName: 'Sample',
       cardNumber: 123,
       effectId: 1,
-      description: 'テスト説明',
+      description: 'Test description',
     ));
     verifyNoMoreInteractions(mockRepository);
   });
 }
+

@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
+import 'package:flutter/material.dart';
 
 class CardListItem extends StatelessWidget {
   final CardWithInstance card;
   final VoidCallback onDelete;
-  final Function(String, {String? rarity, String? setName, int? cardNumber}) onEdit;
+  final Function(String, {String? rarity, String? setName, int? cardNumber})
+      onEdit;
 
   const CardListItem({
     super.key,
@@ -49,25 +50,21 @@ class CardListItem extends StatelessWidget {
               ],
             ),
             if (card.card.rarity != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text('レアリティ: ${card.card.rarity}'),
-              ),
+              const SizedBox(height: 8),
+            if (card.card.rarity != null)
+              Text('Rarity: ${card.card.rarity}'),
             if (card.card.setName != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text('セット: ${card.card.setName}'),
-              ),
+              const SizedBox(height: 4),
+            if (card.card.setName != null)
+              Text('Set: ${card.card.setName}'),
             if (card.card.cardNumber != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text('カード番号: ${card.card.cardNumber}'),
-              ),
+              const SizedBox(height: 4),
+            if (card.card.cardNumber != null)
+              Text('Card No.: ${card.card.cardNumber}'),
             if (card.instance.description != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text('メモ: ${card.instance.description}'),
-              ),
+              const SizedBox(height: 8),
+            if (card.instance.description != null)
+              Text('Memo: ${card.instance.description}'),
           ],
         ),
       ),
@@ -78,19 +75,20 @@ class CardListItem extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('カードを削除'),
-        content: const Text('このカードを削除してもよろしいですか？'),
+        title: const Text('Delete Card'),
+        content:
+            const Text('Are you sure you want to delete this card?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('キャンセル'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               onDelete();
             },
-            child: const Text('削除'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -98,18 +96,13 @@ class CardListItem extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context) {
-    final descriptionController = TextEditingController(
-      text: card.instance.description ?? '',
-    );
-    final nameController = TextEditingController(
-      text: card.card.name,
-    );
-    final rarityController = TextEditingController(
-      text: card.card.rarity ?? '',
-    );
-    final setNameController = TextEditingController(
-      text: card.card.setName ?? '',
-    );
+    final descriptionController =
+        TextEditingController(text: card.instance.description ?? '');
+    final nameController = TextEditingController(text: card.card.name);
+    final rarityController =
+        TextEditingController(text: card.card.rarity ?? '');
+    final setNameController =
+        TextEditingController(text: card.card.setName ?? '');
     final cardNumberController = TextEditingController(
       text: card.card.cardNumber?.toString() ?? '',
     );
@@ -123,7 +116,7 @@ class CardListItem extends StatelessWidget {
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: const Text('カード情報を編集'),
+            title: const Text('Edit Card Info'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -131,7 +124,7 @@ class CardListItem extends StatelessWidget {
                   TextField(
                     controller: nameController,
                     decoration: const InputDecoration(
-                      labelText: 'カード名',
+                      labelText: 'Name',
                       border: OutlineInputBorder(),
                     ),
                     readOnly: true,
@@ -140,49 +133,38 @@ class CardListItem extends StatelessWidget {
                   TextField(
                     controller: rarityController,
                     decoration: const InputDecoration(
-                      labelText: 'レアリティ',
+                      labelText: 'Rarity',
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        rarityChanged = true;
-                      });
-                    },
+                    onChanged: (value) => setState(() => rarityChanged = true),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: setNameController,
                     decoration: const InputDecoration(
-                      labelText: '拡張パック名',
+                      labelText: 'Set Name',
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        setNameChanged = true;
-                      });
-                    },
+                    onChanged: (value) => setState(() => setNameChanged = true),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: cardNumberController,
                     decoration: const InputDecoration(
-                      labelText: 'カード番号',
+                      labelText: 'Card Number',
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      setState(() {
-                        cardNumberChanged = true;
-                      });
-                    },
+                    onChanged: (value) =>
+                        setState(() => cardNumberChanged = true),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: descriptionController,
                     decoration: const InputDecoration(
-                      labelText: 'メモ',
+                      labelText: 'Memo',
                       border: OutlineInputBorder(),
-                      hintText: 'メモを入力してください',
+                      hintText: 'Enter a note',
                     ),
                     maxLines: 3,
                   ),
@@ -192,15 +174,23 @@ class CardListItem extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('キャンセル'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
 
-                  final String? rarity = rarityChanged ? rarityController.text.isEmpty ? null : rarityController.text : null;
-                  final String? setName = setNameChanged ? setNameController.text.isEmpty ? null : setNameController.text : null;
-                  final int? cardNumber = cardNumberChanged ? int.tryParse(cardNumberController.text) : null;
+                  final String? rarity =
+                      rarityChanged && rarityController.text.isEmpty
+                          ? null
+                          : (rarityChanged ? rarityController.text : null);
+                  final String? setName =
+                      setNameChanged && setNameController.text.isEmpty
+                          ? null
+                          : (setNameChanged ? setNameController.text : null);
+                  final int? cardNumber = cardNumberChanged
+                      ? int.tryParse(cardNumberController.text)
+                      : null;
 
                   if (rarityChanged || setNameChanged || cardNumberChanged) {
                     onEdit(
@@ -213,7 +203,7 @@ class CardListItem extends StatelessWidget {
                     onEdit(descriptionController.text);
                   }
                 },
-                child: const Text('保存'),
+                child: const Text('Save'),
               ),
             ],
           );
@@ -222,3 +212,4 @@ class CardListItem extends StatelessWidget {
     );
   }
 }
+

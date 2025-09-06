@@ -1,32 +1,51 @@
 import 'package:get_it/get_it.dart';
+
+import 'package:cardpro/db/database.dart';
+
+// Cards
 import 'package:cardpro/features/cards/data/datasources/card_local_data_source.dart';
 import 'package:cardpro/features/cards/data/repositories/card_repository_impl.dart';
 import 'package:cardpro/features/cards/domain/repositories/card_repository.dart';
-import 'package:cardpro/features/cards/domain/usecases/get_cards.dart';
 import 'package:cardpro/features/cards/domain/usecases/add_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/delete_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart';
+import 'package:cardpro/features/cards/domain/usecases/get_cards.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
+
+// Decks
 import 'package:cardpro/features/decks/data/datasources/deck_local_data_source.dart';
 import 'package:cardpro/features/decks/data/repositories/deck_repository_impl.dart';
 import 'package:cardpro/features/decks/domain/repositories/deck_repository.dart';
-import 'package:cardpro/features/decks/domain/usecases/get_decks.dart';
 import 'package:cardpro/features/decks/domain/usecases/add_deck.dart';
 import 'package:cardpro/features/decks/domain/usecases/delete_deck.dart';
 import 'package:cardpro/features/decks/domain/usecases/edit_deck.dart';
+import 'package:cardpro/features/decks/domain/usecases/get_decks.dart';
 import 'package:cardpro/features/decks/presentation/bloc/deck_bloc.dart';
-import 'package:cardpro/db/database.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
   // Database
   final database = AppDatabase();
-  // デフォルトのカード効果を追加
+  // Seed defaults
+  // Note: keep prints in English/ASCII to avoid encoding issues on some shells.
+  // This does not impact app behavior.
+  // Initialize default effects and initial data
   await database.ensureDefaultCardEffectsExist();
-  // 初期カードと初期デッキを用意
   await database.ensureInitialCardsAndDeckExist();
+
+  // Quick counts for sanity
+  final cardsCount = await (database.select(database.mtgCards)..limit(1000))
+      .get()
+      .then((l) => l.length);
+  final instancesCount =
+      await (database.select(database.cardInstances)..limit(1000))
+          .get()
+          .then((l) => l.length);
+  // ignore: avoid_print
+  print('DB seeded: cards=$cardsCount, instances=$instancesCount');
+
   sl.registerLazySingleton<AppDatabase>(() => database);
 
   // Features - Cards
@@ -85,3 +104,4 @@ Future<void> init() async {
     () => DeckLocalDataSourceImpl(database: sl()),
   );
 }
+

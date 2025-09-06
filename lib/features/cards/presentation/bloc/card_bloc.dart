@@ -62,11 +62,19 @@ class CardBloc extends Bloc<CardEvent, CardState> {
   }
 
   Future<void> _onGetCards(GetCardsEvent event, Emitter<CardState> emit) async {
+    print('🎯 CardBloc: GetCardsEvent受信');
     emit(CardLoading());
+    
     final result = await getCards();
     result.fold(
-      (failure) => emit(CardError(failure.message)),
-      (cards) => emit(CardLoaded(cards)),
+      (failure) {
+        print('❌ CardBloc: エラー発生 - ${failure.message}');
+        emit(CardError(failure.message));
+      },
+      (cards) {
+        print('✅ CardBloc: カード取得成功 - ${cards.length}件');
+        emit(CardLoaded(cards));
+      },
     );
   }
 

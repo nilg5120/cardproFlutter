@@ -1,13 +1,13 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:mockito/annotations.dart';
+import 'package:cardpro/core/error/failures.dart';
+import 'package:cardpro/features/cards/domain/entities/card.dart' as card_entity;
+import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
+import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
 import 'package:cardpro/features/cards/domain/repositories/card_repository.dart';
 import 'package:cardpro/features/cards/domain/usecases/get_cards.dart';
-import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
-import 'package:cardpro/features/cards/domain/entities/card.dart';
-import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
-import 'package:cardpro/core/error/failures.dart';
 import 'package:dartz/dartz.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 
 import 'get_cards_test.mocks.dart';
 
@@ -21,11 +21,11 @@ void main() {
     usecase = GetCards(mockRepository);
   });
 
-  final testCard = Card(
+  final testCard = card_entity.Card(
     id: 1,
-    name: 'テストカード',
+    name: 'Test Card',
     rarity: 'R',
-    setName: 'テストセット',
+    setName: 'Sample',
     cardNumber: 123,
     effectId: 1,
   );
@@ -34,7 +34,7 @@ void main() {
     id: 1,
     cardId: 1,
     updatedAt: DateTime(2025, 5, 29),
-    description: 'テスト説明',
+    description: 'Test description',
   );
 
   final testCardWithInstance = CardWithInstance(
@@ -42,34 +42,27 @@ void main() {
     instance: testCardInstance,
   );
 
-test('正常系：リポジトリからカード一覧を取得できる', () async {
-  // arrange
-  when(mockRepository.getCards())
-      .thenAnswer((_) async => Right([testCardWithInstance]));
-
-  // act
-  final result = await usecase();
-
-  // assert
-  expect(result, isA<Right<Failure, List<CardWithInstance>>>());
-  expect(result.getOrElse(() => []), contains(testCardWithInstance));
-  verify(mockRepository.getCards());
-  verifyNoMoreInteractions(mockRepository);
-});
-
-
-  test('異常系：リポジトリからエラーが返された場合はそのまま返す', () async {
-    // arrange
-    final failure = DatabaseFailure(message: 'データベースエラー');
+  test('returns cards from repository', () async {
     when(mockRepository.getCards())
-        .thenAnswer((_) async => Left(failure));
+        .thenAnswer((_) async => Right([testCardWithInstance]));
 
-    // act
     final result = await usecase();
 
-    // assert
+    expect(result, isA<Right<Failure, List<CardWithInstance>>>());
+    expect(result.getOrElse(() => []), contains(testCardWithInstance));
+    verify(mockRepository.getCards());
+    verifyNoMoreInteractions(mockRepository);
+  });
+
+  test('propagates repository failure', () async {
+    final failure = DatabaseFailure(message: 'DB error');
+    when(mockRepository.getCards()).thenAnswer((_) async => Left(failure));
+
+    final result = await usecase();
+
     expect(result, Left<Failure, List<CardWithInstance>>(failure));
     verify(mockRepository.getCards());
     verifyNoMoreInteractions(mockRepository);
   });
 }
+

@@ -1,45 +1,44 @@
+import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
-
 import 'card_list_page_test.mocks.dart';
 
-// テスト用のダイアログウィジェット
+// Minimal test dialog widget used instead of the app's real dialog
 class TestAddCardDialog extends StatelessWidget {
   const TestAddCardDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('カードを追加'),
-      content: const Text('テスト用ダイアログ'),
+      title: const Text('Add Card'),
+      content: const Text('Test dialog'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('キャンセル'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('追加'),
+          child: const Text('Add'),
         ),
       ],
     );
   }
 }
 
-// テスト用のカードリストページ
+// Minimal test page with a FAB that opens the test dialog
 class TestCardListPage extends StatelessWidget {
   const TestCardListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('カード一覧')),
-      body: const Center(child: Text('テスト用ページ')),
+      appBar: AppBar(title: const Text('Cards')),
+      body: const Center(child: Text('Test page')),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
@@ -59,13 +58,11 @@ void main() {
 
   setUp(() {
     mockBloc = MockCardBloc();
-
     when(mockBloc.state).thenReturn(const CardLoaded([]));
     when(mockBloc.stream).thenAnswer((_) => const Stream<CardState>.empty());
   });
 
-  testWidgets('FABを押すと追加ダイアログが表示される', (WidgetTester tester) async {
-    // テスト用のウィジェットをポンプ
+  testWidgets('tapping FAB opens add dialog', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: BlocProvider<CardBloc>.value(
@@ -75,15 +72,13 @@ void main() {
       ),
     );
 
-    // FABが存在することを確認
     expect(find.byType(FloatingActionButton), findsOneWidget);
 
-    // FABをタップ
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
 
-    // ダイアログが表示されることを確認
     expect(find.byType(AlertDialog), findsOneWidget);
-    expect(find.text('カードを追加'), findsOneWidget);
+    expect(find.text('Add Card'), findsOneWidget);
   });
 }
+

@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cardpro/core/di/injection_container.dart';
 import 'package:cardpro/features/decks/domain/entities/container.dart' as deck_entity;
 import 'package:cardpro/features/decks/presentation/bloc/deck_bloc.dart';
 import 'package:cardpro/features/decks/presentation/bloc/deck_event.dart';
-import 'package:cardpro/core/di/injection_container.dart';
 import 'package:cardpro/features/decks/presentation/widgets/deck_list_item.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DeckListPage extends StatelessWidget {
   const DeckListPage({super.key});
@@ -15,7 +15,7 @@ class DeckListPage extends StatelessWidget {
       create: (_) => sl<DeckBloc>()..add(GetDecksEvent()),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('デッキ一覧'),
+          title: const Text('Decks'),
         ),
         body: BlocBuilder<DeckBloc, DeckState>(
           builder: (context, state) {
@@ -26,7 +26,7 @@ class DeckListPage extends StatelessWidget {
             } else if (state is DeckError) {
               return Center(child: Text(state.message));
             }
-            return const Center(child: Text('デッキを読み込んでください'));
+            return const Center(child: Text('Please load decks'));
           },
         ),
         floatingActionButton: FloatingActionButton(
@@ -39,7 +39,7 @@ class DeckListPage extends StatelessWidget {
 
   Widget _buildDeckList(BuildContext context, List<deck_entity.Container> decks) {
     if (decks.isEmpty) {
-      return const Center(child: Text('デッキがありません'));
+      return const Center(child: Text('No decks'));
     }
 
     return ListView.builder(
@@ -73,14 +73,14 @@ class DeckListPage extends StatelessWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('デッキを追加'),
+          title: const Text('Add Deck'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
                 decoration: const InputDecoration(
-                  labelText: 'デッキ名',
+                  labelText: 'Deck Name',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -88,7 +88,7 @@ class DeckListPage extends StatelessWidget {
               TextField(
                 controller: descriptionController,
                 decoration: const InputDecoration(
-                  labelText: '説明',
+                  labelText: 'Description',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
@@ -98,7 +98,7 @@ class DeckListPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('キャンセル'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
@@ -114,7 +114,7 @@ class DeckListPage extends StatelessWidget {
                   Navigator.of(dialogContext).pop();
                 }
               },
-              child: const Text('追加'),
+              child: const Text('Add'),
             ),
           ],
         );
@@ -122,3 +122,4 @@ class DeckListPage extends StatelessWidget {
     );
   }
 }
+

@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:cardpro/features/decks/domain/entities/container.dart' as deck_entity;
+import 'package:flutter/material.dart';
 
 class DeckListItem extends StatelessWidget {
   final deck_entity.Container deck;
@@ -27,7 +27,7 @@ class DeckListItem extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    deck.name ?? 'デッキ ${deck.id}',
+                    deck.name ?? 'Deck ${deck.id}',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -48,11 +48,10 @@ class DeckListItem extends StatelessWidget {
                 ),
               ],
             ),
-            if (deck.description != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text('説明: ${deck.description}'),
-              ),
+            if (deck.description != null) ...[
+              const SizedBox(height: 8),
+              Text('Description: ${deck.description}'),
+            ],
           ],
         ),
       ),
@@ -63,19 +62,20 @@ class DeckListItem extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('デッキを削除'),
-        content: const Text('このデッキを削除してもよろしいですか？'),
+        title: const Text('Delete Deck'),
+        content:
+            const Text('Are you sure you want to delete this deck?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('キャンセル'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               onDelete();
             },
-            child: const Text('削除'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -83,17 +83,14 @@ class DeckListItem extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context) {
-    final descriptionController = TextEditingController(
-      text: deck.description ?? '',
-    );
-    final nameController = TextEditingController(
-      text: deck.name ?? '',
-    );
+    final descriptionController =
+        TextEditingController(text: deck.description ?? '');
+    final nameController = TextEditingController(text: deck.name ?? '');
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('デッキ情報を編集'),
+        title: const Text('Edit Deck'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -101,7 +98,7 @@ class DeckListItem extends StatelessWidget {
               TextField(
                 controller: nameController,
                 decoration: const InputDecoration(
-                  labelText: 'デッキ名',
+                  labelText: 'Deck Name',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -109,9 +106,9 @@ class DeckListItem extends StatelessWidget {
               TextField(
                 controller: descriptionController,
                 decoration: const InputDecoration(
-                  labelText: '説明',
+                  labelText: 'Description',
                   border: OutlineInputBorder(),
-                  hintText: '説明を入力してください',
+                  hintText: 'Enter a description',
                 ),
                 maxLines: 3,
               ),
@@ -121,22 +118,23 @@ class DeckListItem extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('キャンセル'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              // 現在のBlocの実装では編集機能がないため、
-              // 将来的に実装される編集機能に対応できるようにしておく
               onEdit(
                 nameController.text.isEmpty ? null : nameController.text,
-                descriptionController.text.isEmpty ? null : descriptionController.text
+                descriptionController.text.isEmpty
+                    ? null
+                    : descriptionController.text,
               );
             },
-            child: const Text('保存'),
+            child: const Text('Save'),
           ),
         ],
       ),
     );
   }
 }
+
