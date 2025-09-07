@@ -104,7 +104,7 @@ class _DeckDetailPageState extends State<DeckDetailPage> {
                     itemCount: data.length,
                     separatorBuilder: (_, __) => const Divider(height: 1),
                     itemBuilder: (context, index) {
-                      final (mtg, _instance, link) = data[index];
+                      final (mtg, instanceUnused, link) = data[index];
                       return ListTile(
                         title: Text(mtg.name),
                         subtitle: Text('Location: ${link.location}'),
@@ -214,13 +214,12 @@ class _DeckDetailPageState extends State<DeckDetailPage> {
                                   cardInstanceId: instance.id,
                                   location: 'main',
                                 );
-                                if (mounted) {
-                                  Navigator.of(context).pop();
-                                  _refreshCards();
-                                  ScaffoldMessenger.of(this.context).showSnackBar(
-                                    SnackBar(content: Text('Added ${mtg.name}')),
-                                  );
-                                }
+                                if (!context.mounted) return;
+                                Navigator.of(context).pop();
+                                _refreshCards();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Added ${mtg.name}')),
+                                );
                               },
                             ),
                           );

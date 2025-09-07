@@ -6,6 +6,7 @@ import 'package:cardpro/features/cards/domain/usecases/add_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/delete_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card.dart';
 import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart';
+// ignore_for_file: avoid_print
 import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
 
 /// --- ステート定義 ---

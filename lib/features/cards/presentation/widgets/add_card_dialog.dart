@@ -124,6 +124,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
         return;
       }
 
+      if (!mounted) return;
       final selected = await showDialog<ScryfallCard>(
         context: context,
         builder: (ctx) {
@@ -304,6 +305,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
                         labelText: 'Effect',
                         border: OutlineInputBorder(),
                       ),
+                      // ignore: deprecated_member_use
                       value: selectedEffectId,
                       items: cardEffects
                           .map((effect) => DropdownMenuItem<int>(

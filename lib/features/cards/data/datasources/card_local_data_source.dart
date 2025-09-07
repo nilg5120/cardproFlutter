@@ -3,6 +3,7 @@ import 'package:cardpro/features/cards/data/models/card_instance_model.dart';
 import 'package:cardpro/features/cards/data/models/card_model.dart';
 import 'package:cardpro/features/cards/data/models/card_with_instance_model.dart';
 import 'package:drift/drift.dart';
+import 'dart:developer' as developer;
 
 abstract class CardLocalDataSource {
   Future<List<CardWithInstanceModel>> getCards();
@@ -33,15 +34,15 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
 
   @override
   Future<List<CardWithInstanceModel>> getCards() async {
-    print('🔍 カードデータ取得開始');
+    developer.log('Fetching card data', name: 'CardLocalDataSource');
     final results = await database.getCardWithMaster();
-    print('📊 取得したカード数: ${results.length}');
+    developer.log('Fetched cards: ${results.length}', name: 'CardLocalDataSource');
     
     final cardModels = results
         .map((tuple) => CardWithInstanceModel.fromDrift(tuple.$1, tuple.$2))
         .toList();
     
-    print('✅ カードモデル変換完了: ${cardModels.length}件');
+    developer.log('Converted to models: ${cardModels.length}', name: 'CardLocalDataSource');
     return cardModels;
   }
 

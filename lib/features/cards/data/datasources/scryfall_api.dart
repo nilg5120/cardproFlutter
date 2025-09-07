@@ -84,8 +84,8 @@ extension _SearchJa on ScryfallApi {
   Future<List<String>> _searchJapaneseNames(String q) async {
     // lang:ja を付けて検索。name: フィールドにもかけるが、printed_name が返るので前方一致・部分一致を許容
     final queries = [
-      'lang:ja name:${q}',
-      'lang:ja ${q}',
+      'lang:ja name:$q',
+      'lang:ja $q',
     ];
     final results = <String>[];
     for (final part in queries) {
