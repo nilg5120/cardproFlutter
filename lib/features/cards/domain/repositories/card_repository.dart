@@ -13,6 +13,7 @@ abstract class CardRepository {
     required int? cardNumber,
     required int effectId,
     required String? description,
+    required int quantity,
   });
   Future<Either<Failure, void>> deleteCard(CardInstance instance);
   Future<Either<Failure, void>> editCard(CardInstance instance, String description);

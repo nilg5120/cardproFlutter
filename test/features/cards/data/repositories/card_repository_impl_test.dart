@@ -82,6 +82,7 @@ void main() {
         cardNumber: 123,
         effectId: 1,
         description: 'Test description',
+        quantity: 1,
       )).thenAnswer((_) async => testCardWithInstanceModel);
 
       final result = await repository.addCard(
@@ -91,6 +92,7 @@ void main() {
         cardNumber: 123,
         effectId: 1,
         description: 'Test description',
+        quantity: 1,
       );
 
       expect(result, Right<Failure, CardWithInstance>(testCardWithInstanceModel));
@@ -101,6 +103,7 @@ void main() {
         cardNumber: 123,
         effectId: 1,
         description: 'Test description',
+        quantity: 1,
       ));
       verifyNoMoreInteractions(mockLocalDataSource);
     });
@@ -113,6 +116,7 @@ void main() {
         cardNumber: 123,
         effectId: 1,
         description: 'Test description',
+        quantity: 1,
       )).thenThrow(Exception('DB error'));
 
       final result = await repository.addCard(
@@ -122,6 +126,7 @@ void main() {
         cardNumber: 123,
         effectId: 1,
         description: 'Test description',
+        quantity: 1,
       );
 
       expect(
@@ -137,6 +142,7 @@ void main() {
         cardNumber: 123,
         effectId: 1,
         description: 'Test description',
+        quantity: 1,
       ));
       verifyNoMoreInteractions(mockLocalDataSource);
     });

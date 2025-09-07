@@ -55,12 +55,13 @@ class MockCardLocalDataSource extends _i1.Mock
 
   @override
   _i4.Future<_i2.CardWithInstanceModel> addCard({
-    required String? name,
+    required String name,
     required String? rarity,
     required String? setName,
     required int? cardNumber,
-    required int? effectId,
+    required int effectId,
     required String? description,
+    required int quantity,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#addCard, [], {
@@ -70,6 +71,7 @@ class MockCardLocalDataSource extends _i1.Mock
               #cardNumber: cardNumber,
               #effectId: effectId,
               #description: description,
+              #quantity: quantity,
             }),
             returnValue: _i4.Future<_i2.CardWithInstanceModel>.value(
               _FakeCardWithInstanceModel_0(
@@ -81,6 +83,7 @@ class MockCardLocalDataSource extends _i1.Mock
                   #cardNumber: cardNumber,
                   #effectId: effectId,
                   #description: description,
+                  #quantity: quantity,
                 }),
               ),
             ),

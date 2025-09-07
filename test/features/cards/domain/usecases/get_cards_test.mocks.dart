@@ -60,12 +60,13 @@ class MockCardRepository extends _i1.Mock implements _i3.CardRepository {
 
   @override
   _i4.Future<_i2.Either<_i5.Failure, _i6.CardWithInstance>> addCard({
-    required String? name,
+    required String name,
     required String? rarity,
     required String? setName,
     required int? cardNumber,
-    required int? effectId,
+    required int effectId,
     required String? description,
+    required int quantity,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#addCard, [], {
@@ -75,6 +76,7 @@ class MockCardRepository extends _i1.Mock implements _i3.CardRepository {
               #cardNumber: cardNumber,
               #effectId: effectId,
               #description: description,
+              #quantity: quantity,
             }),
             returnValue:
                 _i4.Future<_i2.Either<_i5.Failure, _i6.CardWithInstance>>.value(
@@ -87,6 +89,7 @@ class MockCardRepository extends _i1.Mock implements _i3.CardRepository {
                       #cardNumber: cardNumber,
                       #effectId: effectId,
                       #description: description,
+                      #quantity: quantity,
                     }),
                   ),
                 ),

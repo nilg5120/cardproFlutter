@@ -88,6 +88,7 @@ class CardBloc extends Bloc<CardEvent, CardState> {
       cardNumber: event.cardNumber,
       effectId: event.effectId,
       description: event.description,
+      quantity: event.quantity,
     );
     final result = await addCard(params);
     result.fold(

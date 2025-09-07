@@ -76,21 +76,20 @@ class CardListPage extends StatelessWidget {
       return const Center(child: Text('カードがありません'));
     }
 
-    // Group instances by card id
-    final Map<int, List<CardWithInstance>> byCard = {};
+    // Group instances by card name (even if set differs)
+    final Map<String, List<CardWithInstance>> byName = {};
     for (final e in items) {
-      byCard.putIfAbsent(e.card.id, () => []).add(e);
+      byName.putIfAbsent(e.card.name, () => []).add(e);
     }
-    final grouped = byCard.values.toList();
+    final grouped = byName.values.toList();
 
     return ListView.builder(
       itemCount: grouped.length,
       itemBuilder: (context, index) {
         final group = grouped[index];
         final representative = group.first; // use first instance for display
-        final title = representative.card.setName != null
-            ? '${representative.card.name} (${representative.card.setName})'
-            : representative.card.name;
+        // Title is the card name only (ignore set differences)
+        final title = representative.card.name;
 
         return CardListItem(
           card: representative,
@@ -110,6 +109,8 @@ class CardListPage extends StatelessWidget {
           },
           // Hide delete button on grouped list
           showDelete: false,
+          // Hide set name on grouped list (since sets may differ)
+          showSetName: false,
           // Keep handlers to satisfy constructor but won't be visible/used
           onDelete: () {},
           onEdit: (_, {String? rarity, String? setName, int? cardNumber}) {},

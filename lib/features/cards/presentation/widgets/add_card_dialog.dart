@@ -23,6 +23,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
   final rarityController = TextEditingController();
   final setNameController = TextEditingController();
   final cardNumberController = TextEditingController();
+  final quantityController = TextEditingController(text: '1');
 
   // Selected card effect id
   int selectedEffectId = 1;
@@ -51,6 +52,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
     rarityController.dispose();
     setNameController.dispose();
     cardNumberController.dispose();
+    quantityController.dispose();
     _debounce?.cancel();
     super.dispose();
   }
@@ -291,11 +293,21 @@ class _AddCardDialogState extends State<AddCardDialog> {
                       ),
                     ),
                     const SizedBox(height: 12),
+                  TextField(
+                    controller: cardNumberController,
+                    decoration: const InputDecoration(
+                      labelText: 'Card Number',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                    const SizedBox(height: 12),
                     TextField(
-                      controller: cardNumberController,
+                      controller: quantityController,
                       decoration: const InputDecoration(
-                        labelText: 'Card Number',
+                        labelText: 'Quantity',
                         border: OutlineInputBorder(),
+                        hintText: '1',
                       ),
                       keyboardType: TextInputType.number,
                     ),
@@ -340,6 +352,8 @@ class _AddCardDialogState extends State<AddCardDialog> {
                   onPressed: () {
                     final name = nameController.text;
                     if (name.isNotEmpty) {
+                      final q = int.tryParse(quantityController.text.trim());
+                      final qty = (q == null || q <= 0) ? 1 : q;
                       context.read<CardBloc>().add(
                             AddCardEvent(
                               name: name,
@@ -350,6 +364,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
                               description: descriptionController.text.isNotEmpty
                                   ? descriptionController.text
                                   : null,
+                              quantity: qty,
                             ),
                           );
                       Navigator.of(context).pop();

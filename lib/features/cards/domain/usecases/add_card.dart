@@ -17,6 +17,7 @@ class AddCard {
       cardNumber: params.cardNumber,
       effectId: params.effectId,
       description: params.description,
+      quantity: params.quantity,
     );
   }
 }
@@ -28,6 +29,7 @@ class AddCardParams extends Equatable {
   final int? cardNumber;
   final int effectId;
   final String? description;
+  final int quantity;
 
   const AddCardParams({
     required this.name,
@@ -36,8 +38,9 @@ class AddCardParams extends Equatable {
     this.cardNumber,
     required this.effectId,
     this.description,
+    this.quantity = 1,
   });
 
   @override
-  List<Object?> get props => [name, rarity, setName, cardNumber, effectId, description];
+  List<Object?> get props => [name, rarity, setName, cardNumber, effectId, description, quantity];
 }

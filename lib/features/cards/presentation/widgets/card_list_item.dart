@@ -8,6 +8,7 @@ class CardListItem extends StatelessWidget {
       onEdit;
   final VoidCallback? onTap;
   final bool showDelete;
+  final bool showSetName;
 
   const CardListItem({
     super.key,
@@ -16,6 +17,7 @@ class CardListItem extends StatelessWidget {
     required this.onEdit,
     this.onTap,
     this.showDelete = true,
+    this.showSetName = true,
   });
 
   @override
@@ -46,7 +48,7 @@ class CardListItem extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   // Set name (optional)
-                  if (card.card.setName != null)
+                  if (showSetName && card.card.setName != null)
                     Text(
                       card.card.setName!,
                       overflow: TextOverflow.ellipsis,

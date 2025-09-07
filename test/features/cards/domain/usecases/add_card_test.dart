@@ -47,6 +47,7 @@ void main() {
     cardNumber: 123,
     effectId: 1,
     description: 'Test description',
+    quantity: 1,
   );
 
   test('リポジトリ経由でカードを追加できる', () async {
@@ -57,6 +58,7 @@ void main() {
       cardNumber: 123,
       effectId: 1,
       description: 'Test description',
+      quantity: 1,
     )).thenAnswer((_) async => Right(testCardWithInstance));
 
     final result = await usecase(testParams);
@@ -69,6 +71,7 @@ void main() {
       cardNumber: 123,
       effectId: 1,
       description: 'Test description',
+      quantity: 1,
     ));
     verifyNoMoreInteractions(mockRepository);
   });
@@ -82,6 +85,7 @@ void main() {
       cardNumber: 123,
       effectId: 1,
       description: 'Test description',
+      quantity: 1,
     )).thenAnswer((_) async => Left(failure));
 
     final result = await usecase(testParams);
@@ -94,6 +98,7 @@ void main() {
       cardNumber: 123,
       effectId: 1,
       description: 'Test description',
+      quantity: 1,
     ));
     verifyNoMoreInteractions(mockRepository);
   });

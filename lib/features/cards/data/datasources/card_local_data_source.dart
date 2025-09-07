@@ -14,6 +14,7 @@ abstract class CardLocalDataSource {
     required int? cardNumber,
     required int effectId,
     required String? description,
+    required int quantity,
   });
   Future<void> deleteCard(CardInstanceModel instance);
   Future<void> editCard(CardInstanceModel instance, String description);
@@ -54,6 +55,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     required int? cardNumber,
     required int effectId,
     required String? description,
+    required int quantity,
   }) async {
     // 既存カードの重複チェック（同名・同セット・同カード番号）
     final existingCard = await (database.select(database.mtgCards)
@@ -76,21 +78,28 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
             ))
             .id;
 
-    // カードインスタンスを挿入
-    final instanceId = await database.into(database.cardInstances).insertReturning(
-          CardInstancesCompanion.insert(
-            cardId: cardId,
-            description: Value(description),
-            updatedAt: Value(DateTime.now()),
-          ),
-        );
+    // カードインスタンスを複数挿入（quantity 指定分）
+    CardInstance? lastInstance;
+    final insertCount = (quantity <= 0) ? 1 : quantity;
+    for (var i = 0; i < insertCount; i++) {
+      lastInstance = await database
+          .into(database.cardInstances)
+          .insertReturning(
+            CardInstancesCompanion.insert(
+              cardId: cardId,
+              description: Value(description),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
+    }
 
     // 直近のカード・インスタンスを取得して返却
     final card = await (database.select(database.mtgCards)
           ..where((tbl) => tbl.id.equals(cardId)))
         .getSingle();
-    
-    return CardWithInstanceModel.fromDrift(card, instanceId);
+
+    // 最後に挿入したインスタンスを返す（呼び出し側では一覧再取得を行う）
+    return CardWithInstanceModel.fromDrift(card, lastInstance!);
   }
 
   @override

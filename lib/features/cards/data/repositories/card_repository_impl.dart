@@ -31,6 +31,7 @@ class CardRepositoryImpl implements CardRepository {
     required int? cardNumber,
     required int effectId,
     required String? description,
+    required int quantity,
   }) async {
     try {
       final card = await localDataSource.addCard(
@@ -40,6 +41,7 @@ class CardRepositoryImpl implements CardRepository {
         cardNumber: cardNumber,
         effectId: effectId,
         description: description,
+        quantity: quantity,
       );
       return Right(card);
     } catch (e) {
