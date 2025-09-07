@@ -1,4 +1,4 @@
-import 'package:bloc_test/bloc_test.dart';
+ï»¿import 'package:bloc_test/bloc_test.dart';
 import 'package:cardpro/core/error/failures.dart';
 import 'package:cardpro/features/cards/domain/entities/card.dart' as card_entity;
 import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
@@ -62,13 +62,13 @@ void main() {
     ),
   );
 
-  group('GetCardsEventiˆê——æ“¾j', () {
-    test('‰Šúó‘Ô‚Í CardInitial', () {
+  group('GetCardsEventï¼ˆä¸€è¦§å–å¾—ï¼‰', () {
+    test('åˆæœŸçŠ¶æ…‹ã¯ CardInitial', () {
       expect(bloc.state, CardInitial());
     });
 
     blocTest<CardBloc, CardState>(
-      '¬Œ÷‚Í CardLoaded ‚ğo‚·',
+      'æˆåŠŸæ™‚ã¯ CardLoaded ã‚’å‡ºã™',
       build: () {
         when(mockGetCards())
             .thenAnswer((_) async => Right([testCardWithInstance]));
@@ -83,7 +83,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      '¸”s‚Í CardError ‚ğo‚·',
+      'å¤±æ•—æ™‚ã¯ CardError ã‚’å‡ºã™',
       build: () {
         when(mockGetCards())
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
@@ -98,7 +98,7 @@ void main() {
     );
   });
 
-  group('AddCardEventi’Ç‰Áj', () {
+  group('AddCardEventï¼ˆè¿½åŠ ï¼‰', () {
     final addCardEvent = AddCardEvent(
       name: 'Test Card',
       rarity: 'R',
@@ -109,7 +109,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      '¬Œ÷‚Í“Ç‚İ‚İŒã‚Éˆê——XV',
+      'æˆåŠŸã—ãŸã‚‰èª­ã¿è¾¼ã¿å¾Œã«ä¸€è¦§æ›´æ–°',
       build: () {
         when(mockAddCard(any))
             .thenAnswer((_) async => Right(testCardWithInstance));
@@ -129,7 +129,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      '¸”s‚Í CardError ‚ğo‚·',
+      'å¤±æ•—æ™‚ã¯ CardError ã‚’å‡ºã™',
       build: () {
         when(mockAddCard(any))
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
@@ -144,11 +144,11 @@ void main() {
     );
   });
 
-  group('DeleteCardEventiíœj', () {
+  group('DeleteCardEventï¼ˆå‰Šé™¤ï¼‰', () {
     final deleteCardEvent = DeleteCardEvent(testCardWithInstance.instance);
 
     blocTest<CardBloc, CardState>(
-      '¬Œ÷‚Í“Ç‚İ‚İŒã‚Éˆê——XV',
+      'æˆåŠŸã—ãŸã‚‰èª­ã¿è¾¼ã¿å¾Œã«ä¸€è¦§æ›´æ–°',
       build: () {
         when(mockDeleteCard(any))
             .thenAnswer((_) async => const Right(null));
@@ -168,7 +168,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      '¸”s‚Í CardError ‚ğo‚·',
+      'å¤±æ•—æ™‚ã¯ CardError ã‚’å‡ºã™',
       build: () {
         when(mockDeleteCard(any))
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
@@ -183,14 +183,14 @@ void main() {
     );
   });
 
-  group('EditCardEventi•ÒWj', () {
+  group('EditCardEventï¼ˆå¤‰æ›´ï¼‰', () {
     final editCardEvent = EditCardEvent(
       instance: testCardWithInstance.instance,
       description: 'New description',
     );
 
     blocTest<CardBloc, CardState>(
-      '¬Œ÷‚Í“Ç‚İ‚İŒã‚Éˆê——XV',
+      'æˆåŠŸã—ãŸã‚‰èª­ã¿è¾¼ã¿å¾Œã«ä¸€è¦§æ›´æ–°',
       build: () {
         when(mockEditCard(any))
             .thenAnswer((_) async => const Right(null));
@@ -210,7 +210,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      '¸”s‚Í CardError ‚ğo‚·',
+      'å¤±æ•—æ™‚ã¯ CardError ã‚’å‡ºã™',
       build: () {
         when(mockEditCard(any))
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
@@ -225,5 +225,3 @@ void main() {
     );
   });
 }
-
-
