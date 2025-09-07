@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import 'package:cardpro/features/cards/presentation/pages/card_list_page.dart';
 import 'package:cardpro/features/decks/presentation/pages/deck_list_page.dart';
@@ -11,15 +11,15 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('繝帙・繝'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _NavTile(
             icon: Icons.view_list,
-            title: 'Cards',
-            subtitle: 'Browse and edit cards',
+            title: '繧ｫ繝ｼ繝我ｸ隕ｧ',
+            subtitle: '逋ｻ骭ｲ貂医∩縺ｮ繧ｫ繝ｼ繝峨ｒ陦ｨ遉ｺ繝ｻ邱ｨ髮・,
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const CardListPage()),
@@ -29,8 +29,8 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 12),
           _NavTile(
             icon: Icons.folder,
-            title: 'Decks',
-            subtitle: 'Manage decks',
+            title: '繝・ャ繧ｭ荳隕ｧ',
+            subtitle: '繝・ャ繧ｭ繧堤｢ｺ隱阪・邱ｨ髮・,
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const DeckListPage()),
@@ -40,8 +40,8 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 12),
           _NavTile(
             icon: Icons.inventory_2,
-            title: 'Containers',
-            subtitle: 'Card storage (closet, drawer, etc.)',
+            title: '繧ｳ繝ｳ繝・リ荳隕ｧ',
+            subtitle: '繧ｫ繝ｼ繝峨・菫晉ｮ｡蝣ｴ謇・域款縺怜・繧後・蠑輔″蜃ｺ縺励↑縺ｩ・・,
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const ContainerListPage()),
@@ -80,4 +80,3 @@ class _NavTile extends StatelessWidget {
     );
   }
 }
-

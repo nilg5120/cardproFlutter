@@ -25,6 +25,16 @@ import 'package:cardpro/features/decks/domain/usecases/get_decks.dart';
 import 'package:cardpro/features/decks/domain/usecases/set_active_deck.dart';
 import 'package:cardpro/features/decks/presentation/bloc/deck_bloc.dart';
 
+// コンテナ（保管場所）関連
+import 'package:cardpro/features/containers/data/datasources/container_local_data_source.dart';
+import 'package:cardpro/features/containers/data/repositories/container_repository_impl.dart';
+import 'package:cardpro/features/containers/domain/repositories/container_repository.dart';
+import 'package:cardpro/features/containers/domain/usecases/get_containers.dart';
+import 'package:cardpro/features/containers/domain/usecases/add_container.dart';
+import 'package:cardpro/features/containers/domain/usecases/delete_container.dart';
+import 'package:cardpro/features/containers/domain/usecases/edit_container.dart';
+import 'package:cardpro/features/containers/presentation/bloc/container_bloc.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -108,5 +118,32 @@ Future<void> init() async {
   // データソース
   sl.registerLazySingleton<DeckLocalDataSource>(
     () => DeckLocalDataSourceImpl(database: sl()),
+  );
+
+  // 機能 - コンテナ（保管場所）
+  // BLoC
+  sl.registerFactory(
+    () => ContainerBloc(
+      getContainers: sl(),
+      addContainer: sl(),
+      deleteContainer: sl(),
+      editContainer: sl(),
+    ),
+  );
+
+  // ユースケース
+  sl.registerLazySingleton(() => GetContainers(sl()));
+  sl.registerLazySingleton(() => AddContainer(sl()));
+  sl.registerLazySingleton(() => DeleteContainer(sl()));
+  sl.registerLazySingleton(() => EditContainer(sl()));
+
+  // リポジトリ
+  sl.registerLazySingleton<ContainerRepository>(
+    () => ContainerRepositoryImpl(localDataSource: sl()),
+  );
+
+  // データソース
+  sl.registerLazySingleton<ContainerLocalDataSource>(
+    () => ContainerLocalDataSourceImpl(database: sl()),
   );
 }
