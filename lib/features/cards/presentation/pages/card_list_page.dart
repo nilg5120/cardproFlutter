@@ -4,6 +4,7 @@ import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
 import 'package:cardpro/features/cards/presentation/widgets/add_card_dialog.dart';
 import 'package:cardpro/features/cards/presentation/widgets/card_list_item.dart';
+import 'package:cardpro/features/cards/presentation/pages/card_instances_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -70,41 +71,48 @@ class CardListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCardList(BuildContext context, List<CardWithInstance> cards) {
-    if (cards.isEmpty) {
+  Widget _buildCardList(BuildContext context, List<CardWithInstance> items) {
+    if (items.isEmpty) {
       return const Center(child: Text('カードがありません'));
     }
 
+    // Group instances by card id
+    final Map<int, List<CardWithInstance>> byCard = {};
+    for (final e in items) {
+      byCard.putIfAbsent(e.card.id, () => []).add(e);
+    }
+    final grouped = byCard.values.toList();
+
     return ListView.builder(
-      itemCount: cards.length,
+      itemCount: grouped.length,
       itemBuilder: (context, index) {
-        final card = cards[index];
+        final group = grouped[index];
+        final representative = group.first; // use first instance for display
+        final title = representative.card.setName != null
+            ? '${representative.card.name} (${representative.card.setName})'
+            : representative.card.name;
+
         return CardListItem(
-          card: card,
-          onDelete: () {
-            context.read<CardBloc>().add(DeleteCardEvent(card.instance));
+          card: representative,
+          // Navigate to instances list when tapped
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => BlocProvider.value(
+                  value: context.read<CardBloc>(),
+                  child: CardInstancesPage(
+                    title: title,
+                    instances: group,
+                  ),
+                ),
+              ),
+            );
           },
-          onEdit: (description, {String? rarity, String? setName, int? cardNumber}) {
-            if (rarity != null || setName != null || cardNumber != null) {
-              context.read<CardBloc>().add(
-                    EditCardFullEvent(
-                      card: card.card,
-                      instance: card.instance,
-                      rarity: rarity ?? card.card.rarity,
-                      setName: setName ?? card.card.setName,
-                      cardNumber: cardNumber ?? card.card.cardNumber,
-                      description: description,
-                    ),
-                  );
-            } else {
-              context.read<CardBloc>().add(
-                    EditCardEvent(
-                      instance: card.instance,
-                      description: description,
-                    ),
-                  );
-            }
-          },
+          // Hide delete button on grouped list
+          showDelete: false,
+          // Keep handlers to satisfy constructor but won't be visible/used
+          onDelete: () {},
+          onEdit: (_, {String? rarity, String? setName, int? cardNumber}) {},
         );
       },
     );

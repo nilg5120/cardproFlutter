@@ -6,68 +6,71 @@ class CardListItem extends StatelessWidget {
   final VoidCallback onDelete;
   final Function(String, {String? rarity, String? setName, int? cardNumber})
       onEdit;
+  final VoidCallback? onTap;
+  final bool showDelete;
 
   const CardListItem({
     super.key,
     required this.card,
     required this.onDelete,
     required this.onEdit,
+    this.onTap,
+    this.showDelete = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    card.card.name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+      child: InkWell(
+        onTap: onTap ?? () => _showEditDialog(context),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                  // Card name
+                  Flexible(
+                    fit: FlexFit.tight,
+                    child: Text(
+                      card.card.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () => _showEditDialog(context),
+                  const SizedBox(width: 12),
+                  // Set name (optional)
+                  if (card.card.setName != null)
+                    Text(
+                      card.card.setName!,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: Colors.grey[700]),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => _showDeleteDialog(context),
-                    ),
-                  ],
-                ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                if (showDelete)
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () => _showDeleteDialog(context),
+                  ),
               ],
             ),
-            if (card.card.rarity != null)
-              const SizedBox(height: 8),
-            if (card.card.rarity != null)
-              Text('Rarity: ${card.card.rarity}'),
-            if (card.card.setName != null)
-              const SizedBox(height: 4),
-            if (card.card.setName != null)
-              Text('Set: ${card.card.setName}'),
-            if (card.card.cardNumber != null)
-              const SizedBox(height: 4),
-            if (card.card.cardNumber != null)
-              Text('Card No.: ${card.card.cardNumber}'),
-            if (card.instance.description != null)
-              const SizedBox(height: 8),
-            if (card.instance.description != null)
-              Text('Memo: ${card.instance.description}'),
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -212,4 +215,3 @@ class CardListItem extends StatelessWidget {
     );
   }
 }
-
