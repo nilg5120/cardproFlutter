@@ -18,6 +18,7 @@ void main() {
   late MockCardLocalDataSource mockLocalDataSource;
 
   setUp(() {
+    // 各テスト前にモックとリポジトリを初期化
     mockLocalDataSource = MockCardLocalDataSource();
     repository = CardRepositoryImpl(localDataSource: mockLocalDataSource);
   });
@@ -43,8 +44,8 @@ void main() {
     instance: testCardInstanceModel,
   );
 
-  group('getCards', () {
-    test('returns cards from local datasource', () async {
+  group('getCards（取得）', () {
+    test('ローカルデータソースからカード一覧を返す', () async {
       when(mockLocalDataSource.getCards())
           .thenAnswer((_) async => [testCardWithInstanceModel]);
 
@@ -56,7 +57,7 @@ void main() {
       verifyNoMoreInteractions(mockLocalDataSource);
     });
 
-    test('returns DatabaseFailure when datasource throws', () async {
+    test('データソース例外時はDatabaseFailureを返す', () async {
       when(mockLocalDataSource.getCards()).thenThrow(Exception('DB error'));
 
       final result = await repository.getCards();
@@ -72,8 +73,8 @@ void main() {
     });
   });
 
-  group('addCard', () {
-    test('adds a card', () async {
+  group('addCard（追加）', () {
+    test('カードを追加できる', () async {
       when(mockLocalDataSource.addCard(
         name: 'Test Card',
         rarity: 'R',
@@ -104,7 +105,7 @@ void main() {
       verifyNoMoreInteractions(mockLocalDataSource);
     });
 
-    test('returns DatabaseFailure when datasource throws', () async {
+    test('データソース例外時はDatabaseFailureを返す', () async {
       when(mockLocalDataSource.addCard(
         name: 'Test Card',
         rarity: 'R',
@@ -141,8 +142,8 @@ void main() {
     });
   });
 
-  group('deleteCard', () {
-    test('deletes a card instance', () async {
+  group('deleteCard（削除）', () {
+    test('カード個体を削除できる', () async {
       when(mockLocalDataSource.deleteCard(testCardInstanceModel))
           .thenAnswer((_) async => {});
 
@@ -153,7 +154,7 @@ void main() {
       verifyNoMoreInteractions(mockLocalDataSource);
     });
 
-    test('returns DatabaseFailure when datasource throws', () async {
+    test('データソース例外時はDatabaseFailureを返す', () async {
       when(mockLocalDataSource.deleteCard(testCardInstanceModel))
           .thenThrow(Exception('DB error'));
 
@@ -168,8 +169,8 @@ void main() {
     });
   });
 
-  group('editCard', () {
-    test('edits card instance description', () async {
+  group('editCard（編集）', () {
+    test('カード個体の説明文を編集できる', () async {
       when(mockLocalDataSource.editCard(testCardInstanceModel, 'New description'))
           .thenAnswer((_) async => {});
 
@@ -180,7 +181,7 @@ void main() {
       verifyNoMoreInteractions(mockLocalDataSource);
     });
 
-    test('returns DatabaseFailure when datasource throws', () async {
+    test('データソース例外時はDatabaseFailureを返す', () async {
       when(mockLocalDataSource.editCard(testCardInstanceModel, 'New description'))
           .thenThrow(Exception('DB error'));
 
@@ -195,4 +196,3 @@ void main() {
     });
   });
 }
-

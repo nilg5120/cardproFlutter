@@ -7,7 +7,7 @@ import 'package:mockito/mockito.dart';
 
 import 'card_list_page_test.mocks.dart';
 
-// Minimal test dialog widget used instead of the app's real dialog
+// 本番のダイアログの代わりに用いる最小限のテスト用ダイアログ
 class TestAddCardDialog extends StatelessWidget {
   const TestAddCardDialog({super.key});
 
@@ -30,7 +30,7 @@ class TestAddCardDialog extends StatelessWidget {
   }
 }
 
-// Minimal test page with a FAB that opens the test dialog
+// FAB タップでテスト用ダイアログを開く最小ページ
 class TestCardListPage extends StatelessWidget {
   const TestCardListPage({super.key});
 
@@ -62,7 +62,7 @@ void main() {
     when(mockBloc.stream).thenAnswer((_) => const Stream<CardState>.empty());
   });
 
-  testWidgets('tapping FAB opens add dialog', (WidgetTester tester) async {
+  testWidgets('FAB タップで追加ダイアログが開く', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: BlocProvider<CardBloc>.value(
@@ -81,4 +81,3 @@ void main() {
     expect(find.text('Add Card'), findsOneWidget);
   });
 }
-

@@ -62,13 +62,13 @@ void main() {
     ),
   );
 
-  group('GetCardsEvent', () {
-    test('initial state is CardInitial', () {
+  group('GetCardsEvent（一覧取得）', () {
+    test('初期状態は CardInitial', () {
       expect(bloc.state, CardInitial());
     });
 
     blocTest<CardBloc, CardState>(
-      'emits CardLoaded on success',
+      '成功時は CardLoaded を出す',
       build: () {
         when(mockGetCards())
             .thenAnswer((_) async => Right([testCardWithInstance]));
@@ -83,7 +83,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      'emits CardError on failure',
+      '失敗時は CardError を出す',
       build: () {
         when(mockGetCards())
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
@@ -98,7 +98,7 @@ void main() {
     );
   });
 
-  group('AddCardEvent', () {
+  group('AddCardEvent（追加）', () {
     final addCardEvent = AddCardEvent(
       name: 'Test Card',
       rarity: 'R',
@@ -109,7 +109,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      'loads and then reloads list on success',
+      '成功時は読み込み後に一覧更新',
       build: () {
         when(mockAddCard(any))
             .thenAnswer((_) async => Right(testCardWithInstance));
@@ -129,7 +129,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      'emits CardError on failure',
+      '失敗時は CardError を出す',
       build: () {
         when(mockAddCard(any))
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
@@ -144,11 +144,11 @@ void main() {
     );
   });
 
-  group('DeleteCardEvent', () {
+  group('DeleteCardEvent（削除）', () {
     final deleteCardEvent = DeleteCardEvent(testCardWithInstance.instance);
 
     blocTest<CardBloc, CardState>(
-      'loads and then reloads list on success',
+      '成功時は読み込み後に一覧更新',
       build: () {
         when(mockDeleteCard(any))
             .thenAnswer((_) async => const Right(null));
@@ -168,7 +168,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      'emits CardError on failure',
+      '失敗時は CardError を出す',
       build: () {
         when(mockDeleteCard(any))
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
@@ -183,14 +183,14 @@ void main() {
     );
   });
 
-  group('EditCardEvent', () {
+  group('EditCardEvent（編集）', () {
     final editCardEvent = EditCardEvent(
       instance: testCardWithInstance.instance,
       description: 'New description',
     );
 
     blocTest<CardBloc, CardState>(
-      'loads and then reloads list on success',
+      '成功時は読み込み後に一覧更新',
       build: () {
         when(mockEditCard(any))
             .thenAnswer((_) async => const Right(null));
@@ -210,7 +210,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      'emits CardError on failure',
+      '失敗時は CardError を出す',
       build: () {
         when(mockEditCard(any))
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
@@ -225,4 +225,5 @@ void main() {
     );
   });
 }
+
 

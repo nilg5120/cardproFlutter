@@ -12,6 +12,7 @@ void main() {
   late MockCardRepository mockRepository;
 
   setUp(() {
+    // 各テスト前にモックとUseCaseを初期化
     mockRepository = MockCardRepository();
     usecase = DeleteCard(mockRepository);
   });
@@ -23,7 +24,7 @@ void main() {
     description: 'Test description',
   );
 
-  test('deletes a card via repository', () async {
+  test('リポジトリ経由でカード個体を削除できる', () async {
     when(mockRepository.deleteCard(testCardInstance))
         .thenAnswer((_) async => const Right(null));
 
@@ -34,7 +35,7 @@ void main() {
     verifyNoMoreInteractions(mockRepository);
   });
 
-  test('propagates repository failure', () async {
+  test('リポジトリの失敗をそのまま伝播する', () async {
     final failure = DatabaseFailure(message: 'DB error');
     when(mockRepository.deleteCard(testCardInstance))
         .thenAnswer((_) async => Left(failure));
@@ -46,4 +47,3 @@ void main() {
     verifyNoMoreInteractions(mockRepository);
   });
 }
-

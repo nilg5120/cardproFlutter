@@ -7,6 +7,7 @@ void main() {
   late AppDatabase db;
 
   setUp(() {
+    // 各テストはメモリDBでクリーンに開始する
     db = AppDatabase.test(NativeDatabase.memory());
   });
 
@@ -14,8 +15,8 @@ void main() {
     await db.close();
   });
 
-  test('insert and fetch a card with instance', () async {
-    // ensure an effect exists for FK
+  test('カードのマスタと個体を挿入して取得できる', () async {
+    // 外部キー用に効果を1件作成
     final effect = await db.into(db.cardEffects).insertReturning(
           CardEffectsCompanion.insert(
             name: 'Basic',
@@ -23,7 +24,7 @@ void main() {
           ),
         );
 
-    // insert master
+    // マスタカードを挿入
     final card = await db.into(db.mtgCards).insertReturning(
           MtgCardsCompanion.insert(
             name: 'Test Card',
@@ -34,7 +35,7 @@ void main() {
           ),
         );
 
-    // insert instance
+    // 個体カードを挿入
     await db.into(db.cardInstances).insert(
           CardInstancesCompanion.insert(
             cardId: card.id,
@@ -42,7 +43,7 @@ void main() {
           ),
         );
 
-    // verify
+    // 検証
     final results = await db.getCardWithMaster();
     expect(results.length, 1);
     final (fetchedCard, instance) = results.first;
@@ -50,4 +51,3 @@ void main() {
     expect(instance.description, 'This is a test instance');
   });
 }
-

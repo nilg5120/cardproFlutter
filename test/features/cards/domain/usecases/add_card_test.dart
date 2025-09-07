@@ -14,6 +14,7 @@ void main() {
   late MockCardRepository mockRepository;
 
   setUp(() {
+    // 各テスト前にモックとUseCaseを初期化
     mockRepository = MockCardRepository();
     usecase = AddCard(mockRepository);
   });
@@ -48,7 +49,7 @@ void main() {
     description: 'Test description',
   );
 
-  test('adds a card via repository', () async {
+  test('リポジトリ経由でカードを追加できる', () async {
     when(mockRepository.addCard(
       name: 'Test Card',
       rarity: 'R',
@@ -72,7 +73,7 @@ void main() {
     verifyNoMoreInteractions(mockRepository);
   });
 
-  test('propagates repository failure', () async {
+  test('リポジトリの失敗をそのまま伝播する', () async {
     final failure = DatabaseFailure(message: 'DB error');
     when(mockRepository.addCard(
       name: 'Test Card',
@@ -97,4 +98,3 @@ void main() {
     verifyNoMoreInteractions(mockRepository);
   });
 }
-

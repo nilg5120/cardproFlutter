@@ -27,10 +27,11 @@ part 'seed_data.dart';
   ],
 )
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  final bool enableSeeding;
+  AppDatabase({this.enableSeeding = true}) : super(_openConnection());
 
   // テスト用: メモリDBのエグゼキュータを差し込むための名前付きコンストラクタ
-  AppDatabase.test(super.executor);
+  AppDatabase.test(super.executor) : enableSeeding = false;
 
   @override
   int get schemaVersion => 3;
@@ -40,8 +41,10 @@ class AppDatabase extends _$AppDatabase {
         onCreate: (m) async {
           await m.createAll();
           // 初回作成時にベースラインの初期データを投入
-          await ensureDefaultCardEffectsExist();
-          await ensureInitialCardsAndDeckExist();
+          if (enableSeeding) {
+            await ensureDefaultCardEffectsExist();
+            await ensureInitialCardsAndDeckExist();
+          }
         },
         onUpgrade: (m, from, to) async {
           if (from == 1) {
