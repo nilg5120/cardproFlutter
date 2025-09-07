@@ -62,4 +62,14 @@ class DeckRepositoryImpl implements DeckRepository {
       return Left(DatabaseFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> setActiveDeck({required int id}) async {
+    try {
+      await localDataSource.setActiveDeck(id: id);
+      return const Right(null);
+    } catch (e) {
+      return Left(DatabaseFailure(message: e.toString()));
+    }
+  }
 }

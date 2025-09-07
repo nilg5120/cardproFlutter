@@ -33,7 +33,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.test(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -48,6 +48,11 @@ class AppDatabase extends _$AppDatabase {
             await customStatement(
               'ALTER TABLE pokemon_cards RENAME TO mtg_cards',
             );
+            from = 2; // fallthrough to next migration step
+          }
+          if (from == 2) {
+            // v3: add isActive to containers
+            await m.addColumn(containers, containers.isActive);
           }
         },
       );
@@ -147,5 +152,28 @@ extension DeckQueries on AppDatabase {
               t.containerId.equals(containerId) &
               t.cardInstanceId.equals(cardInstanceId)))
         .go();
+  }
+}
+
+extension ActiveDeckQueries on AppDatabase {
+  Future<void> setActiveDeck(int deckId) async {
+    await transaction(() async {
+      // Reset all decks to inactive
+      await (update(containers)
+            ..where((t) => t.containerType.equals('deck')))
+          .write(const ContainersCompanion(isActive: Value(false)));
+      // Mark the selected deck active
+      await (update(containers)
+            ..where((t) => t.id.equals(deckId)))
+          .write(const ContainersCompanion(isActive: Value(true)));
+    });
+  }
+
+  Future<int?> getActiveDeckId() async {
+    final row = await (select(containers)
+          ..where((t) => t.containerType.equals('deck') & t.isActive.equals(true))
+          ..limit(1))
+        .getSingleOrNull();
+    return row?.id;
   }
 }

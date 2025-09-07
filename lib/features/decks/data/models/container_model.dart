@@ -6,6 +6,7 @@ class ContainerModel extends Container {
     super.name,
     super.description,
     required super.containerType,
+    super.isActive = false,
   });
 
   factory ContainerModel.fromDrift(dynamic driftContainer) {
@@ -14,6 +15,7 @@ class ContainerModel extends Container {
       name: driftContainer.name,
       description: driftContainer.description,
       containerType: driftContainer.containerType,
+      isActive: driftContainer.isActive ?? false,
     );
   }
 
@@ -23,6 +25,7 @@ class ContainerModel extends Container {
       'name': name,
       'description': description,
       'containerType': containerType,
+      'isActive': isActive,
     };
   }
 
@@ -32,6 +35,7 @@ class ContainerModel extends Container {
       name: json['name'],
       description: json['description'],
       containerType: json['containerType'],
+      isActive: json['isActive'] ?? false,
     );
   }
 }

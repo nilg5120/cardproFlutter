@@ -22,6 +22,7 @@ import 'package:cardpro/features/decks/domain/usecases/add_deck.dart';
 import 'package:cardpro/features/decks/domain/usecases/delete_deck.dart';
 import 'package:cardpro/features/decks/domain/usecases/edit_deck.dart';
 import 'package:cardpro/features/decks/domain/usecases/get_decks.dart';
+import 'package:cardpro/features/decks/domain/usecases/set_active_deck.dart';
 import 'package:cardpro/features/decks/presentation/bloc/deck_bloc.dart';
 
 final sl = GetIt.instance;
@@ -88,6 +89,7 @@ Future<void> init() async {
       addDeck: sl(),
       deleteDeck: sl(),
       editDeck: sl(),
+      setActiveDeck: sl(),
     ),
   );
 
@@ -96,6 +98,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AddDeck(sl()));
   sl.registerLazySingleton(() => DeleteDeck(sl()));
   sl.registerLazySingleton(() => EditDeck(sl()));
+  sl.registerLazySingleton(() => SetActiveDeck(sl()));
 
   // リポジトリ
   sl.registerLazySingleton<DeckRepository>(

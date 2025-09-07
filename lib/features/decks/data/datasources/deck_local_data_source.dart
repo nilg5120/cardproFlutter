@@ -16,6 +16,9 @@ abstract class DeckLocalDataSource {
     required String name,
     required String? description,
   });
+  Future<void> setActiveDeck({
+    required int id,
+  });
 }
 
 class DeckLocalDataSourceImpl implements DeckLocalDataSource {
@@ -66,5 +69,10 @@ class DeckLocalDataSourceImpl implements DeckLocalDataSource {
     
     final updatedDeck = await (database.select(database.containers)..where((tbl) => tbl.id.equals(id))).getSingle();
     return ContainerModel.fromDrift(updatedDeck);
+  }
+
+  @override
+  Future<void> setActiveDeck({required int id}) async {
+    await database.setActiveDeck(id);
   }
 }

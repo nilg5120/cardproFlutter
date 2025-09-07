@@ -50,3 +50,13 @@ class EditDeckEvent extends DeckEvent {
   @override
   List<Object?> get props => [id, name, description];
 }
+
+/// デッキを「使用中」に設定するイベント
+class SetActiveDeckEvent extends DeckEvent {
+  final int id; // 対象のデッキID
+
+  const SetActiveDeckEvent({required this.id});
+
+  @override
+  List<Object?> get props => [id];
+}

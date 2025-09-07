@@ -1,6 +1,9 @@
 import 'package:cardpro/features/decks/domain/entities/container.dart' as deck_entity;
 import 'package:cardpro/features/decks/presentation/pages/deck_detail_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cardpro/features/decks/presentation/bloc/deck_bloc.dart';
+import 'package:cardpro/features/decks/presentation/bloc/deck_event.dart';
 
 class DeckListItem extends StatelessWidget {
   final deck_entity.Container deck;
@@ -41,14 +44,34 @@ class DeckListItem extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () => _showDeleteDialog(context),
+              Row(
+                children: [
+                  if (deck.isActive)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Chip(
+                        avatar: const Icon(Icons.check, size: 16),
+                        label: const Text('使用中'),
+                        visualDensity: VisualDensity.compact,
                       ),
-                    ],
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.play_arrow),
+                        label: const Text('使用中にする'),
+                        onPressed: () {
+                          context.read<DeckBloc>().add(SetActiveDeckEvent(id: deck.id));
+                        },
+                      ),
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () => _showDeleteDialog(context),
                   ),
+                ],
+              ),
                 ],
               ),
               if (deck.description != null) ...[

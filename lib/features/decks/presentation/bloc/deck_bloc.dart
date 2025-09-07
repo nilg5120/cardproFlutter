@@ -5,6 +5,7 @@ import 'package:cardpro/features/decks/domain/usecases/get_decks.dart';
 import 'package:cardpro/features/decks/domain/usecases/add_deck.dart';
 import 'package:cardpro/features/decks/domain/usecases/delete_deck.dart';
 import 'package:cardpro/features/decks/domain/usecases/edit_deck.dart';
+import 'package:cardpro/features/decks/domain/usecases/set_active_deck.dart';
 import 'package:cardpro/features/decks/presentation/bloc/deck_event.dart';
 
 /// デッキ一覧管理に関する状態（State）のベースクラス
@@ -47,6 +48,7 @@ class DeckBloc extends Bloc<DeckEvent, DeckState> {
   final AddDeck addDeck;
   final DeleteDeck deleteDeck;
   final EditDeck editDeck;
+  final SetActiveDeck setActiveDeck;
 
   /// コンストラクタ：ユースケースを注入
   DeckBloc({
@@ -54,12 +56,14 @@ class DeckBloc extends Bloc<DeckEvent, DeckState> {
     required this.addDeck,
     required this.deleteDeck,
     required this.editDeck,
+    required this.setActiveDeck,
   }) : super(DeckInitial()) {
     // イベントごとの処理を登録
     on<GetDecksEvent>(_onGetDecks);
     on<AddDeckEvent>(_onAddDeck);
     on<DeleteDeckEvent>(_onDeleteDeck);
     on<EditDeckEvent>(_onEditDeck);
+    on<SetActiveDeckEvent>(_onSetActiveDeck);
   }
 
   /// デッキ一覧取得イベントの処理
@@ -109,6 +113,17 @@ class DeckBloc extends Bloc<DeckEvent, DeckState> {
     result.fold(
       (failure) => emit(DeckError(failure.message)),
       (_) => add(GetDecksEvent()), // 成功後、一覧再取得
+    );
+  }
+
+  /// デッキを使用中に設定
+  Future<void> _onSetActiveDeck(SetActiveDeckEvent event, Emitter<DeckState> emit) async {
+    emit(DeckLoading());
+    final params = SetActiveDeckParams(id: event.id);
+    final result = await setActiveDeck(params);
+    result.fold(
+      (failure) => emit(DeckError(failure.message)),
+      (_) => add(GetDecksEvent()),
     );
   }
 }

@@ -6,6 +6,7 @@ class Containers extends Table {
   TextColumn get description => text().nullable()();  // 補足説明
   TextColumn get containerType => text()();           // 'deck', 'drawer', 'binder' など
 
+  BoolColumn get isActive => boolean().withDefault(const Constant(false))(); // 使用中フラグ
   @override
   Set<Column> get primaryKey => {id};
 }

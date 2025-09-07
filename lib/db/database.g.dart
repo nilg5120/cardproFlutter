@@ -1023,8 +1023,29 @@ class $ContainersTable extends Containers
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, name, description, containerType];
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    description,
+    containerType,
+    isActive,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1066,6 +1087,12 @@ class $ContainersTable extends Containers
     } else if (isInserting) {
       context.missing(_containerTypeMeta);
     }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
     return context;
   }
 
@@ -1093,6 +1120,11 @@ class $ContainersTable extends Containers
             DriftSqlType.string,
             data['${effectivePrefix}container_type'],
           )!,
+      isActive:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_active'],
+          )!,
     );
   }
 
@@ -1107,11 +1139,13 @@ class Container extends DataClass implements Insertable<Container> {
   final String? name;
   final String? description;
   final String containerType;
+  final bool isActive;
   const Container({
     required this.id,
     this.name,
     this.description,
     required this.containerType,
+    required this.isActive,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1124,6 +1158,7 @@ class Container extends DataClass implements Insertable<Container> {
       map['description'] = Variable<String>(description);
     }
     map['container_type'] = Variable<String>(containerType);
+    map['is_active'] = Variable<bool>(isActive);
     return map;
   }
 
@@ -1136,6 +1171,7 @@ class Container extends DataClass implements Insertable<Container> {
               ? const Value.absent()
               : Value(description),
       containerType: Value(containerType),
+      isActive: Value(isActive),
     );
   }
 
@@ -1149,6 +1185,7 @@ class Container extends DataClass implements Insertable<Container> {
       name: serializer.fromJson<String?>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
       containerType: serializer.fromJson<String>(json['containerType']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
     );
   }
   @override
@@ -1159,6 +1196,7 @@ class Container extends DataClass implements Insertable<Container> {
       'name': serializer.toJson<String?>(name),
       'description': serializer.toJson<String?>(description),
       'containerType': serializer.toJson<String>(containerType),
+      'isActive': serializer.toJson<bool>(isActive),
     };
   }
 
@@ -1167,11 +1205,13 @@ class Container extends DataClass implements Insertable<Container> {
     Value<String?> name = const Value.absent(),
     Value<String?> description = const Value.absent(),
     String? containerType,
+    bool? isActive,
   }) => Container(
     id: id ?? this.id,
     name: name.present ? name.value : this.name,
     description: description.present ? description.value : this.description,
     containerType: containerType ?? this.containerType,
+    isActive: isActive ?? this.isActive,
   );
   Container copyWithCompanion(ContainersCompanion data) {
     return Container(
@@ -1183,6 +1223,7 @@ class Container extends DataClass implements Insertable<Container> {
           data.containerType.present
               ? data.containerType.value
               : this.containerType,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
     );
   }
 
@@ -1192,13 +1233,15 @@ class Container extends DataClass implements Insertable<Container> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
-          ..write('containerType: $containerType')
+          ..write('containerType: $containerType, ')
+          ..write('isActive: $isActive')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, description, containerType);
+  int get hashCode =>
+      Object.hash(id, name, description, containerType, isActive);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1206,7 +1249,8 @@ class Container extends DataClass implements Insertable<Container> {
           other.id == this.id &&
           other.name == this.name &&
           other.description == this.description &&
-          other.containerType == this.containerType);
+          other.containerType == this.containerType &&
+          other.isActive == this.isActive);
 }
 
 class ContainersCompanion extends UpdateCompanion<Container> {
@@ -1214,29 +1258,34 @@ class ContainersCompanion extends UpdateCompanion<Container> {
   final Value<String?> name;
   final Value<String?> description;
   final Value<String> containerType;
+  final Value<bool> isActive;
   const ContainersCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.description = const Value.absent(),
     this.containerType = const Value.absent(),
+    this.isActive = const Value.absent(),
   });
   ContainersCompanion.insert({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.description = const Value.absent(),
     required String containerType,
+    this.isActive = const Value.absent(),
   }) : containerType = Value(containerType);
   static Insertable<Container> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? description,
     Expression<String>? containerType,
+    Expression<bool>? isActive,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (description != null) 'description': description,
       if (containerType != null) 'container_type': containerType,
+      if (isActive != null) 'is_active': isActive,
     });
   }
 
@@ -1245,12 +1294,14 @@ class ContainersCompanion extends UpdateCompanion<Container> {
     Value<String?>? name,
     Value<String?>? description,
     Value<String>? containerType,
+    Value<bool>? isActive,
   }) {
     return ContainersCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
       containerType: containerType ?? this.containerType,
+      isActive: isActive ?? this.isActive,
     );
   }
 
@@ -1269,6 +1320,9 @@ class ContainersCompanion extends UpdateCompanion<Container> {
     if (containerType.present) {
       map['container_type'] = Variable<String>(containerType.value);
     }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
     return map;
   }
 
@@ -1278,7 +1332,8 @@ class ContainersCompanion extends UpdateCompanion<Container> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
-          ..write('containerType: $containerType')
+          ..write('containerType: $containerType, ')
+          ..write('isActive: $isActive')
           ..write(')'))
         .toString();
   }
@@ -2390,6 +2445,7 @@ typedef $$ContainersTableCreateCompanionBuilder =
       Value<String?> name,
       Value<String?> description,
       required String containerType,
+      Value<bool> isActive,
     });
 typedef $$ContainersTableUpdateCompanionBuilder =
     ContainersCompanion Function({
@@ -2397,6 +2453,7 @@ typedef $$ContainersTableUpdateCompanionBuilder =
       Value<String?> name,
       Value<String?> description,
       Value<String> containerType,
+      Value<bool> isActive,
     });
 
 class $$ContainersTableFilterComposer
@@ -2425,6 +2482,11 @@ class $$ContainersTableFilterComposer
 
   ColumnFilters<String> get containerType => $composableBuilder(
     column: $table.containerType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2457,6 +2519,11 @@ class $$ContainersTableOrderingComposer
     column: $table.containerType,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ContainersTableAnnotationComposer
@@ -2483,6 +2550,9 @@ class $$ContainersTableAnnotationComposer
     column: $table.containerType,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
 }
 
 class $$ContainersTableTableManager
@@ -2520,11 +2590,13 @@ class $$ContainersTableTableManager
                 Value<String?> name = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<String> containerType = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
               }) => ContainersCompanion(
                 id: id,
                 name: name,
                 description: description,
                 containerType: containerType,
+                isActive: isActive,
               ),
           createCompanionCallback:
               ({
@@ -2532,11 +2604,13 @@ class $$ContainersTableTableManager
                 Value<String?> name = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 required String containerType,
+                Value<bool> isActive = const Value.absent(),
               }) => ContainersCompanion.insert(
                 id: id,
                 name: name,
                 description: description,
                 containerType: containerType,
+                isActive: isActive,
               ),
           withReferenceMapper:
               (p0) =>

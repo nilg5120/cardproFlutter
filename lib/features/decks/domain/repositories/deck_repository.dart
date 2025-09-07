@@ -16,4 +16,7 @@ abstract class DeckRepository {
     required String name,
     required String? description,
   });
+  Future<Either<Failure, void>> setActiveDeck({
+    required int id,
+  });
 }
