@@ -1,7 +1,5 @@
-# ER 図（DB 概要 / PlantUML）
-
+# ER 図 概要 / PlantUML
 以下は現在の論理データモデルを表す ER 図です。PlantUML 対応環境で可視化できます。
-
 ```plantuml
 @startuml
 left to right direction
@@ -18,17 +16,9 @@ entity "MTG_CARDS" as mtg_cards {
   --
   name : TEXT
   rarity : TEXT
-  setName : TEXT
-  cardnumber : INTEGER
-  effectId : INTEGER <<FK>>
-}
-
-entity "CARD_INSTANCES" as card_instances {
-  *id : INTEGER
-  --
-  cardId : INTEGER <<FK>>
-  updatedAt : DATETIME
-  description : TEXT
+  set_name : TEXT
+  card_number : TEXT
+  effect_id : INTEGER <<FK>>
 }
 
 entity "CONTAINERS" as containers {
@@ -36,19 +26,25 @@ entity "CONTAINERS" as containers {
   --
   name : TEXT
   description : TEXT
-  containerType : TEXT
-  isActive : BOOLEAN
+  container_type : TEXT
+  is_active : BOOLEAN
 }
 
-entity "CONTAINER_CARD_LOCATIONS" as ccl {
-  *containerId : INTEGER <<FK>>
-  *cardInstanceId : INTEGER <<FK>>
-  *location : TEXT
+entity "CARD_INSTANCES" as card_instances {
+  *id : INTEGER
+  --
+  card_id : INTEGER <<FK>>
+  container_id : INTEGER <<FK>>
+  location : TEXT
+  updated_at : DATETIME
+  description : TEXT
 }
 
-card_effects ||--o{ mtg_cards : has
-mtg_cards    ||--o{ card_instances : defines
-containers   ||--o{ ccl : holds
-card_instances ||--o{ ccl : placed_in
+' 関係（効果は任意: effect_id は NULL 可）
+card_effects o|--o{ mtg_cards : referenced_by
+mtg_cards    ||--o{ card_instances : instantiates
+containers   ||--o{ card_instances : holds
+
 @enduml
 ```
+
