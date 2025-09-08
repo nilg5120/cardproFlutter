@@ -136,14 +136,23 @@ extension DeckQueries on AppDatabase {
     required int cardInstanceId,
     String location = 'main',
   }) async {
-    await into(containerCardLocations).insert(
-      ContainerCardLocationsCompanion.insert(
-        containerId: containerId,
-        cardInstanceId: cardInstanceId,
-        location: location,
-      ),
-      mode: InsertMode.insertOrIgnore,
-    );
+    // 同一コンテナ内で同一インスタンスは board を1つに保つため、既存行をクリアしてから挿入
+    await transaction(() async {
+      await (delete(containerCardLocations)
+            ..where((t) =>
+                t.containerId.equals(containerId) &
+                t.cardInstanceId.equals(cardInstanceId)))
+          .go();
+
+      await into(containerCardLocations).insert(
+        ContainerCardLocationsCompanion.insert(
+          containerId: containerId,
+          cardInstanceId: cardInstanceId,
+          location: location,
+        ),
+        mode: InsertMode.insertOrIgnore,
+      );
+    });
   }
 
   Future<void> removeCardFromDeck({

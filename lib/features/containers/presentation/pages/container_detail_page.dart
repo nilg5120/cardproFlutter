@@ -115,7 +115,7 @@ class _ContainerDetailPageState extends State<ContainerDetailPage> {
                     itemCount: data.length,
                     separatorBuilder: (_, __) => const Divider(height: 1),
                     itemBuilder: (context, index) {
-                      final (mtg, _instance, link) = data[index];
+                      final (mtg, instance, link) = data[index];
                       return ListTile(
                         title: Text(mtg.name),
                         subtitle: Text('場所: ${link.location}'),
