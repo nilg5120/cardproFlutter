@@ -1,33 +1,44 @@
 @startuml
-title カード管理アプリ - 画面遷移図
+title CardPro 画面遷移図（現行実装）
 
-[*] --> HomeScreen : アプリ起動
-HomeScreen --> CardListScreen : カード一覧を見る
-CardListScreen --> AddCardDialog : ＋ボタンを押す
-AddCardDialog --> CardListScreen : カード追加後戻る
+[*] --> HomePage : アプリ起動
 
-CardListScreen --> CardDetailScreen : カードをタップ
-CardDetailScreen --> CardListScreen : 戻る
+HomePage --> CardListPage : "Cards" を選択
+HomePage --> DeckListPage : "Decks" を選択
+HomePage --> ContainerListPage : "Containers" を選択
 
-HomeScreen --> DeckListScreen : デッキ一覧を見る
-DeckListScreen --> DeckDetailScreen : デッキ選択
-DeckDetailScreen --> CardListScreen : デッキ内カード一覧
+CardListPage --> AddCardDialog : 追加（+ FAB）
+AddCardDialog --> CardListPage : 登録完了
+
+CardListPage --> CardInstancesPage : カード名をタップ
+CardInstancesPage --> EditCardDialog : リスト項目をタップ（編集）
+EditCardDialog --> CardInstancesPage : 保存/キャンセル
+CardInstancesPage --> CardListPage : 戻る
+
+DeckListPage --> DeckDetailPage : デッキをタップ
+DeckDetailPage --> DeckListPage : 戻る
+
+ContainerListPage --> ContainerDetailPage : コンテナをタップ
+ContainerDetailPage --> ContainerListPage : 戻る
 
 @enduml
 
 @startuml
-title デッキ使用フロー（カード移動操作あり）
+title デッキ使用フロー（重複カードの移動指示）
 
-[*] --> デッキ一覧画面
+[*] --> DeckListPage
 
-デッキ一覧画面 --> デッキ詳細画面 : デッキを選択
-デッキ詳細画面 --> 補完チェック処理 : 「使用する」ボタン押下
+DeckListPage --> [*] : 「使用中にする」（重複なし）
 
-補完チェック処理 --> 移動指示表示画面 : 不足カードの補完指示を生成
+DeckListPage --> MoveInstructionDialog : 「使用中にする」（重複あり）
+note right of MoveInstructionDialog
+  - 既存の使用中デッキにある同一インスタンスを検出
+  - 表示: カード名 / 元デッキ名（場所）/ 移動先
+  - 操作: [移動完了] または [キャンセル]
+end note
 
-移動指示表示画面 --> カード移動操作中 : ユーザーが実物カードを移動
-カード移動操作中 --> 使用状態確定画面 : 「カード移動が完了しました」押下
-
-使用状態確定画面 --> [*] : デッキ使用状態がアクティブに
+MoveInstructionDialog --> DeckListPage : 移動完了
+DeckListPage --> [*] : 選択デッキをアクティブ化
 
 @enduml
+

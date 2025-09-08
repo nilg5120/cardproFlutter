@@ -76,7 +76,7 @@ class CardListPage extends StatelessWidget {
       return const Center(child: Text('カードがありません'));
     }
 
-    // Group instances by card name (even if set differs)
+    // カード名ごとにグルーピング
     final Map<String, List<CardWithInstance>> byName = {};
     for (final e in items) {
       byName.putIfAbsent(e.card.name, () => []).add(e);
@@ -88,7 +88,7 @@ class CardListPage extends StatelessWidget {
       itemBuilder: (context, index) {
         final group = grouped[index];
         final representative = group.first; // use first instance for display
-        // Title is the card name only (ignore set differences)
+        // タイトルは代表カードの名前
         final title = representative.card.name;
 
         return CardListItem(
@@ -109,7 +109,7 @@ class CardListPage extends StatelessWidget {
           },
           // Hide delete button on grouped list
           showDelete: false,
-          // Hide set name on grouped list (since sets may differ)
+          // セット名は一覧では非表示（セットが混在するため）
           showSetName: false,
           // Keep handlers to satisfy constructor but won't be visible/used
           onDelete: () {},

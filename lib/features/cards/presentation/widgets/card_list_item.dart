@@ -9,6 +9,7 @@ class CardListItem extends StatelessWidget {
   final VoidCallback? onTap;
   final bool showDelete;
   final bool showSetName;
+  final bool showCardName;
 
   const CardListItem({
     super.key,
@@ -18,6 +19,7 @@ class CardListItem extends StatelessWidget {
     this.onTap,
     this.showDelete = true,
     this.showSetName = true,
+    this.showCardName = true,
   });
 
   @override
@@ -34,32 +36,32 @@ class CardListItem extends StatelessWidget {
               Expanded(
                 child: Row(
                   children: [
-                  // Card name
-                  Flexible(
-                    fit: FlexFit.tight,
-                    child: Text(
-                      card.card.name,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    if (showCardName)
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: Text(
+                          card.card.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Set name (optional)
-                  if (showSetName && card.card.setName != null)
-                    Text(
-                      card.card.setName!,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(color: Colors.grey[700]),
-                    ),
-                ],
+                    if (showCardName) const SizedBox(width: 12),
+                    // Set name (optional)
+                    if (showSetName && card.card.setName != null)
+                      Text(
+                        card.card.setName!,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: Colors.grey[700]),
+                      ),
+                  ],
+                ),
               ),
-            ),
             Row(
               children: [
                 if (showDelete)
