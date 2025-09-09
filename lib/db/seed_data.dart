@@ -187,4 +187,25 @@ extension SeedData on AppDatabase {
       });
     }
   }
+
+  /// Ensure a default non-deck container exists.
+  /// - Idempotent: Inserts only when there are no non-deck containers.
+  /// - Inserts name '保管庫' with containerType 'drawer'.
+  Future<void> ensureInitialContainersExist() async {
+    // Seed a default non-deck container if none exist
+    final nonDeckContainers = await (select(containers)
+          ..where((t) => t.containerType.isNotValue('deck')))
+        .get();
+    if (nonDeckContainers.isEmpty) {
+      await into(containers).insert(
+        ContainersCompanion.insert(
+          name: const Value('保管庫'),
+          description: const Value(null),
+          // Use a generic non-deck type; UI examples include 'drawer', 'binder'
+          containerType: 'drawer',
+        ),
+      );
+      debugPrint('Created initial container: 保管庫 (type: drawer)');
+    }
+  }
 }

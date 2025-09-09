@@ -45,6 +45,7 @@ Future<void> init() async {
   // デフォルトのカード効果と初期カード/デッキを作成
   await database.ensureDefaultCardEffectsExist();
   await database.ensureInitialCardsAndDeckExist();
+  await database.ensureInitialContainersExist();
 
   // 簡易的な件数確認用ログ
   final cardsCount = await (database.select(database.mtgCards)..limit(1000))
@@ -55,7 +56,11 @@ Future<void> init() async {
           .get()
           .then((l) => l.length);
   // ignore: avoid_print
-  print('DB seeded: cards=$cardsCount, instances=$instancesCount');
+  final nonDeckContainerCount = await (database.select(database.containers)
+          ..where((t) => t.containerType.isNotValue('deck')))
+      .get()
+      .then((l) => l.length);
+  print('DB seeded: cards=$cardsCount, instances=$instancesCount, containers=$nonDeckContainerCount');
 
   sl.registerLazySingleton<AppDatabase>(() => database);
 
