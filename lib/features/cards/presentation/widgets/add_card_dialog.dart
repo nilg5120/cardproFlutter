@@ -197,7 +197,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
         }
 
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (dialogContext, setState) {
             return AlertDialog(
               title: const Text('Add Card'),
               content: SingleChildScrollView(
@@ -350,7 +350,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Navigator.of(dialogContext).pop(),
                   child: const Text('Cancel'),
                 ),
                 TextButton(
@@ -368,9 +368,10 @@ class _AddCardDialogState extends State<AddCardDialog> {
                           final c = await _scryfall.getCardByExactName(name);
                           oracleId = c?.oracleId;
                         }
+                        if (!dialogContext.mounted) return;
                         if (oracleId == null || oracleId.isEmpty) {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
+                          if (dialogContext.mounted) {
+                            ScaffoldMessenger.of(dialogContext).showSnackBar(
                               const SnackBar(content: Text('カードの識別子(oracle_id)を取得できません。候補から選択してください。')),
                             );
                           }
@@ -378,7 +379,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
                         }
                       final q = int.tryParse(quantityController.text.trim());
                       final qty = (q == null || q <= 0) ? 1 : q;
-                      context.read<CardBloc>().add(
+                      dialogContext.read<CardBloc>().add(
                         AddCardEvent(
                           name: name,
                           oracleId: oracleId,
@@ -392,7 +393,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
                           quantity: qty,
                         ),
                       );
-                      if (mounted) Navigator.of(context).pop();
+                      if (dialogContext.mounted) Navigator.of(dialogContext).pop();
                       }();
                     }
                   },
