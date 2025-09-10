@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:get_it/get_it.dart';
 
 import 'package:cardpro/db/database.dart';
@@ -55,12 +56,11 @@ Future<void> init() async {
       await (database.select(database.cardInstances)..limit(1000))
           .get()
           .then((l) => l.length);
-  // ignore: avoid_print
   final nonDeckContainerCount = await (database.select(database.containers)
           ..where((t) => t.containerType.isNotValue('deck')))
       .get()
       .then((l) => l.length);
-  print('DB seeded: cards=$cardsCount, instances=$instancesCount, containers=$nonDeckContainerCount');
+  developer.log('DB seeded: cards=$cardsCount, instances=$instancesCount, containers=$nonDeckContainerCount');
 
   sl.registerLazySingleton<AppDatabase>(() => database);
 
