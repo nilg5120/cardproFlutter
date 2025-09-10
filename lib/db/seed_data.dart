@@ -28,6 +28,7 @@ extension SeedData on AppDatabase {
         Future<MtgCard> addCard(String name, String rarity, int number) async {
           final card = await into(mtgCards).insertReturning(
             MtgCardsCompanion.insert(
+              oracleId: 'seed-${name.replaceAll(' ', '-')}-${number}',
               name: name,
               rarity: Value(rarity),
               setName: const Value('Alpha'),

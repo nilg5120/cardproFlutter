@@ -24,6 +24,7 @@ void main() {
 
   final testCard = card_entity.Card(
     id: 1,
+    oracleId: 'oracle-1',
     name: 'Test Card',
     rarity: 'R',
     setName: 'Sample',

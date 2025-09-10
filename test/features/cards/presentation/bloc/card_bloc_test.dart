@@ -48,6 +48,7 @@ void main() {
   final testCardWithInstance = CardWithInstance(
     card: card_entity.Card(
       id: 1,
+      oracleId: 'oracle-1',
       name: 'Test Card',
       rarity: 'R',
       setName: 'Sample',
@@ -100,6 +101,7 @@ void main() {
 
   group('AddCardEvent（追加）', () {
     final addCardEvent = AddCardEvent(
+      oracleId: 'oracle-1',
       name: 'Test Card',
       rarity: 'R',
       setName: 'Sample',

@@ -8,6 +8,7 @@ import 'dart:developer' as developer;
 abstract class CardLocalDataSource {
   Future<List<CardWithInstanceModel>> getCards();
   Future<CardWithInstanceModel> addCard({
+    required String oracleId,
     required String name,
     required String? rarity,
     required String? setName,
@@ -49,6 +50,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
 
   @override
   Future<CardWithInstanceModel> addCard({
+    required String oracleId,
     required String name,
     required String? rarity,
     required String? setName,
@@ -57,18 +59,16 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     required String? description,
     required int quantity,
   }) async {
-    // 既存カードの重複チェック（同名・同セット・同カード番号）
+    // 既存カードの重複チェック（oracleId 基準）
     final existingCard = await (database.select(database.mtgCards)
-          ..where((tbl) =>
-              tbl.name.equals(name) &
-              tbl.setName.equals(setName ?? '') &
-              tbl.cardnumber.equals(cardNumber ?? 0)))
+          ..where((tbl) => tbl.oracleId.equals(oracleId)))
         .getSingleOrNull();
 
     // 新規カードを挿入、もしくは既存カードのIDを利用
     final cardId = existingCard?.id ??
         (await database.into(database.mtgCards).insertReturning(
               MtgCardsCompanion.insert(
+                oracleId: oracleId,
                 name: name,
                 rarity: Value(rarity),
                 setName: Value(setName),

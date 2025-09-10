@@ -1,5 +1,6 @@
 class ScryfallCard {
   final String name; // English oracle name
+  final String oracleId; // Oracle ID to uniquely identify the card
   final String? printedName; // Localized printed name (e.g., Japanese)
   final String? setCode; // e.g., "lea"
   final String? setName; // e.g., "Limited Edition Alpha"
@@ -10,6 +11,7 @@ class ScryfallCard {
 
   ScryfallCard({
     required this.name,
+    required this.oracleId,
     this.printedName,
     this.setCode,
     this.setName,
@@ -22,6 +24,7 @@ class ScryfallCard {
   factory ScryfallCard.fromJson(Map<String, dynamic> json) {
     return ScryfallCard(
       name: json['name'] as String? ?? '',
+      oracleId: json['oracle_id'] as String? ?? '',
       printedName: json['printed_name'] as String?,
       setCode: json['set'] as String?,
       setName: json['set_name'] as String?,

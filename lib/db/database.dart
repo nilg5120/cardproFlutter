@@ -34,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.test(super.executor) : enableSeeding = false;
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -56,6 +56,15 @@ class AppDatabase extends _$AppDatabase {
           if (from == 2) {
             // v3: add isActive to containers
             await m.addColumn(containers, containers.isActive);
+            from = 3;
+          }
+          if (from == 3) {
+            // v4: add oracleId to mtg_cards and enforce uniqueness
+            await m.addColumn(mtgCards, mtgCards.oracleId);
+            await m.createIndex(
+              Index('mtg_cards_oracle_id_idx',
+                  'CREATE UNIQUE INDEX mtg_cards_oracle_id_idx ON mtg_cards (oracle_id)'),
+            );
           }
         },
       );

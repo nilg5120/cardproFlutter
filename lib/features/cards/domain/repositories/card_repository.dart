@@ -7,6 +7,7 @@ import 'package:cardpro/features/cards/domain/entities/card.dart';
 abstract class CardRepository {
   Future<Either<Failure, List<CardWithInstance>>> getCards();
   Future<Either<Failure, CardWithInstance>> addCard({
+    required String oracleId,
     required String name,
     required String? rarity,
     required String? setName,

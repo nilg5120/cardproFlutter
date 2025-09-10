@@ -37,6 +37,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
   bool _isSuggestLoading = false;
   String? _suggestError;
   TextEditingController? _acController; // Autocomplete's internal controller
+  String? _selectedOracleId;
 
   @override
   void initState() {
@@ -60,6 +61,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
   void _onNameChanged(String value) {
     _debounce?.cancel();
     final q = value.trim();
+    _selectedOracleId = null;
     if (q.length < 2) {
       setState(() {
         _nameOptions = [];
@@ -106,6 +108,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
       final ScryfallCard? c = await _scryfall.getCardByExactName(exactName);
       if (c == null) return;
       setState(() {
+        _selectedOracleId = c.oracleId;
         // Keep the selected name
         rarityController.text = c.rarityShort ?? (c.rarity ?? '');
         setNameController.text = c.setName ?? '';
@@ -164,6 +167,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
 
       if (selected != null) {
         setState(() {
+          _selectedOracleId = selected.oracleId;
           rarityController.text = selected.rarityShort ?? (selected.rarity ?? '');
           setNameController.text = selected.setName ?? '';
           final n = selected.collectorNumberInt;
@@ -349,13 +353,18 @@ class _AddCardDialogState extends State<AddCardDialog> {
                   child: const Text('Cancel'),
                 ),
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     final name = nameController.text;
                     if (name.isNotEmpty) {
+                      if (_selectedOracleId == null) {
+                        final c = await _scryfall.getCardByExactName(name);
+                        _selectedOracleId = c?.oracleId ?? name;
+                      }
                       final q = int.tryParse(quantityController.text.trim());
                       final qty = (q == null || q <= 0) ? 1 : q;
                       context.read<CardBloc>().add(
                             AddCardEvent(
+                              oracleId: _selectedOracleId!,
                               name: name,
                               rarity: rarityController.text.isNotEmpty ? rarityController.text : null,
                               setName: setNameController.text.isNotEmpty ? setNameController.text : null,

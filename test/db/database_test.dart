@@ -27,6 +27,7 @@ void main() {
     // マスタカードを挿入
     final card = await db.into(db.mtgCards).insertReturning(
           MtgCardsCompanion.insert(
+            oracleId: 'test-oracle',
             name: 'Test Card',
             rarity: const Value('R'),
             setName: const Value('Sample'),

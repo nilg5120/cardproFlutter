@@ -25,6 +25,7 @@ class CardRepositoryImpl implements CardRepository {
 
   @override
   Future<Either<Failure, CardWithInstance>> addCard({
+    required String oracleId,
     required String name,
     required String? rarity,
     required String? setName,
@@ -35,6 +36,7 @@ class CardRepositoryImpl implements CardRepository {
   }) async {
     try {
       final card = await localDataSource.addCard(
+        oracleId: oracleId,
         name: name,
         rarity: rarity,
         setName: setName,

@@ -82,6 +82,7 @@ class CardBloc extends Bloc<CardEvent, CardState> {
   Future<void> _onAddCard(AddCardEvent event, Emitter<CardState> emit) async {
     emit(CardLoading());
     final params = AddCardParams(
+      oracleId: event.oracleId,
       name: event.name,
       rarity: event.rarity,
       setName: event.setName,

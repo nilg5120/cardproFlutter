@@ -60,6 +60,7 @@ class MockCardRepository extends _i1.Mock implements _i3.CardRepository {
 
   @override
   _i4.Future<_i2.Either<_i5.Failure, _i6.CardWithInstance>> addCard({
+    required String oracleId,
     required String name,
     required String? rarity,
     required String? setName,
@@ -70,6 +71,7 @@ class MockCardRepository extends _i1.Mock implements _i3.CardRepository {
   }) =>
       (super.noSuchMethod(
             Invocation.method(#addCard, [], {
+              #oracleId: oracleId,
               #name: name,
               #rarity: rarity,
               #setName: setName,
@@ -83,6 +85,7 @@ class MockCardRepository extends _i1.Mock implements _i3.CardRepository {
                   _FakeEither_0<_i5.Failure, _i6.CardWithInstance>(
                     this,
                     Invocation.method(#addCard, [], {
+                      #oracleId: oracleId,
                       #name: name,
                       #rarity: rarity,
                       #setName: setName,

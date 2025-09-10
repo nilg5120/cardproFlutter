@@ -6,6 +6,7 @@ class MtgCards extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   // Basic fields
+  TextColumn get oracleId => text().unique()();
   TextColumn get name => text()();
   TextColumn get rarity => text().nullable()();
   TextColumn get setName => text().nullable()();

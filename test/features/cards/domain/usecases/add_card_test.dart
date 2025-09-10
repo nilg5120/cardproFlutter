@@ -21,6 +21,7 @@ void main() {
 
   final testCard = card_entity.Card(
     id: 1,
+    oracleId: 'oracle-1',
     name: 'Test Card',
     rarity: 'R',
     setName: 'Sample',
@@ -41,6 +42,7 @@ void main() {
   );
 
   final testParams = AddCardParams(
+    oracleId: 'oracle-1',
     name: 'Test Card',
     rarity: 'R',
     setName: 'Sample',
@@ -52,6 +54,7 @@ void main() {
 
   test('リポジトリ経由でカードを追加できる', () async {
     when(mockRepository.addCard(
+      oracleId: 'oracle-1',
       name: 'Test Card',
       rarity: 'R',
       setName: 'Sample',
@@ -65,6 +68,7 @@ void main() {
 
     expect(result, Right<Failure, CardWithInstance>(testCardWithInstance));
     verify(mockRepository.addCard(
+      oracleId: 'oracle-1',
       name: 'Test Card',
       rarity: 'R',
       setName: 'Sample',
@@ -79,6 +83,7 @@ void main() {
   test('リポジトリの失敗をそのまま伝播する', () async {
     final failure = DatabaseFailure(message: 'DB error');
     when(mockRepository.addCard(
+      oracleId: 'oracle-1',
       name: 'Test Card',
       rarity: 'R',
       setName: 'Sample',
@@ -92,6 +97,7 @@ void main() {
 
     expect(result, Left<Failure, CardWithInstance>(failure));
     verify(mockRepository.addCard(
+      oracleId: 'oracle-1',
       name: 'Test Card',
       rarity: 'R',
       setName: 'Sample',

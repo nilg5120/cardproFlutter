@@ -14,6 +14,7 @@ class GetCardsEvent extends CardEvent {}
 
 /// 新しいカードを追加するイベント
 class AddCardEvent extends CardEvent {
+  final String oracleId;
   final String name;
   final String? rarity;
   final String? setName;
@@ -23,6 +24,7 @@ class AddCardEvent extends CardEvent {
   final int quantity;
 
   const AddCardEvent({
+    required this.oracleId,
     required this.name,
     this.rarity,
     this.setName,
@@ -33,7 +35,7 @@ class AddCardEvent extends CardEvent {
   });
 
   @override
-  List<Object?> get props => [name, rarity, setName, cardNumber, effectId, description, quantity];
+  List<Object?> get props => [oracleId, name, rarity, setName, cardNumber, effectId, description, quantity];
 }
 
 /// カード個体を削除するイベント
