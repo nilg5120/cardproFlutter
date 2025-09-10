@@ -9,6 +9,7 @@ abstract class CardLocalDataSource {
   Future<List<CardWithInstanceModel>> getCards();
   Future<CardWithInstanceModel> addCard({
     required String name,
+    required String oracleId,
     required String? rarity,
     required String? setName,
     required int? cardNumber,
@@ -50,6 +51,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
   @override
   Future<CardWithInstanceModel> addCard({
     required String name,
+    required String oracleId,
     required String? rarity,
     required String? setName,
     required int? cardNumber,
@@ -58,25 +60,59 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     required int quantity,
   }) async {
     // 既存カードの重複チェック（同名・同セット・同カード番号）
-    final existingCard = await (database.select(database.mtgCards)
-          ..where((tbl) =>
-              tbl.name.equals(name) &
-              tbl.setName.equals(setName ?? '') &
-              tbl.cardnumber.equals(cardNumber ?? 0)))
+    // Prefer dedup by oracle_id via raw SQL (works before codegen updates)
+    final byOracle = await database
+        .customSelect(
+          'SELECT id FROM mtg_cards WHERE oracle_id = ? LIMIT 1',
+          variables: [Variable.withString(oracleId)],
+        )
         .getSingleOrNull();
+    MtgCard? existingCard;
+    if (byOracle != null) {
+      final id = byOracle.read<int>('id');
+      existingCard = await (database.select(database.mtgCards)
+            ..where((t) => t.id.equals(id)))
+          .getSingleOrNull();
+    }
+
+    // 旧ロジックでの重複（name/setName/cardnumber）とも突合し、oracleId 未設定なら補完
+    if (existingCard == null) {
+      final legacy = await (database.select(database.mtgCards)
+            ..where((tbl) =>
+                tbl.name.equals(name) &
+                tbl.setName.equals(setName ?? '') &
+                tbl.cardnumber.equals(cardNumber ?? 0)))
+          .getSingleOrNull();
+      if (legacy != null) {
+        // Backfill oracle_id only when it's currently NULL
+        await database.customStatement(
+          'UPDATE mtg_cards SET oracle_id = ? WHERE id = ? AND oracle_id IS NULL',
+          [oracleId, legacy.id],
+        );
+        existingCard = legacy;
+      }
+    }
 
     // 新規カードを挿入、もしくは既存カードのIDを利用
     final cardId = existingCard?.id ??
         (await database.into(database.mtgCards).insertReturning(
-              MtgCardsCompanion.insert(
-                name: name,
-                rarity: Value(rarity),
-                setName: Value(setName),
-                cardnumber: Value(cardNumber),
-                effectId: effectId,
-              ),
-            ))
-            .id;
+          MtgCardsCompanion.insert(
+            name: name,
+            effectId: effectId,
+          ).copyWith(
+            rarity: Value(rarity),
+            setName: Value(setName),
+            cardnumber: Value(cardNumber),
+          ),
+        )).id;
+
+    // Ensure oracle_id is set for the card (two-step to avoid relying on generated companion)
+    if (existingCard == null) {
+      await database.customStatement(
+        'UPDATE mtg_cards SET oracle_id = ? WHERE id = ?',
+        [oracleId, cardId],
+      );
+    }
 
     // カードインスタンスを複数挿入（quantity 指定分）
     CardInstance? lastInstance;

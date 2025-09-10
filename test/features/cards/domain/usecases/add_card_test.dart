@@ -42,6 +42,7 @@ void main() {
 
   final testParams = AddCardParams(
     name: 'Test Card',
+    oracleId: '0000-ORACLE-TEST',
     rarity: 'R',
     setName: 'Sample',
     cardNumber: 123,
@@ -53,6 +54,7 @@ void main() {
   test('リポジトリ経由でカードを追加できる', () async {
     when(mockRepository.addCard(
       name: 'Test Card',
+      oracleId: '0000-ORACLE-TEST',
       rarity: 'R',
       setName: 'Sample',
       cardNumber: 123,
@@ -66,6 +68,7 @@ void main() {
     expect(result, Right<Failure, CardWithInstance>(testCardWithInstance));
     verify(mockRepository.addCard(
       name: 'Test Card',
+      oracleId: '0000-ORACLE-TEST',
       rarity: 'R',
       setName: 'Sample',
       cardNumber: 123,
@@ -80,6 +83,7 @@ void main() {
     final failure = DatabaseFailure(message: 'DB error');
     when(mockRepository.addCard(
       name: 'Test Card',
+      oracleId: '0000-ORACLE-TEST',
       rarity: 'R',
       setName: 'Sample',
       cardNumber: 123,
@@ -93,6 +97,7 @@ void main() {
     expect(result, Left<Failure, CardWithInstance>(failure));
     verify(mockRepository.addCard(
       name: 'Test Card',
+      oracleId: '0000-ORACLE-TEST',
       rarity: 'R',
       setName: 'Sample',
       cardNumber: 123,

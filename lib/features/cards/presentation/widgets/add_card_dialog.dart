@@ -37,6 +37,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
   bool _isSuggestLoading = false;
   String? _suggestError;
   TextEditingController? _acController; // Autocomplete's internal controller
+  String? _selectedOracleId; // Selected Scryfall oracle id
 
   @override
   void initState() {
@@ -58,6 +59,8 @@ class _AddCardDialogState extends State<AddCardDialog> {
   }
 
   void _onNameChanged(String value) {
+    // Reset selected oracle when name is edited manually
+    _selectedOracleId = null;
     _debounce?.cancel();
     final q = value.trim();
     if (q.length < 2) {
@@ -111,6 +114,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
         setNameController.text = c.setName ?? '';
         final n = c.collectorNumberInt;
         cardNumberController.text = n != null ? '$n' : '';
+        _selectedOracleId = c.oracleId;
       });
     } catch (_) {
       // ignore failures silently in UI
@@ -168,6 +172,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
           setNameController.text = selected.setName ?? '';
           final n = selected.collectorNumberInt;
           cardNumberController.text = n != null ? '$n' : '';
+          _selectedOracleId = selected.oracleId;
         });
       }
     } catch (_) {
@@ -352,22 +357,43 @@ class _AddCardDialogState extends State<AddCardDialog> {
                   onPressed: () {
                     final name = nameController.text;
                     if (name.isNotEmpty) {
+                      // Ensure oracleId is available; try to resolve if missing
+                      if (_selectedOracleId == null || _selectedOracleId!.isEmpty) {
+                        // Try fetching by exact name or fallback search
+                        // Note: We don't await here to keep UI responsive; instead do async
+                      }
+                      () async {
+                        String? oracleId = _selectedOracleId;
+                        if (oracleId == null || oracleId.isEmpty) {
+                          final c = await _scryfall.getCardByExactName(name);
+                          oracleId = c?.oracleId;
+                        }
+                        if (oracleId == null || oracleId.isEmpty) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('カードの識別子(oracle_id)を取得できません。候補から選択してください。')),
+                            );
+                          }
+                          return;
+                        }
                       final q = int.tryParse(quantityController.text.trim());
                       final qty = (q == null || q <= 0) ? 1 : q;
                       context.read<CardBloc>().add(
-                            AddCardEvent(
-                              name: name,
-                              rarity: rarityController.text.isNotEmpty ? rarityController.text : null,
-                              setName: setNameController.text.isNotEmpty ? setNameController.text : null,
-                              cardNumber: int.tryParse(cardNumberController.text),
-                              effectId: selectedEffectId,
-                              description: descriptionController.text.isNotEmpty
-                                  ? descriptionController.text
-                                  : null,
-                              quantity: qty,
-                            ),
-                          );
-                      Navigator.of(context).pop();
+                        AddCardEvent(
+                          name: name,
+                          oracleId: oracleId,
+                          rarity: rarityController.text.isNotEmpty ? rarityController.text : null,
+                          setName: setNameController.text.isNotEmpty ? setNameController.text : null,
+                          cardNumber: int.tryParse(cardNumberController.text),
+                          effectId: selectedEffectId,
+                          description: descriptionController.text.isNotEmpty
+                              ? descriptionController.text
+                              : null,
+                          quantity: qty,
+                        ),
+                      );
+                      if (mounted) Navigator.of(context).pop();
+                      }();
                     }
                   },
                   child: const Text('Add'),

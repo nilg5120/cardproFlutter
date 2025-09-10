@@ -7,6 +7,7 @@ class ScryfallCard {
   final String? rarity; // common, uncommon, rare, mythic, etc.
   final String? lang; // "en", "ja", etc.
   final String? releasedAt; // yyyy-mm-dd
+  final String oracleId; // Scryfall oracle_id (same across languages/prints)
 
   ScryfallCard({
     required this.name,
@@ -17,6 +18,7 @@ class ScryfallCard {
     this.rarity,
     this.lang,
     this.releasedAt,
+    required this.oracleId,
   });
 
   factory ScryfallCard.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class ScryfallCard {
       rarity: json['rarity'] as String?,
       lang: json['lang'] as String?,
       releasedAt: json['released_at'] as String?,
+      oracleId: json['oracle_id'] as String? ?? '',
     );
   }
 

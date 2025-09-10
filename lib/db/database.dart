@@ -34,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.test(super.executor) : enableSeeding = false;
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -56,6 +56,15 @@ class AppDatabase extends _$AppDatabase {
           if (from == 2) {
             // v3: add isActive to containers
             await m.addColumn(containers, containers.isActive);
+            from = 3; // fallthrough
+          }
+          if (from == 3) {
+            // v4: add oracle_id to mtg_cards and a unique index
+            await customStatement('ALTER TABLE mtg_cards ADD COLUMN oracle_id TEXT');
+            // Create unique index (SQLite treats multiple NULLs as distinct)
+            await customStatement(
+              'CREATE UNIQUE INDEX IF NOT EXISTS idx_mtg_cards_oracle_id ON mtg_cards(oracle_id)'
+            );
           }
         },
       );

@@ -101,6 +101,7 @@ void main() {
   group('AddCardEvent（追加）', () {
     final addCardEvent = AddCardEvent(
       name: 'Test Card',
+      oracleId: '0000-ORACLE-TEST',
       rarity: 'R',
       setName: 'Sample',
       cardNumber: 123,

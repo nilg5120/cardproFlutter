@@ -10,11 +10,18 @@ class MtgCards extends Table {
   TextColumn get rarity => text().nullable()();
   TextColumn get setName => text().nullable()();
   IntColumn get cardnumber => integer().nullable()();
+  // Scryfall oracle id (unique across languages/prints)
+  TextColumn get oracleId => text().nullable()();
 
   // Relation to card effects
   IntColumn get effectId => integer().references(CardEffects, #id)();
 
   @override
   Set<Column> get primaryKey => {id};
-}
 
+  // Unique constraint on oracleId (allows multiple NULLs)
+  @override
+  List<Set<Column>> get uniqueKeys => [
+        {oracleId},
+      ];
+}

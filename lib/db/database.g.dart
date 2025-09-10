@@ -317,6 +317,17 @@ class $MtgCardsTable extends MtgCards with TableInfo<$MtgCardsTable, MtgCard> {
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _oracleIdMeta = const VerificationMeta(
+    'oracleId',
+  );
+  @override
+  late final GeneratedColumn<String> oracleId = GeneratedColumn<String>(
+    'oracle_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _effectIdMeta = const VerificationMeta(
     'effectId',
   );
@@ -338,6 +349,7 @@ class $MtgCardsTable extends MtgCards with TableInfo<$MtgCardsTable, MtgCard> {
     rarity,
     setName,
     cardnumber,
+    oracleId,
     effectId,
   ];
   @override
@@ -381,6 +393,12 @@ class $MtgCardsTable extends MtgCards with TableInfo<$MtgCardsTable, MtgCard> {
         cardnumber.isAcceptableOrUnknown(data['cardnumber']!, _cardnumberMeta),
       );
     }
+    if (data.containsKey('oracle_id')) {
+      context.handle(
+        _oracleIdMeta,
+        oracleId.isAcceptableOrUnknown(data['oracle_id']!, _oracleIdMeta),
+      );
+    }
     if (data.containsKey('effect_id')) {
       context.handle(
         _effectIdMeta,
@@ -394,6 +412,10 @@ class $MtgCardsTable extends MtgCards with TableInfo<$MtgCardsTable, MtgCard> {
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {oracleId},
+  ];
   @override
   MtgCard map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -420,6 +442,10 @@ class $MtgCardsTable extends MtgCards with TableInfo<$MtgCardsTable, MtgCard> {
         DriftSqlType.int,
         data['${effectivePrefix}cardnumber'],
       ),
+      oracleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}oracle_id'],
+      ),
       effectId:
           attachedDatabase.typeMapping.read(
             DriftSqlType.int,
@@ -440,6 +466,7 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
   final String? rarity;
   final String? setName;
   final int? cardnumber;
+  final String? oracleId;
   final int effectId;
   const MtgCard({
     required this.id,
@@ -447,6 +474,7 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
     this.rarity,
     this.setName,
     this.cardnumber,
+    this.oracleId,
     required this.effectId,
   });
   @override
@@ -462,6 +490,9 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
     }
     if (!nullToAbsent || cardnumber != null) {
       map['cardnumber'] = Variable<int>(cardnumber);
+    }
+    if (!nullToAbsent || oracleId != null) {
+      map['oracle_id'] = Variable<String>(oracleId);
     }
     map['effect_id'] = Variable<int>(effectId);
     return map;
@@ -481,6 +512,10 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
           cardnumber == null && nullToAbsent
               ? const Value.absent()
               : Value(cardnumber),
+      oracleId:
+          oracleId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(oracleId),
       effectId: Value(effectId),
     );
   }
@@ -496,6 +531,7 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
       rarity: serializer.fromJson<String?>(json['rarity']),
       setName: serializer.fromJson<String?>(json['setName']),
       cardnumber: serializer.fromJson<int?>(json['cardnumber']),
+      oracleId: serializer.fromJson<String?>(json['oracleId']),
       effectId: serializer.fromJson<int>(json['effectId']),
     );
   }
@@ -508,6 +544,7 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
       'rarity': serializer.toJson<String?>(rarity),
       'setName': serializer.toJson<String?>(setName),
       'cardnumber': serializer.toJson<int?>(cardnumber),
+      'oracleId': serializer.toJson<String?>(oracleId),
       'effectId': serializer.toJson<int>(effectId),
     };
   }
@@ -518,6 +555,7 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
     Value<String?> rarity = const Value.absent(),
     Value<String?> setName = const Value.absent(),
     Value<int?> cardnumber = const Value.absent(),
+    Value<String?> oracleId = const Value.absent(),
     int? effectId,
   }) => MtgCard(
     id: id ?? this.id,
@@ -525,6 +563,7 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
     rarity: rarity.present ? rarity.value : this.rarity,
     setName: setName.present ? setName.value : this.setName,
     cardnumber: cardnumber.present ? cardnumber.value : this.cardnumber,
+    oracleId: oracleId.present ? oracleId.value : this.oracleId,
     effectId: effectId ?? this.effectId,
   );
   MtgCard copyWithCompanion(MtgCardsCompanion data) {
@@ -535,6 +574,7 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
       setName: data.setName.present ? data.setName.value : this.setName,
       cardnumber:
           data.cardnumber.present ? data.cardnumber.value : this.cardnumber,
+      oracleId: data.oracleId.present ? data.oracleId.value : this.oracleId,
       effectId: data.effectId.present ? data.effectId.value : this.effectId,
     );
   }
@@ -547,6 +587,7 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
           ..write('rarity: $rarity, ')
           ..write('setName: $setName, ')
           ..write('cardnumber: $cardnumber, ')
+          ..write('oracleId: $oracleId, ')
           ..write('effectId: $effectId')
           ..write(')'))
         .toString();
@@ -554,7 +595,7 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
 
   @override
   int get hashCode =>
-      Object.hash(id, name, rarity, setName, cardnumber, effectId);
+      Object.hash(id, name, rarity, setName, cardnumber, oracleId, effectId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -564,6 +605,7 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
           other.rarity == this.rarity &&
           other.setName == this.setName &&
           other.cardnumber == this.cardnumber &&
+          other.oracleId == this.oracleId &&
           other.effectId == this.effectId);
 }
 
@@ -573,6 +615,7 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
   final Value<String?> rarity;
   final Value<String?> setName;
   final Value<int?> cardnumber;
+  final Value<String?> oracleId;
   final Value<int> effectId;
   const MtgCardsCompanion({
     this.id = const Value.absent(),
@@ -580,6 +623,7 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
     this.rarity = const Value.absent(),
     this.setName = const Value.absent(),
     this.cardnumber = const Value.absent(),
+    this.oracleId = const Value.absent(),
     this.effectId = const Value.absent(),
   });
   MtgCardsCompanion.insert({
@@ -588,6 +632,7 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
     this.rarity = const Value.absent(),
     this.setName = const Value.absent(),
     this.cardnumber = const Value.absent(),
+    this.oracleId = const Value.absent(),
     required int effectId,
   }) : name = Value(name),
        effectId = Value(effectId);
@@ -597,6 +642,7 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
     Expression<String>? rarity,
     Expression<String>? setName,
     Expression<int>? cardnumber,
+    Expression<String>? oracleId,
     Expression<int>? effectId,
   }) {
     return RawValuesInsertable({
@@ -605,6 +651,7 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
       if (rarity != null) 'rarity': rarity,
       if (setName != null) 'set_name': setName,
       if (cardnumber != null) 'cardnumber': cardnumber,
+      if (oracleId != null) 'oracle_id': oracleId,
       if (effectId != null) 'effect_id': effectId,
     });
   }
@@ -615,6 +662,7 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
     Value<String?>? rarity,
     Value<String?>? setName,
     Value<int?>? cardnumber,
+    Value<String?>? oracleId,
     Value<int>? effectId,
   }) {
     return MtgCardsCompanion(
@@ -623,6 +671,7 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
       rarity: rarity ?? this.rarity,
       setName: setName ?? this.setName,
       cardnumber: cardnumber ?? this.cardnumber,
+      oracleId: oracleId ?? this.oracleId,
       effectId: effectId ?? this.effectId,
     );
   }
@@ -645,6 +694,9 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
     if (cardnumber.present) {
       map['cardnumber'] = Variable<int>(cardnumber.value);
     }
+    if (oracleId.present) {
+      map['oracle_id'] = Variable<String>(oracleId.value);
+    }
     if (effectId.present) {
       map['effect_id'] = Variable<int>(effectId.value);
     }
@@ -659,6 +711,7 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
           ..write('rarity: $rarity, ')
           ..write('setName: $setName, ')
           ..write('cardnumber: $cardnumber, ')
+          ..write('oracleId: $oracleId, ')
           ..write('effectId: $effectId')
           ..write(')'))
         .toString();
@@ -1924,6 +1977,7 @@ typedef $$MtgCardsTableCreateCompanionBuilder =
       Value<String?> rarity,
       Value<String?> setName,
       Value<int?> cardnumber,
+      Value<String?> oracleId,
       required int effectId,
     });
 typedef $$MtgCardsTableUpdateCompanionBuilder =
@@ -1933,6 +1987,7 @@ typedef $$MtgCardsTableUpdateCompanionBuilder =
       Value<String?> rarity,
       Value<String?> setName,
       Value<int?> cardnumber,
+      Value<String?> oracleId,
       Value<int> effectId,
     });
 
@@ -1994,6 +2049,11 @@ class $$MtgCardsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get oracleId => $composableBuilder(
+    column: $table.oracleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$CardEffectsTableFilterComposer get effectId {
     final $$CardEffectsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -2052,6 +2112,11 @@ class $$MtgCardsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get oracleId => $composableBuilder(
+    column: $table.oracleId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$CardEffectsTableOrderingComposer get effectId {
     final $$CardEffectsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -2101,6 +2166,9 @@ class $$MtgCardsTableAnnotationComposer
     column: $table.cardnumber,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get oracleId =>
+      $composableBuilder(column: $table.oracleId, builder: (column) => column);
 
   $$CardEffectsTableAnnotationComposer get effectId {
     final $$CardEffectsTableAnnotationComposer composer = $composerBuilder(
@@ -2159,6 +2227,7 @@ class $$MtgCardsTableTableManager
                 Value<String?> rarity = const Value.absent(),
                 Value<String?> setName = const Value.absent(),
                 Value<int?> cardnumber = const Value.absent(),
+                Value<String?> oracleId = const Value.absent(),
                 Value<int> effectId = const Value.absent(),
               }) => MtgCardsCompanion(
                 id: id,
@@ -2166,6 +2235,7 @@ class $$MtgCardsTableTableManager
                 rarity: rarity,
                 setName: setName,
                 cardnumber: cardnumber,
+                oracleId: oracleId,
                 effectId: effectId,
               ),
           createCompanionCallback:
@@ -2175,6 +2245,7 @@ class $$MtgCardsTableTableManager
                 Value<String?> rarity = const Value.absent(),
                 Value<String?> setName = const Value.absent(),
                 Value<int?> cardnumber = const Value.absent(),
+                Value<String?> oracleId = const Value.absent(),
                 required int effectId,
               }) => MtgCardsCompanion.insert(
                 id: id,
@@ -2182,6 +2253,7 @@ class $$MtgCardsTableTableManager
                 rarity: rarity,
                 setName: setName,
                 cardnumber: cardnumber,
+                oracleId: oracleId,
                 effectId: effectId,
               ),
           withReferenceMapper:

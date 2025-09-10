@@ -77,6 +77,7 @@ void main() {
     test('カードを追加できる', () async {
       when(mockLocalDataSource.addCard(
         name: 'Test Card',
+        oracleId: '0000-ORACLE-TEST',
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
@@ -87,6 +88,7 @@ void main() {
 
       final result = await repository.addCard(
         name: 'Test Card',
+        oracleId: '0000-ORACLE-TEST',
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
@@ -98,6 +100,7 @@ void main() {
       expect(result, Right<Failure, CardWithInstance>(testCardWithInstanceModel));
       verify(mockLocalDataSource.addCard(
         name: 'Test Card',
+        oracleId: '0000-ORACLE-TEST',
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
@@ -111,6 +114,7 @@ void main() {
     test('データソース例外時はDatabaseFailureを返す', () async {
       when(mockLocalDataSource.addCard(
         name: 'Test Card',
+        oracleId: '0000-ORACLE-TEST',
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
@@ -121,6 +125,7 @@ void main() {
 
       final result = await repository.addCard(
         name: 'Test Card',
+        oracleId: '0000-ORACLE-TEST',
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
@@ -137,6 +142,7 @@ void main() {
       );
       verify(mockLocalDataSource.addCard(
         name: 'Test Card',
+        oracleId: '0000-ORACLE-TEST',
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
