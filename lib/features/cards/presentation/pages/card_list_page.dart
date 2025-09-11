@@ -65,6 +65,7 @@ class CardListPage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'cards_fab',
         onPressed: () => _showAddCardDialog(context),
         child: const Icon(Icons.add),
       ),

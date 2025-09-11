@@ -30,6 +30,7 @@ class DeckListPage extends StatelessWidget {
           },
         ),
         floatingActionButton: FloatingActionButton(
+          heroTag: 'decks_fab_list',
           onPressed: () => _showAddDeckDialog(context),
           child: const Icon(Icons.add),
         ),

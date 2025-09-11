@@ -43,6 +43,7 @@ class ContainerListPage extends StatelessWidget {
           },
         ),
         floatingActionButton: FloatingActionButton(
+          heroTag: 'containers_fab_list',
           onPressed: () => _showAddContainerDialog(context),
           child: const Icon(Icons.add),
         ),
@@ -118,4 +119,3 @@ class ContainerListPage extends StatelessWidget {
     );
   }
 }
-

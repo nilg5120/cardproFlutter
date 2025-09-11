@@ -129,6 +129,7 @@ class _DeckDetailPageState extends State<DeckDetailPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'decks_fab_detail',
         onPressed: _showAddCardSheet,
         icon: const Icon(Icons.add),
         label: const Text('Add Card'),

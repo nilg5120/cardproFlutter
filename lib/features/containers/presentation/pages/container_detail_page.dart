@@ -140,6 +140,7 @@ class _ContainerDetailPageState extends State<ContainerDetailPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'containers_fab_detail',
         onPressed: _showAddCardSheet,
         icon: const Icon(Icons.add),
         label: const Text('カードを追加'),
