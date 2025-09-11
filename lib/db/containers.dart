@@ -7,6 +7,4 @@ class Containers extends Table {
   TextColumn get containerType => text()();           // 'deck', 'drawer', 'binder' など
 
   BoolColumn get isActive => boolean().withDefault(const Constant(false))(); // 使用中フラグ
-  @override
-  Set<Column> get primaryKey => {id};
 }

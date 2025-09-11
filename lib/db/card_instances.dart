@@ -9,6 +9,4 @@ class CardInstances extends Table {
   TextColumn get description => text().nullable()(); // カードの説明や状態など
 
 
-  @override
-  Set<Column> get primaryKey => {id};
 }

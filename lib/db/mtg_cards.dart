@@ -16,9 +16,6 @@ class MtgCards extends Table {
   // Relation to card effects
   IntColumn get effectId => integer().references(CardEffects, #id)();
 
-  @override
-  Set<Column> get primaryKey => {id};
-
   // Unique constraint on oracleId (allows multiple NULLs)
   @override
   List<Set<Column>> get uniqueKeys => [
