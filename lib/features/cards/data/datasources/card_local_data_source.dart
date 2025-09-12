@@ -6,7 +6,10 @@ import 'package:drift/drift.dart';
 import 'dart:developer' as developer;
 
 abstract class CardLocalDataSource {
+  /// カード一覧（カード定義 + 個体）を取得
   Future<List<CardWithInstanceModel>> getCards();
+
+  /// カードを追加（必要に応じてマスタ新規作成し、個体を数量分作成）
   Future<CardWithInstanceModel> addCard({
     required String name,
     required String oracleId,
@@ -17,8 +20,14 @@ abstract class CardLocalDataSource {
     required String? description,
     required int quantity,
   });
+
+  /// 個体を1件削除
   Future<void> deleteCard(CardInstanceModel instance);
+
+  /// 個体のメモのみ更新
   Future<void> editCard(CardInstanceModel instance, String description);
+
+  /// カードの印刷情報（Rarity/Set/Card No.）と個体のメモを更新
   Future<void> editCardFull({
     required CardModel card,
     required CardInstanceModel instance,
@@ -39,11 +48,11 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     developer.log('Fetching card data', name: 'CardLocalDataSource');
     final results = await database.getCardWithMaster();
     developer.log('Fetched cards: ${results.length}', name: 'CardLocalDataSource');
-    
+
     final cardModels = results
         .map((tuple) => CardWithInstanceModel.fromDrift(tuple.$1, tuple.$2))
         .toList();
-    
+
     developer.log('Converted to models: ${cardModels.length}', name: 'CardLocalDataSource');
     return cardModels;
   }
@@ -59,8 +68,10 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     required String? description,
     required int quantity,
   }) async {
-    // 既存カードの重複チェック（同名・同セット・同カード番号）
-    // Prefer dedup by oracle_id via raw SQL (works before codegen updates)
+    // 重複排除方針:
+    // 1) oracle_id で一意判定（コード生成に依存せず raw SQL を使用）
+    // 2) 互換: oracle_id が不明な場合は name + setName + cardnumber で突合し、
+    //    既存行が見つかれば oracle_id を後追いで補完
     final byOracle = await database
         .customSelect(
           'SELECT id FROM mtg_cards WHERE oracle_id = ? LIMIT 1',
@@ -75,7 +86,8 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
           .getSingleOrNull();
     }
 
-    // 旧ロジックでの重複（name/setName/cardnumber）とも突合し、oracleId 未設定なら補完
+    // レガシー照合: name/setName/cardnumber でも一致を確認し、
+    // oracle_id 未設定の既存行があれば oracle_id を補完
     if (existingCard == null) {
       final legacy = await (database.select(database.mtgCards)
             ..where((tbl) =>
@@ -84,7 +96,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
                 tbl.cardnumber.equals(cardNumber ?? 0)))
           .getSingleOrNull();
       if (legacy != null) {
-        // Backfill oracle_id only when it's currently NULL
+        // 現在 NULL の場合のみ oracle_id を後追いで埋める
         await database.customStatement(
           'UPDATE mtg_cards SET oracle_id = ? WHERE id = ? AND oracle_id IS NULL',
           [oracleId, legacy.id],
@@ -93,7 +105,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
       }
     }
 
-    // 新規カードを挿入、もしくは既存カードのIDを利用
+    // 新規カードを挿入、もしくは既存カードの ID を流用
     final cardId = existingCard?.id ??
         (await database.into(database.mtgCards).insertReturning(
           MtgCardsCompanion.insert(
@@ -106,7 +118,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
           ),
         )).id;
 
-    // Ensure oracle_id is set for the card (two-step to avoid relying on generated companion)
+    // 生成された Companion に依存せず、カードの oracle_id を確実に設定
     if (existingCard == null) {
       await database.customStatement(
         'UPDATE mtg_cards SET oracle_id = ? WHERE id = ?',
@@ -114,7 +126,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
       );
     }
 
-    // カードインスタンスを複数挿入（quantity 指定分）
+    // カード個体を数量分挿入（quantity <= 0 の場合は 1）
     CardInstance? lastInstance;
     final insertCount = (quantity <= 0) ? 1 : quantity;
     for (var i = 0; i < insertCount; i++) {
@@ -129,12 +141,12 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
           );
     }
 
-    // 直近のカード・インスタンスを取得して返却
+    // 直近で対象となったカード定義を取得
     final card = await (database.select(database.mtgCards)
           ..where((tbl) => tbl.id.equals(cardId)))
         .getSingle();
 
-    // 最後に挿入したインスタンスを返す（呼び出し側では一覧再取得を行う）
+    // 最後に挿入した個体とカード定義を結合したモデルを返す
     return CardWithInstanceModel.fromDrift(card, lastInstance!);
   }
 
@@ -166,7 +178,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     required int? cardNumber,
     required String? description,
   }) async {
-    // カード情報を更新
+    // カード（マスタ）の印刷情報を更新
     await (database.update(database.mtgCards)
           ..where((tbl) => tbl.id.equals(card.id)))
         .write(
@@ -177,7 +189,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
       ),
     );
 
-    // インスタンス情報を更新
+    // 個体（インスタンス）のメモ・更新日時を更新
     await (database.update(database.cardInstances)
           ..where((tbl) => tbl.id.equals(instance.id)))
         .write(
@@ -188,3 +200,4 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     );
   }
 }
+

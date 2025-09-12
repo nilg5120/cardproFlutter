@@ -84,7 +84,7 @@ LazyDatabase _openConnection() {
   });
 }
 
-// 初期データ投入（Seed）関連の拡張は seed_data.dart に分離
+// 初期データ投入などの seeding 関連は seed_data.dart に定義
 
 extension CardQueries on AppDatabase {
   Future<List<(MtgCard, CardInstance)>> getCardWithMaster() {
@@ -145,7 +145,8 @@ extension DeckQueries on AppDatabase {
     required int cardInstanceId,
     String location = 'main',
   }) async {
-    // 同一コンテナ内で同一インスタンスは board を1つに保つため、既存行をクリアしてから挿入
+    // 同一コンテナ内で同一インスタンスは board（main/side）のいずれか1つのみ。
+    // そのため既存行を削除してから挿入。
     await transaction(() async {
       await (delete(containerCardLocations)
             ..where((t) =>
@@ -179,11 +180,11 @@ extension DeckQueries on AppDatabase {
 extension ActiveDeckQueries on AppDatabase {
   Future<void> setActiveDeck(int deckId) async {
     await transaction(() async {
-      // Reset all decks to inactive
+      // すべてのデッキを非アクティブにする
       await (update(containers)
             ..where((t) => t.containerType.equals('deck')))
           .write(const ContainersCompanion(isActive: Value(false)));
-      // Mark the selected deck active
+      // 指定したデッキをアクティブにする
       await (update(containers)
             ..where((t) => t.id.equals(deckId)))
           .write(const ContainersCompanion(isActive: Value(true)));
@@ -198,3 +199,4 @@ extension ActiveDeckQueries on AppDatabase {
     return row?.id;
   }
 }
+

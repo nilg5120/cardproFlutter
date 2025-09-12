@@ -1,10 +1,16 @@
 import 'package:drift/drift.dart';
 
 class Containers extends Table {
-  IntColumn get id => integer().autoIncrement()();    // 一意のID
-  TextColumn get name => text().nullable()();         // 表示名（引き出し1、草デッキなど）
-  TextColumn get description => text().nullable()();  // 補足説明
-  TextColumn get containerType => text()();           // 'deck', 'drawer', 'binder' など
+  // 主キー
+  IntColumn get id => integer().autoIncrement()();
+  // 表示名（例: 引き出しA、草案デッキ）
+  TextColumn get name => text().nullable()();
+  // 補足説明
+  TextColumn get description => text().nullable()();
+  // 種類（'deck' / 'drawer' / 'binder' など）
+  TextColumn get containerType => text()();
 
-  BoolColumn get isActive => boolean().withDefault(const Constant(false))(); // 使用中フラグ
+  // 使用中フラグ
+  BoolColumn get isActive => boolean().withDefault(const Constant(false))();
 }
+

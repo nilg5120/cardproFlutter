@@ -1,7 +1,11 @@
 import 'package:drift/drift.dart';
 
 class CardEffects extends Table {
+  // 主キー
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text()(); // 効果の名称（例：エネルギー加速）
-  TextColumn get description => text()(); // 効果の詳細な説明
+  // 効果名（例: マナ加速）
+  TextColumn get name => text()();
+  // 効果の説明
+  TextColumn get description => text()();
 }
+

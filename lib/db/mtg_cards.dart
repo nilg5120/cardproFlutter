@@ -2,21 +2,21 @@ import 'package:drift/drift.dart';
 import 'card_effects.dart';
 
 class MtgCards extends Table {
-  // Primary key
+  // 主キー
   IntColumn get id => integer().autoIncrement()();
 
-  // Basic fields
+  // 基本項目
   TextColumn get name => text()();
   TextColumn get rarity => text().nullable()();
   TextColumn get setName => text().nullable()();
   IntColumn get cardnumber => integer().nullable()();
-  // Scryfall oracle id (unique across languages/prints)
+  // Scryfall の oracle_id（言語や印刷を跨いで一意）
   TextColumn get oracleId => text().nullable()();
 
-  // Relation to card effects
+  // カード効果との関連
   IntColumn get effectId => integer().references(CardEffects, #id)();
 
-  // Unique constraint on oracleId (allows multiple NULLs)
+  // oracleId への一意制約（NULL は複数可）
   @override
   List<Set<Column>> get uniqueKeys => [
         {oracleId},

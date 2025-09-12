@@ -5,11 +5,11 @@ extension SeedData on AppDatabase {
     try {
       debugPrint('Seeding initial data...');
 
-      // Ensure card effects exist first
+      // 先にカード効果を用意
       await ensureDefaultCardEffectsExist();
       debugPrint('Card effects ensured.');
 
-      // Create initial 10 cards if none exist
+      // 初期カード10種を作成（未存在の場合）
       final existingCards = await select(mtgCards).get();
       debugPrint('Existing cards: ${existingCards.length}');
 
@@ -68,7 +68,7 @@ extension SeedData on AppDatabase {
         debugPrint('Created initial card instances (10).');
       }
 
-      // Ensure at least one instance exists for existing cards
+      // 既存カードに少なくとも1個体が存在するよう保証
       final instancesCount = await cardInstances.count().getSingle();
       debugPrint('Existing instances: $instancesCount');
       if (instancesCount == 0) {
@@ -94,7 +94,7 @@ extension SeedData on AppDatabase {
         }
       }
 
-      // Create 2 default decks if none exist and assign cards
+      // デフォルトデッキを2つ作成（未存在の場合）し、カードを割り当て
       final decks = await (select(containers)
             ..where((t) => t.containerType.equals('deck')))
           .get();
@@ -122,7 +122,7 @@ extension SeedData on AppDatabase {
         final instances = await select(cardInstances).get();
         final deckAList = instances.take(8).toList();
         final remainingForB = instances.skip(8).take(2).toList();
-        // pick 3 from deck A to also include in deck B (dup across decks)
+        // Deck A から3枚を B にも重複で含める（デッキ間の重複）
         final duplicatesFromA = deckAList.take(3).toList();
         final deckBList = [...remainingForB, ...duplicatesFromA];
 
@@ -188,11 +188,11 @@ extension SeedData on AppDatabase {
     }
   }
 
-  /// Ensure a default non-deck container exists.
-  /// - Idempotent: Inserts only when there are no non-deck containers.
-  /// - Inserts name '保管庫' with containerType 'drawer'.
+  /// デッキ以外のデフォルトコンテナを用意する
+  /// - べき等: 非デッキのコンテナが無い場合のみ挿入
+  /// - 名前は『保管庫』、containerType は 'drawer' を挿入
   Future<void> ensureInitialContainersExist() async {
-    // Seed a default non-deck container if none exist
+    // 非デッキのコンテナが存在しない場合は初期コンテナを作成
     final nonDeckContainers = await (select(containers)
           ..where((t) => t.containerType.isNotValue('deck')))
         .get();
@@ -201,7 +201,7 @@ extension SeedData on AppDatabase {
         ContainersCompanion.insert(
           name: const Value('保管庫'),
           description: const Value(null),
-          // Use a generic non-deck type; UI examples include 'drawer', 'binder'
+          // 非デッキの汎用タイプ（UI例: 'drawer', 'binder' など）
           containerType: 'drawer',
         ),
       );
@@ -209,3 +209,4 @@ extension SeedData on AppDatabase {
     }
   }
 }
+

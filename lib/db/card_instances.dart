@@ -1,12 +1,15 @@
 import 'package:drift/drift.dart';
 
 class CardInstances extends Table {
-  IntColumn get id => integer().autoIncrement()();           // 例: UUIDなど
-  IntColumn get cardId => integer()();         // MtgCards.id を参照
+  // 主キー
+  IntColumn get id => integer().autoIncrement()();
+  // 参照: MtgCards.id（カードマスタ）
+  IntColumn get cardId => integer()();
 
-  // optional: カード個体の属性
-  DateTimeColumn get updatedAt => dateTime().nullable()(); // カードの情報が更新された日
-  TextColumn get description => text().nullable()(); // カードの説明や状態など
-
-
+  // 任意項目
+  // 最終更新日時
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+  // メモ/状態などの自由記述
+  TextColumn get description => text().nullable()();
 }
+

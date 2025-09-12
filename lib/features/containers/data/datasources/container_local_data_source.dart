@@ -3,15 +3,22 @@ import 'package:cardpro/features/decks/data/models/container_model.dart';
 import 'package:drift/drift.dart';
 
 abstract class ContainerLocalDataSource {
+  /// デッキ以外のコンテナ一覧を取得
   Future<List<ContainerModel>> getContainers();
+
+  /// コンテナを追加
   Future<ContainerModel> addContainer({
     required String name,
     required String? description,
     required String containerType,
   });
+
+  /// コンテナを削除
   Future<void> deleteContainer({
     required int id,
   });
+
+  /// コンテナ情報を更新
   Future<ContainerModel> editContainer({
     required int id,
     required String name,
@@ -72,4 +79,3 @@ class ContainerLocalDataSourceImpl implements ContainerLocalDataSource {
     return ContainerModel.fromDrift(updated);
   }
 }
-
