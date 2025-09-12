@@ -9,7 +9,7 @@
 | 画面 | ファイル | 概要 |
 |------|---------|------|
 | ホーム | `lib/features/home/presentation/pages/home_page.dart` | エントリー。Cards / Decks / Containers へ遷移 |
-| カード一覧 | `lib/features/cards/presentation/pages/card_list_page.dart` | カードを「名前」でグルーピング表示。FABで追加。エンプティ/エラー/ローディング対応 |
+| カード一覧 | `lib/features/cards/presentation/pages/card_list_page.dart` | カードを「oracleId」でグルーピング表示（同一 oracle を1種類として扱う）。FABで追加。エンプティ/エラー/ローディング対応 |
 | カード追加ダイアログ | `lib/features/cards/presentation/widgets/add_card_dialog.dart` | Scryfall オートコンプリート対応。Rarity/Set/Card No./Effect/メモ/数量を入力して追加 |
 | カード個体一覧 | `lib/features/cards/presentation/pages/card_instances_page.dart` | 同名カードの個体を「Set名」でグルーピング表示。削除/編集（メモのみ or メタ含む） |
 | デッキ一覧 | `lib/features/decks/presentation/pages/deck_list_page.dart` | デッキ一覧。追加/削除/「使用中にする」。詳細へ遷移 |
@@ -78,4 +78,3 @@
 - ワイヤーファイル名: `deck_usage_move_instructions_dialog.puml` に変更（実体に合わせて修正）
 - 画面に「コンテナ」機能が追加されているため、一覧/詳細を追記
 - カード一覧の検索/並び替えは未対応（当面不要）
-

@@ -102,6 +102,20 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
           [oracleId, legacy.id],
         );
         existingCard = legacy;
+      } else {
+        // 既存名のみで一意に特定できる場合は oracle_id を補完
+        // 同名が複数ある場合はユニーク制約の都合でスキップ
+        final sameName = await (database.select(database.mtgCards)
+              ..where((t) => t.name.equals(name)))
+            .get();
+        if (sameName.length == 1) {
+          final only = sameName.first;
+          await database.customStatement(
+            'UPDATE mtg_cards SET oracle_id = ? WHERE id = ? AND oracle_id IS NULL',
+            [oracleId, only.id],
+          );
+          existingCard = only;
+        }
       }
     }
 
@@ -200,4 +214,3 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     );
   }
 }
-

@@ -77,12 +77,15 @@ class CardListPage extends StatelessWidget {
       return const Center(child: Text('カードがありません'));
     }
 
-    // カード名ごとにグルーピング
-    final Map<String, List<CardWithInstance>> byName = {};
+    // oracleId ごとにグルーピング（NULL/空は個別IDで分離）
+    final Map<String, List<CardWithInstance>> byOracle = {};
     for (final e in items) {
-      byName.putIfAbsent(e.card.name, () => []).add(e);
+      final key = (e.card.oracleId != null && e.card.oracleId!.isNotEmpty)
+          ? e.card.oracleId!
+          : 'no-oracle:${e.card.id}';
+      byOracle.putIfAbsent(key, () => []).add(e);
     }
-    final grouped = byName.values.toList();
+    final grouped = byOracle.values.toList();
 
     return ListView.builder(
       itemCount: grouped.length,
