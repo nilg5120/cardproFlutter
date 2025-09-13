@@ -1,5 +1,4 @@
 import 'package:cardpro/core/di/injection_container.dart';
-import 'package:cardpro/features/cards/data/datasources/scryfall_api.dart';
 import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
@@ -96,7 +95,8 @@ class CardListPage extends StatelessWidget {
         // タイトルは代表カードの名前
         final titleWidget = _LocalizedCardTitle(
           fallback: representative.card.name,
-          oracleId: representative.card.oracleId,
+          nameEn: representative.card.nameEn,
+          nameJa: representative.card.nameJa,
         );
 
         return CardListItem(
@@ -141,41 +141,36 @@ class CardListPage extends StatelessWidget {
 
 class _LocalizedCardTitle extends StatelessWidget {
   final String fallback;
-  final String? oracleId;
+  final String? nameEn;
+  final String? nameJa;
 
-  const _LocalizedCardTitle({required this.fallback, required this.oracleId});
+  const _LocalizedCardTitle({
+    required this.fallback,
+    this.nameEn,
+    this.nameJa,
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (oracleId == null || oracleId!.isEmpty) {
-      return Text(
-        fallback,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      );
-    }
-
-    final api = sl<ScryfallApi>();
-    return FutureBuilder<LocalizedNames?>(
-      future: api.getLocalizedNamesByOracleId(oracleId!),
-      builder: (context, snapshot) {
-        String display = fallback;
-        if (snapshot.hasData && snapshot.data != null) {
-          final names = snapshot.data!;
-          final en = names.en;
-          final ja = names.ja;
-          if (ja != null && ja.trim().isNotEmpty && ja.trim() != en.trim()) {
-            display = '$ja/$en';
-          } else {
-            display = en;
-          }
+    // Prefer DB stored names if available; no network fetch here.
+    final en = nameEn?.trim();
+    final ja = nameJa?.trim();
+    String display = fallback;
+    if ((ja != null && ja.isNotEmpty) || (en != null && en.isNotEmpty)) {
+      if (ja != null && ja.isNotEmpty) {
+        if (en != null && en.isNotEmpty && ja != en) {
+          display = '$ja/$en';
+        } else {
+          display = ja;
         }
-        return Text(
-          display,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        );
-      },
+      } else {
+        display = en!;
+      }
+    }
+    return Text(
+      display,
+      overflow: TextOverflow.ellipsis,
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
     );
   }
 }
