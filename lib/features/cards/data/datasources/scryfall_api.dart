@@ -122,3 +122,51 @@ extension _SearchJa on ScryfallApi {
     return out.take(20).toList();
   }
 }
+class LocalizedNames {
+  final String en;
+  final String? ja;
+  const LocalizedNames(this.en, this.ja);
+}
+
+extension LocalizedByOracle on ScryfallApi {
+  /// Returns English and Japanese names for a card identified by oracle_id.
+  /// If no Japanese print exists, `ja` will be null.
+  Future<LocalizedNames?> getLocalizedNamesByOracleId(String oracleId) async {
+    try {
+      // English name (Scryfall's `name` is the oracle English name)
+      final enUri = Uri.parse('${ScryfallApi._base}/cards/search?q=${Uri.encodeQueryComponent('oracleid:$oracleId')}&unique=cards&order=released');
+      final enResp = await http.get(enUri).timeout(const Duration(seconds: 10));
+      if (enResp.statusCode != 200) return null;
+      final enBody = json.decode(enResp.body) as Map<String, dynamic>;
+      final enData = (enBody['data'] as List<dynamic>?);
+      if (enData == null || enData.isEmpty) return null;
+      final enName = (enData.first as Map<String, dynamic>)['name'] as String? ?? '';
+
+      // Japanese printed name, if any
+      String? jaName;
+      final jaUri = Uri.parse('${ScryfallApi._base}/cards/search?q=${Uri.encodeQueryComponent('oracleid:$oracleId lang:ja')}&unique=prints&order=released');
+      final jaResp = await http.get(jaUri).timeout(const Duration(seconds: 10));
+      if (jaResp.statusCode == 200) {
+        final jaBody = json.decode(jaResp.body) as Map<String, dynamic>;
+        final jaData = (jaBody['data'] as List<dynamic>?);
+        if (jaData != null && jaData.isNotEmpty) {
+          final first = jaData.first as Map<String, dynamic>;
+          jaName = first['printed_name'] as String?;
+          if (jaName == null) {
+            final faces = first['card_faces'];
+            if (faces is List && faces.isNotEmpty) {
+              final face0 = faces.first;
+              if (face0 is Map && face0['printed_name'] is String) {
+                jaName = face0['printed_name'] as String;
+              }
+            }
+          }
+        }
+      }
+
+      return LocalizedNames(enName, jaName);
+    } catch (_) {
+      return null;
+    }
+  }
+}

@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 class Card extends Equatable {
   final int id;
   final String name;
+  final String? nameEn;
+  final String? nameJa;
   final String? oracleId;
   final String? rarity;
   final String? setName;
@@ -12,6 +14,8 @@ class Card extends Equatable {
   const Card({
     required this.id,
     required this.name,
+    this.nameEn,
+    this.nameJa,
     this.oracleId,
     this.rarity,
     this.setName,
@@ -20,5 +24,5 @@ class Card extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, name, oracleId, rarity, setName, cardNumber, effectId];
+  List<Object?> get props => [id, name, nameEn, nameJa, oracleId, rarity, setName, cardNumber, effectId];
 }

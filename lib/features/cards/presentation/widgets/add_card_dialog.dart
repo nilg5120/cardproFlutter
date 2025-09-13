@@ -38,6 +38,8 @@ class _AddCardDialogState extends State<AddCardDialog> {
   String? _suggestError;
   TextEditingController? _acController; // Autocomplete's internal controller
   String? _selectedOracleId; // Selected Scryfall oracle id
+  String? _selectedNameEn; // English name from Scryfall
+  String? _selectedNameJa; // Japanese printed name from Scryfall
 
   @override
   void initState() {
@@ -115,6 +117,8 @@ class _AddCardDialogState extends State<AddCardDialog> {
         final n = c.collectorNumberInt;
         cardNumberController.text = n != null ? '$n' : '';
         _selectedOracleId = c.oracleId;
+        _selectedNameEn = c.name.isNotEmpty ? c.name : null;
+        _selectedNameJa = (c.printedName != null && c.printedName!.isNotEmpty) ? c.printedName : null;
       });
     } catch (_) {
       // ignore failures silently in UI
@@ -364,9 +368,15 @@ class _AddCardDialogState extends State<AddCardDialog> {
                       }
                       () async {
                         String? oracleId = _selectedOracleId;
+                        String? nameEn = _selectedNameEn;
+                        String? nameJa = _selectedNameJa;
                         if (oracleId == null || oracleId.isEmpty) {
                           final c = await _scryfall.getCardByExactName(name);
-                          oracleId = c?.oracleId;
+                          if (c != null) {
+                            oracleId = c.oracleId;
+                            nameEn ??= c.name.isNotEmpty ? c.name : null;
+                            nameJa ??= (c.printedName != null && c.printedName!.isNotEmpty) ? c.printedName : null;
+                          }
                         }
                         if (!dialogContext.mounted) return;
                         if (oracleId == null || oracleId.isEmpty) {
@@ -382,6 +392,8 @@ class _AddCardDialogState extends State<AddCardDialog> {
                       dialogContext.read<CardBloc>().add(
                         AddCardEvent(
                           name: name,
+                          nameEn: nameEn,
+                          nameJa: nameJa,
                           oracleId: oracleId,
                           rarity: rarityController.text.isNotEmpty ? rarityController.text : null,
                           setName: setNameController.text.isNotEmpty ? setNameController.text : null,

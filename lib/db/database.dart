@@ -34,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.test(super.executor) : enableSeeding = false;
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -65,6 +65,13 @@ class AppDatabase extends _$AppDatabase {
             await customStatement(
               'CREATE UNIQUE INDEX IF NOT EXISTS idx_mtg_cards_oracle_id ON mtg_cards(oracle_id)'
             );
+            from = 4; // fallthrough to next migration step
+          }
+          if (from == 4) {
+            // v5: add localized name columns
+            // Use raw SQL to avoid depending on generated columns at compile time
+            await customStatement('ALTER TABLE mtg_cards ADD COLUMN name_en TEXT');
+            await customStatement('ALTER TABLE mtg_cards ADD COLUMN name_ja TEXT');
           }
         },
       );
@@ -199,4 +206,3 @@ extension ActiveDeckQueries on AppDatabase {
     return row?.id;
   }
 }
-

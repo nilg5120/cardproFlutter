@@ -1,4 +1,5 @@
 import 'package:cardpro/core/di/injection_container.dart';
+import 'package:cardpro/features/cards/data/datasources/scryfall_api.dart';
 import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
@@ -93,10 +94,14 @@ class CardListPage extends StatelessWidget {
         final group = grouped[index];
         final representative = group.first; // use first instance for display
         // タイトルは代表カードの名前
-        final title = representative.card.name;
+        final titleWidget = _LocalizedCardTitle(
+          fallback: representative.card.name,
+          oracleId: representative.card.oracleId,
+        );
 
         return CardListItem(
           card: representative,
+          title: titleWidget,
           // Navigate to instances list when tapped
           onTap: () {
             Navigator.of(context).push(
@@ -104,7 +109,7 @@ class CardListPage extends StatelessWidget {
                 builder: (_) => BlocProvider.value(
                   value: context.read<CardBloc>(),
                   child: CardInstancesPage(
-                    title: title,
+                    title: representative.card.name,
                     instances: group,
                   ),
                 ),
@@ -130,6 +135,47 @@ class CardListPage extends StatelessWidget {
         value: context.read<CardBloc>(),
         child: const AddCardDialog(),
       ),
+    );
+  }
+}
+
+class _LocalizedCardTitle extends StatelessWidget {
+  final String fallback;
+  final String? oracleId;
+
+  const _LocalizedCardTitle({required this.fallback, required this.oracleId});
+
+  @override
+  Widget build(BuildContext context) {
+    if (oracleId == null || oracleId!.isEmpty) {
+      return Text(
+        fallback,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      );
+    }
+
+    final api = sl<ScryfallApi>();
+    return FutureBuilder<LocalizedNames?>(
+      future: api.getLocalizedNamesByOracleId(oracleId!),
+      builder: (context, snapshot) {
+        String display = fallback;
+        if (snapshot.hasData && snapshot.data != null) {
+          final names = snapshot.data!;
+          final en = names.en;
+          final ja = names.ja;
+          if (ja != null && ja.trim().isNotEmpty && ja.trim() != en.trim()) {
+            display = '$ja/$en';
+          } else {
+            display = en;
+          }
+        }
+        return Text(
+          display,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        );
+      },
     );
   }
 }

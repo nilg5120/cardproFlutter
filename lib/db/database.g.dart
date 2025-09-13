@@ -286,6 +286,24 @@ class $MtgCardsTable extends MtgCards with TableInfo<$MtgCardsTable, MtgCard> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _nameEnMeta = const VerificationMeta('nameEn');
+  @override
+  late final GeneratedColumn<String> nameEn = GeneratedColumn<String>(
+    'name_en',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameJaMeta = const VerificationMeta('nameJa');
+  @override
+  late final GeneratedColumn<String> nameJa = GeneratedColumn<String>(
+    'name_ja',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _rarityMeta = const VerificationMeta('rarity');
   @override
   late final GeneratedColumn<String> rarity = GeneratedColumn<String>(
@@ -346,6 +364,8 @@ class $MtgCardsTable extends MtgCards with TableInfo<$MtgCardsTable, MtgCard> {
   List<GeneratedColumn> get $columns => [
     id,
     name,
+    nameEn,
+    nameJa,
     rarity,
     setName,
     cardnumber,
@@ -374,6 +394,18 @@ class $MtgCardsTable extends MtgCards with TableInfo<$MtgCardsTable, MtgCard> {
       );
     } else if (isInserting) {
       context.missing(_nameMeta);
+    }
+    if (data.containsKey('name_en')) {
+      context.handle(
+        _nameEnMeta,
+        nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta),
+      );
+    }
+    if (data.containsKey('name_ja')) {
+      context.handle(
+        _nameJaMeta,
+        nameJa.isAcceptableOrUnknown(data['name_ja']!, _nameJaMeta),
+      );
     }
     if (data.containsKey('rarity')) {
       context.handle(
@@ -430,6 +462,14 @@ class $MtgCardsTable extends MtgCards with TableInfo<$MtgCardsTable, MtgCard> {
             DriftSqlType.string,
             data['${effectivePrefix}name'],
           )!,
+      nameEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_en'],
+      ),
+      nameJa: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_ja'],
+      ),
       rarity: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}rarity'],
@@ -463,6 +503,8 @@ class $MtgCardsTable extends MtgCards with TableInfo<$MtgCardsTable, MtgCard> {
 class MtgCard extends DataClass implements Insertable<MtgCard> {
   final int id;
   final String name;
+  final String? nameEn;
+  final String? nameJa;
   final String? rarity;
   final String? setName;
   final int? cardnumber;
@@ -471,6 +513,8 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
   const MtgCard({
     required this.id,
     required this.name,
+    this.nameEn,
+    this.nameJa,
     this.rarity,
     this.setName,
     this.cardnumber,
@@ -482,6 +526,12 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || nameEn != null) {
+      map['name_en'] = Variable<String>(nameEn);
+    }
+    if (!nullToAbsent || nameJa != null) {
+      map['name_ja'] = Variable<String>(nameJa);
+    }
     if (!nullToAbsent || rarity != null) {
       map['rarity'] = Variable<String>(rarity);
     }
@@ -502,6 +552,10 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
     return MtgCardsCompanion(
       id: Value(id),
       name: Value(name),
+      nameEn:
+          nameEn == null && nullToAbsent ? const Value.absent() : Value(nameEn),
+      nameJa:
+          nameJa == null && nullToAbsent ? const Value.absent() : Value(nameJa),
       rarity:
           rarity == null && nullToAbsent ? const Value.absent() : Value(rarity),
       setName:
@@ -528,6 +582,8 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
     return MtgCard(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      nameEn: serializer.fromJson<String?>(json['nameEn']),
+      nameJa: serializer.fromJson<String?>(json['nameJa']),
       rarity: serializer.fromJson<String?>(json['rarity']),
       setName: serializer.fromJson<String?>(json['setName']),
       cardnumber: serializer.fromJson<int?>(json['cardnumber']),
@@ -541,6 +597,8 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
+      'nameEn': serializer.toJson<String?>(nameEn),
+      'nameJa': serializer.toJson<String?>(nameJa),
       'rarity': serializer.toJson<String?>(rarity),
       'setName': serializer.toJson<String?>(setName),
       'cardnumber': serializer.toJson<int?>(cardnumber),
@@ -552,6 +610,8 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
   MtgCard copyWith({
     int? id,
     String? name,
+    Value<String?> nameEn = const Value.absent(),
+    Value<String?> nameJa = const Value.absent(),
     Value<String?> rarity = const Value.absent(),
     Value<String?> setName = const Value.absent(),
     Value<int?> cardnumber = const Value.absent(),
@@ -560,6 +620,8 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
   }) => MtgCard(
     id: id ?? this.id,
     name: name ?? this.name,
+    nameEn: nameEn.present ? nameEn.value : this.nameEn,
+    nameJa: nameJa.present ? nameJa.value : this.nameJa,
     rarity: rarity.present ? rarity.value : this.rarity,
     setName: setName.present ? setName.value : this.setName,
     cardnumber: cardnumber.present ? cardnumber.value : this.cardnumber,
@@ -570,6 +632,8 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
     return MtgCard(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
+      nameEn: data.nameEn.present ? data.nameEn.value : this.nameEn,
+      nameJa: data.nameJa.present ? data.nameJa.value : this.nameJa,
       rarity: data.rarity.present ? data.rarity.value : this.rarity,
       setName: data.setName.present ? data.setName.value : this.setName,
       cardnumber:
@@ -584,6 +648,8 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
     return (StringBuffer('MtgCard(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('nameJa: $nameJa, ')
           ..write('rarity: $rarity, ')
           ..write('setName: $setName, ')
           ..write('cardnumber: $cardnumber, ')
@@ -594,14 +660,25 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, rarity, setName, cardnumber, oracleId, effectId);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    nameEn,
+    nameJa,
+    rarity,
+    setName,
+    cardnumber,
+    oracleId,
+    effectId,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is MtgCard &&
           other.id == this.id &&
           other.name == this.name &&
+          other.nameEn == this.nameEn &&
+          other.nameJa == this.nameJa &&
           other.rarity == this.rarity &&
           other.setName == this.setName &&
           other.cardnumber == this.cardnumber &&
@@ -612,6 +689,8 @@ class MtgCard extends DataClass implements Insertable<MtgCard> {
 class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
   final Value<int> id;
   final Value<String> name;
+  final Value<String?> nameEn;
+  final Value<String?> nameJa;
   final Value<String?> rarity;
   final Value<String?> setName;
   final Value<int?> cardnumber;
@@ -620,6 +699,8 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
   const MtgCardsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.nameEn = const Value.absent(),
+    this.nameJa = const Value.absent(),
     this.rarity = const Value.absent(),
     this.setName = const Value.absent(),
     this.cardnumber = const Value.absent(),
@@ -629,6 +710,8 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
   MtgCardsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
+    this.nameEn = const Value.absent(),
+    this.nameJa = const Value.absent(),
     this.rarity = const Value.absent(),
     this.setName = const Value.absent(),
     this.cardnumber = const Value.absent(),
@@ -639,6 +722,8 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
   static Insertable<MtgCard> custom({
     Expression<int>? id,
     Expression<String>? name,
+    Expression<String>? nameEn,
+    Expression<String>? nameJa,
     Expression<String>? rarity,
     Expression<String>? setName,
     Expression<int>? cardnumber,
@@ -648,6 +733,8 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (nameEn != null) 'name_en': nameEn,
+      if (nameJa != null) 'name_ja': nameJa,
       if (rarity != null) 'rarity': rarity,
       if (setName != null) 'set_name': setName,
       if (cardnumber != null) 'cardnumber': cardnumber,
@@ -659,6 +746,8 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
   MtgCardsCompanion copyWith({
     Value<int>? id,
     Value<String>? name,
+    Value<String?>? nameEn,
+    Value<String?>? nameJa,
     Value<String?>? rarity,
     Value<String?>? setName,
     Value<int?>? cardnumber,
@@ -668,6 +757,8 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
     return MtgCardsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      nameEn: nameEn ?? this.nameEn,
+      nameJa: nameJa ?? this.nameJa,
       rarity: rarity ?? this.rarity,
       setName: setName ?? this.setName,
       cardnumber: cardnumber ?? this.cardnumber,
@@ -684,6 +775,12 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
+    }
+    if (nameEn.present) {
+      map['name_en'] = Variable<String>(nameEn.value);
+    }
+    if (nameJa.present) {
+      map['name_ja'] = Variable<String>(nameJa.value);
     }
     if (rarity.present) {
       map['rarity'] = Variable<String>(rarity.value);
@@ -708,6 +805,8 @@ class MtgCardsCompanion extends UpdateCompanion<MtgCard> {
     return (StringBuffer('MtgCardsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('nameJa: $nameJa, ')
           ..write('rarity: $rarity, ')
           ..write('setName: $setName, ')
           ..write('cardnumber: $cardnumber, ')
@@ -1974,6 +2073,8 @@ typedef $$MtgCardsTableCreateCompanionBuilder =
     MtgCardsCompanion Function({
       Value<int> id,
       required String name,
+      Value<String?> nameEn,
+      Value<String?> nameJa,
       Value<String?> rarity,
       Value<String?> setName,
       Value<int?> cardnumber,
@@ -1984,6 +2085,8 @@ typedef $$MtgCardsTableUpdateCompanionBuilder =
     MtgCardsCompanion Function({
       Value<int> id,
       Value<String> name,
+      Value<String?> nameEn,
+      Value<String?> nameJa,
       Value<String?> rarity,
       Value<String?> setName,
       Value<int?> cardnumber,
@@ -2031,6 +2134,16 @@ class $$MtgCardsTableFilterComposer
 
   ColumnFilters<String> get name => $composableBuilder(
     column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameJa => $composableBuilder(
+    column: $table.nameJa,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2097,6 +2210,16 @@ class $$MtgCardsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameJa => $composableBuilder(
+    column: $table.nameJa,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get rarity => $composableBuilder(
     column: $table.rarity,
     builder: (column) => ColumnOrderings(column),
@@ -2155,6 +2278,12 @@ class $$MtgCardsTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get nameEn =>
+      $composableBuilder(column: $table.nameEn, builder: (column) => column);
+
+  GeneratedColumn<String> get nameJa =>
+      $composableBuilder(column: $table.nameJa, builder: (column) => column);
 
   GeneratedColumn<String> get rarity =>
       $composableBuilder(column: $table.rarity, builder: (column) => column);
@@ -2224,6 +2353,8 @@ class $$MtgCardsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
+                Value<String?> nameEn = const Value.absent(),
+                Value<String?> nameJa = const Value.absent(),
                 Value<String?> rarity = const Value.absent(),
                 Value<String?> setName = const Value.absent(),
                 Value<int?> cardnumber = const Value.absent(),
@@ -2232,6 +2363,8 @@ class $$MtgCardsTableTableManager
               }) => MtgCardsCompanion(
                 id: id,
                 name: name,
+                nameEn: nameEn,
+                nameJa: nameJa,
                 rarity: rarity,
                 setName: setName,
                 cardnumber: cardnumber,
@@ -2242,6 +2375,8 @@ class $$MtgCardsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required String name,
+                Value<String?> nameEn = const Value.absent(),
+                Value<String?> nameJa = const Value.absent(),
                 Value<String?> rarity = const Value.absent(),
                 Value<String?> setName = const Value.absent(),
                 Value<int?> cardnumber = const Value.absent(),
@@ -2250,6 +2385,8 @@ class $$MtgCardsTableTableManager
               }) => MtgCardsCompanion.insert(
                 id: id,
                 name: name,
+                nameEn: nameEn,
+                nameJa: nameJa,
                 rarity: rarity,
                 setName: setName,
                 cardnumber: cardnumber,

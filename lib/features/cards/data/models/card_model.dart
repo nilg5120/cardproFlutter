@@ -4,6 +4,8 @@ class CardModel extends Card {
   const CardModel({
     required super.id,
     required super.name,
+    super.nameEn,
+    super.nameJa,
     super.oracleId,
     super.rarity,
     super.setName,
@@ -15,6 +17,8 @@ class CardModel extends Card {
     return CardModel(
       id: driftCard.id,
       name: driftCard.name,
+      nameEn: driftCard.nameEn,
+      nameJa: driftCard.nameJa,
       oracleId: driftCard.oracleId,
       rarity: driftCard.rarity,
       setName: driftCard.setName,
@@ -27,6 +31,8 @@ class CardModel extends Card {
     return {
       'id': id,
       'name': name,
+      'nameEn': nameEn,
+      'nameJa': nameJa,
       'oracleId': oracleId,
       'rarity': rarity,
       'setName': setName,
@@ -39,6 +45,8 @@ class CardModel extends Card {
     return CardModel(
       id: json['id'],
       name: json['name'],
+      nameEn: json['nameEn'],
+      nameJa: json['nameJa'],
       oracleId: json['oracleId'],
       rarity: json['rarity'],
       setName: json['setName'],

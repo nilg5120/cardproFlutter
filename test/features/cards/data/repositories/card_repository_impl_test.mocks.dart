@@ -56,6 +56,8 @@ class MockCardLocalDataSource extends _i1.Mock
   @override
   _i4.Future<_i2.CardWithInstanceModel> addCard({
     required String? name,
+    String? nameEn,
+    String? nameJa,
     required String? oracleId,
     required String? rarity,
     required String? setName,
@@ -67,6 +69,8 @@ class MockCardLocalDataSource extends _i1.Mock
       (super.noSuchMethod(
             Invocation.method(#addCard, [], {
               #name: name,
+              #nameEn: nameEn,
+              #nameJa: nameJa,
               #oracleId: oracleId,
               #rarity: rarity,
               #setName: setName,
@@ -80,6 +84,8 @@ class MockCardLocalDataSource extends _i1.Mock
                 this,
                 Invocation.method(#addCard, [], {
                   #name: name,
+                  #nameEn: nameEn,
+                  #nameJa: nameJa,
                   #oracleId: oracleId,
                   #rarity: rarity,
                   #setName: setName,

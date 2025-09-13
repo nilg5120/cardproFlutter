@@ -12,6 +12,8 @@ class AddCard {
   Future<Either<Failure, CardWithInstance>> call(AddCardParams params) async {
     return await repository.addCard(
       name: params.name,
+      nameEn: params.nameEn,
+      nameJa: params.nameJa,
       oracleId: params.oracleId,
       rarity: params.rarity,
       setName: params.setName,
@@ -25,6 +27,8 @@ class AddCard {
 
 class AddCardParams extends Equatable {
   final String name;
+  final String? nameEn;
+  final String? nameJa;
   final String oracleId;
   final String? rarity;
   final String? setName;
@@ -35,6 +39,8 @@ class AddCardParams extends Equatable {
 
   const AddCardParams({
     required this.name,
+    this.nameEn,
+    this.nameJa,
     required this.oracleId,
     this.rarity,
     this.setName,
@@ -45,5 +51,5 @@ class AddCardParams extends Equatable {
   });
 
   @override
-  List<Object?> get props => [name, oracleId, rarity, setName, cardNumber, effectId, description, quantity];
+  List<Object?> get props => [name, nameEn, nameJa, oracleId, rarity, setName, cardNumber, effectId, description, quantity];
 }

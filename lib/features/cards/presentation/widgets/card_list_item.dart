@@ -10,6 +10,8 @@ class CardListItem extends StatelessWidget {
   final bool showDelete;
   final bool showSetName;
   final bool showCardName;
+  // Optional override for the title widget (e.g., localized name)
+  final Widget? title;
 
   const CardListItem({
     super.key,
@@ -20,6 +22,7 @@ class CardListItem extends StatelessWidget {
     this.showDelete = true,
     this.showSetName = true,
     this.showCardName = true,
+    this.title,
   });
 
   @override
@@ -39,14 +42,15 @@ class CardListItem extends StatelessWidget {
                     if (showCardName)
                       Flexible(
                         fit: FlexFit.tight,
-                        child: Text(
-                          card.card.name,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: title ??
+                            Text(
+                              card.card.name,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                       ),
                     if (showCardName) const SizedBox(width: 12),
                     // Set name (optional)

@@ -12,6 +12,8 @@ abstract class CardLocalDataSource {
   /// カードを追加（必要に応じてマスタ新規作成し、個体を数量分作成）
   Future<CardWithInstanceModel> addCard({
     required String name,
+    String? nameEn,
+    String? nameJa,
     required String oracleId,
     required String? rarity,
     required String? setName,
@@ -60,6 +62,8 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
   @override
   Future<CardWithInstanceModel> addCard({
     required String name,
+    String? nameEn,
+    String? nameJa,
     required String oracleId,
     required String? rarity,
     required String? setName,
@@ -129,6 +133,8 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
             rarity: Value(rarity),
             setName: Value(setName),
             cardnumber: Value(cardNumber),
+            nameEn: Value(nameEn),
+            nameJa: Value(nameJa),
           ),
         )).id;
 
@@ -138,6 +144,20 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
         'UPDATE mtg_cards SET oracle_id = ? WHERE id = ?',
         [oracleId, cardId],
       );
+    } else {
+      // Optionally fill names if missing on existing card
+      if ((existingCard.nameEn == null || existingCard.nameEn!.isEmpty) && (nameEn != null && nameEn.isNotEmpty)) {
+        await database.customStatement(
+          'UPDATE mtg_cards SET name_en = ? WHERE id = ? AND (name_en IS NULL OR name_en = "")',
+          [nameEn, existingCard.id],
+        );
+      }
+      if ((existingCard.nameJa == null || existingCard.nameJa!.isEmpty) && (nameJa != null && nameJa.isNotEmpty)) {
+        await database.customStatement(
+          'UPDATE mtg_cards SET name_ja = ? WHERE id = ? AND (name_ja IS NULL OR name_ja = "")',
+          [nameJa, existingCard.id],
+        );
+      }
     }
 
     // カード個体を数量分挿入（quantity <= 0 の場合は 1）

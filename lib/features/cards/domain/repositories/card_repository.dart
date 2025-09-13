@@ -8,6 +8,8 @@ abstract class CardRepository {
   Future<Either<Failure, List<CardWithInstance>>> getCards();
   Future<Either<Failure, CardWithInstance>> addCard({
     required String name,
+    String? nameEn,
+    String? nameJa,
     required String oracleId,
     required String? rarity,
     required String? setName,

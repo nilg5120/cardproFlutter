@@ -2,23 +2,31 @@ import 'package:drift/drift.dart';
 import 'card_effects.dart';
 
 class MtgCards extends Table {
-  // 主キー
+  // Primary key
   IntColumn get id => integer().autoIncrement()();
 
-  // 基本項目
+  // Names
+  // Legacy display name (kept for backward-compat)
   TextColumn get name => text()();
+  // Stored English/Japanese names
+  TextColumn get nameEn => text().nullable()();
+  TextColumn get nameJa => text().nullable()();
+
+  // Printing metadata
   TextColumn get rarity => text().nullable()();
   TextColumn get setName => text().nullable()();
   IntColumn get cardnumber => integer().nullable()();
-  // Scryfall の oracle_id（言語や印刷を跨いで一意）
+
+  // Scryfall oracle_id (unique across languages/prints)
   TextColumn get oracleId => text().nullable()();
 
-  // カード効果との関連
+  // Relation to card effects
   IntColumn get effectId => integer().references(CardEffects, #id)();
 
-  // oracleId への一意制約（NULL は複数可）
+  // Unique index on oracleId (SQLite allows multiple NULLs)
   @override
   List<Set<Column>> get uniqueKeys => [
         {oracleId},
       ];
 }
+

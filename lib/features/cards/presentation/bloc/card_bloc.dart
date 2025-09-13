@@ -83,6 +83,8 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     emit(CardLoading());
     final params = AddCardParams(
       name: event.name,
+      nameEn: event.nameEn,
+      nameJa: event.nameJa,
       oracleId: event.oracleId,
       rarity: event.rarity,
       setName: event.setName,
