@@ -102,6 +102,7 @@ class CardListPage extends StatelessWidget {
         return CardListItem(
           card: representative,
           title: titleWidget,
+          count: group.length,
           // Navigate to instances list when tapped
           onTap: () {
             Navigator.of(context).push(

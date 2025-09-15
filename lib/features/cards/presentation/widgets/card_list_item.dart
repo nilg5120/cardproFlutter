@@ -12,6 +12,8 @@ class CardListItem extends StatelessWidget {
   final bool showCardName;
   // Optional override for the title widget (e.g., localized name)
   final Widget? title;
+  // Optional count badge for grouped views
+  final int? count;
 
   const CardListItem({
     super.key,
@@ -23,6 +25,7 @@ class CardListItem extends StatelessWidget {
     this.showSetName = true,
     this.showCardName = true,
     this.title,
+    this.count,
   });
 
   @override
@@ -68,6 +71,15 @@ class CardListItem extends StatelessWidget {
               ),
             Row(
               children: [
+                if (count != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Chip(
+                      label: Text('$count枚'),
+                      visualDensity: VisualDensity.compact,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
                 if (showDelete)
                   IconButton(
                     icon: const Icon(Icons.delete),
