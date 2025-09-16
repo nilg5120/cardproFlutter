@@ -17,7 +17,7 @@ class AddCardDialog extends StatefulWidget {
 }
 
 class _AddCardDialogState extends State<AddCardDialog> {
-  // Text controllers
+  // テキストコントローラー
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final rarityController = TextEditingController();
@@ -25,21 +25,21 @@ class _AddCardDialogState extends State<AddCardDialog> {
   final cardNumberController = TextEditingController();
   final quantityController = TextEditingController(text: '1');
 
-  // Selected card effect id
+  // 選択中のカード効果ID
   int selectedEffectId = 1;
 
   late Future<List<CardEffect>> cardEffectsFuture;
 
-  // Scryfall
+  // Scryfall関連の設定
   final _scryfall = sl<ScryfallApi>();
   Timer? _debounce;
   List<String> _nameOptions = [];
   bool _isSuggestLoading = false;
   String? _suggestError;
-  TextEditingController? _acController; // Autocomplete's internal controller
-  String? _selectedOracleId; // Selected Scryfall oracle id
-  String? _selectedNameEn; // English name from Scryfall
-  String? _selectedNameJa; // Japanese printed name from Scryfall
+  TextEditingController? _acController; // Autocompleteウィジェット内部のコントローラー
+  String? _selectedOracleId; // 選択済みのScryfall oracle ID
+  String? _selectedNameEn; // Scryfallから取得した英語名
+  String? _selectedNameJa; // Scryfallから取得した日本語表記名
 
   @override
   void initState() {
@@ -61,7 +61,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
   }
 
   void _onNameChanged(String value) {
-    // Reset selected oracle when name is edited manually
+    // 名前が手動で変更された場合は選択済みoracle IDをリセット
     _selectedOracleId = null;
     _debounce?.cancel();
     final q = value.trim();
@@ -84,11 +84,11 @@ class _AddCardDialogState extends State<AddCardDialog> {
           _nameOptions = list;
           _isSuggestLoading = false;
         });
-        // Force Autocomplete to re-evaluate options by nudging the controller
+        // コントローラーを操作してAutocompleteに候補の再評価を促す
         final c = _acController;
         if (c != null && c.text.isNotEmpty) {
           final t = c.text;
-          // Append zero-width space then remove to trigger listeners without visual change
+          // 文字を変えずにリスナーを動かすため零幅スペースを一度追加してから削除する
           c.text = '$t\u200b';
           c.selection = TextSelection.collapsed(offset: c.text.length);
           Future.microtask(() {
@@ -111,7 +111,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
       final ScryfallCard? c = await _scryfall.getCardByExactName(exactName);
       if (c == null) return;
       setState(() {
-        // Keep the selected name
+        // 選択済みの名前は保持する
         rarityController.text = c.rarityShort ?? (c.rarity ?? '');
         setNameController.text = c.setName ?? '';
         final n = c.collectorNumberInt;
@@ -121,7 +121,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
         _selectedNameJa = (c.printedName != null && c.printedName!.isNotEmpty) ? c.printedName : null;
       });
     } catch (_) {
-      // ignore failures silently in UI
+      // UI上では失敗を通知せずに無視する
     }
   }
 
@@ -129,7 +129,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
     try {
       final prints = await _scryfall.listPrintings(name);
       if (prints.isEmpty) {
-        // fallback to single fetch
+        // プリントがなければ単体取得にフォールバックする
         await _fillDetailsFromScryfall(name);
         return;
       }
@@ -267,7 +267,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
                           child: Material(
                             elevation: 4,
                             child: SizedBox(
-                              width: MediaQuery.of(context).size.width - 96, // approximate within dialog
+                              width: MediaQuery.of(context).size.width - 96, // ダイアログ内での想定幅
                               child: ListView.builder(
                                 padding: EdgeInsets.zero,
                                 shrinkWrap: true,
@@ -361,10 +361,10 @@ class _AddCardDialogState extends State<AddCardDialog> {
                   onPressed: () {
                     final name = nameController.text;
                     if (name.isNotEmpty) {
-                      // Ensure oracleId is available; try to resolve if missing
+                      // oracleIdが存在するか確認し、無い場合は取得を試みる
                       if (_selectedOracleId == null || _selectedOracleId!.isEmpty) {
-                        // Try fetching by exact name or fallback search
-                        // Note: We don't await here to keep UI responsive; instead do async
+                        // 正確な名前で取得し、だめなら検索にフォールバックする
+                        // UI応答性を保つためここではawaitせず非同期処理として実行する
                       }
                       () async {
                         String? oracleId = _selectedOracleId;
