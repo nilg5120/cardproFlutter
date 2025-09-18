@@ -177,6 +177,11 @@ class _AddCardDialogState extends State<AddCardDialog> {
           final n = selected.collectorNumberInt;
           cardNumberController.text = n != null ? '$n' : '';
           _selectedOracleId = selected.oracleId;
+          _selectedNameEn = selected.name.isNotEmpty ? selected.name : null;
+          _selectedNameJa =
+            (selected.printedName != null && selected.printedName!.isNotEmpty)
+                ? selected.printedName
+                : null;
         });
       }
     } catch (_) {
