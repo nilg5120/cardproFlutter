@@ -30,6 +30,9 @@ class CardListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final description = card.instance.description?.trim();
+    final hasDescription = description != null && description.isNotEmpty;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: InkWell(
@@ -37,60 +40,85 @@ class CardListItem extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (showCardName)
-                      Flexible(
-                        fit: FlexFit.tight,
-                        child: title ??
-                            Text(
-                              card.card.name,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (showCardName)
+                          Flexible(
+                            fit: FlexFit.tight,
+                            child: title ??
+                                Text(
+                                  card.card.name,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                          )
+                        else if (title != null)
+                          Flexible(
+                            fit: FlexFit.tight,
+                            child: title!,
+                          ),
+                        if (showCardName) const SizedBox(width: 12),
+                        // Set name (optional)
+                        if (showSetName && card.card.setName != null)
+                          Flexible(
+                            child: Text(
+                              card.card.setName!,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(color: Colors.grey[700]),
                             ),
-                      ),
-                    if (showCardName) const SizedBox(width: 12),
-                    // Set name (optional)
-                    if (showSetName && card.card.setName != null)
-                      Text(
-                        card.card.setName!,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(color: Colors.grey[700]),
+                          ),
+                      ],
+                    ),
+                    if (hasDescription)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          description!,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: Colors.grey[800]),
+                        ),
                       ),
                   ],
                 ),
               ),
-            Row(
-              children: [
-                if (count != null)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child: Chip(
-                      label: Text('$count枚'),
-                      visualDensity: VisualDensity.compact,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              Row(
+                children: [
+                  if (count != null)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: Chip(
+                        label: Text('$count��'),
+                        visualDensity: VisualDensity.compact,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                     ),
-                  ),
-                if (showDelete)
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _showDeleteDialog(context),
-                  ),
-              ],
-            ),
-          ],
+                  if (showDelete)
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () => _showDeleteDialog(context),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 

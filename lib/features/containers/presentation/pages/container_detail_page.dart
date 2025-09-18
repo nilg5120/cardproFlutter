@@ -116,9 +116,28 @@ class _ContainerDetailPageState extends State<ContainerDetailPage> {
                     separatorBuilder: (_, __) => const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final (mtg, instance, link) = data[index];
+                      final memo = instance.description?.trim();
+                      final hasMemo = memo != null && memo.isNotEmpty;
                       return ListTile(
                         title: Text(mtg.name),
-                        subtitle: Text('場所: ${link.location}'),
+                        subtitle: hasMemo
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('場所: ${link.location}'),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    memo!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(color: Colors.grey[700]),
+                                  ),
+                                ],
+                              )
+                            : Text('場所: ${link.location}'),
+                        isThreeLine: hasMemo,
                         trailing: IconButton(
                           tooltip: 'コンテナから外す',
                           icon: const Icon(Icons.remove_circle_outline),
