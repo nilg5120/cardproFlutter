@@ -117,8 +117,16 @@ class _AddCardDialogState extends State<AddCardDialog> {
         final n = c.collectorNumberInt;
         cardNumberController.text = n != null ? '$n' : '';
         _selectedOracleId = c.oracleId;
-        _selectedNameEn = c.name.isNotEmpty ? c.name : null;
-        _selectedNameJa = (c.printedName != null && c.printedName!.isNotEmpty) ? c.printedName : null;
+        final printed = c.printedName;
+        final hasPrinted = printed != null && printed.isNotEmpty;
+        String? fallbackName;
+        if (hasPrinted) {
+          fallbackName = printed;
+        } else if (c.name.isNotEmpty) {
+          fallbackName = c.name;
+        }
+        _selectedNameEn = fallbackName;
+        _selectedNameJa = hasPrinted ? printed : fallbackName;
       });
     } catch (_) {
       // UI上では失敗を通知せずに無視する
@@ -177,6 +185,16 @@ class _AddCardDialogState extends State<AddCardDialog> {
           final n = selected.collectorNumberInt;
           cardNumberController.text = n != null ? '$n' : '';
           _selectedOracleId = selected.oracleId;
+          final printed = selected.printedName;
+          final hasPrinted = printed != null && printed.isNotEmpty;
+          String? fallbackName;
+          if (hasPrinted) {
+            fallbackName = printed;
+          } else if (selected.name.isNotEmpty) {
+            fallbackName = selected.name;
+          }
+          _selectedNameEn = fallbackName;
+          _selectedNameJa = hasPrinted ? printed : fallbackName;
         });
       }
     } catch (_) {
@@ -374,8 +392,16 @@ class _AddCardDialogState extends State<AddCardDialog> {
                           final c = await _scryfall.getCardByExactName(name);
                           if (c != null) {
                             oracleId = c.oracleId;
-                            nameEn ??= c.name.isNotEmpty ? c.name : null;
-                            nameJa ??= (c.printedName != null && c.printedName!.isNotEmpty) ? c.printedName : null;
+                            final printed = c.printedName;
+                            final hasPrinted = printed != null && printed.isNotEmpty;
+                            String? fallbackName;
+                            if (hasPrinted) {
+                              fallbackName = printed;
+                            } else if (c.name.isNotEmpty) {
+                              fallbackName = c.name;
+                            }
+                            nameEn ??= fallbackName;
+                            nameJa ??= hasPrinted ? printed : fallbackName;
                           }
                         }
                         if (!dialogContext.mounted) return;
