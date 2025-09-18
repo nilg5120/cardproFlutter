@@ -99,6 +99,12 @@ class CardListPage extends StatelessWidget {
           nameJa: representative.card.nameJa,
         );
 
+        final displayTitle = _LocalizedCardTitle.computeDisplay(
+          fallback: representative.card.name,
+          nameEn: representative.card.nameEn,
+          nameJa: representative.card.nameJa,
+        );
+
         return CardListItem(
           card: representative,
           title: titleWidget,
@@ -110,7 +116,7 @@ class CardListPage extends StatelessWidget {
                 builder: (_) => BlocProvider.value(
                   value: context.read<CardBloc>(),
                   child: CardInstancesPage(
-                    title: representative.card.name,
+                    title: displayTitle,
                     instances: group,
                   ),
                 ),
@@ -151,8 +157,11 @@ class _LocalizedCardTitle extends StatelessWidget {
     this.nameJa,
   });
 
-  @override
-  Widget build(BuildContext context) {
+  static String computeDisplay({
+    required String fallback,
+    String? nameEn,
+    String? nameJa,
+  }) {
     // Prefer DB stored names if available; no network fetch here.
     final en = nameEn?.trim();
     final ja = nameJa?.trim();
@@ -168,6 +177,16 @@ class _LocalizedCardTitle extends StatelessWidget {
         display = en!;
       }
     }
+    return display;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final display = computeDisplay(
+      fallback: fallback,
+      nameEn: nameEn,
+      nameJa: nameJa,
+    );
     return Text(
       display,
       overflow: TextOverflow.ellipsis,
