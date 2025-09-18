@@ -128,7 +128,7 @@ class _ContainerDetailPageState extends State<ContainerDetailPage> {
                                   Text('場所: ${link.location}'),
                                   const SizedBox(height: 4),
                                   Text(
-                                    memo!,
+                                    memo,
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyMedium

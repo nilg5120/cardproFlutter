@@ -87,7 +87,7 @@ class CardListItem extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
-                          description!,
+                          description,
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium
