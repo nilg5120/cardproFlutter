@@ -1,4 +1,4 @@
-@startuml
+@startuml card_add_edit_dialog
 title カード追加・編集ダイアログ
 
 salt

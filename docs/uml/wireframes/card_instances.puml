@@ -1,0 +1,42 @@
+@startuml card_instances_page
+title カード個体一覧画面
+
+salt
+{
+  {T カード個体一覧: Lightning Bolt}
+  [ 戻る ] | Lightning Bolt 個体数: 6
+  --
+  {T セット: Lost Caverns of Ixalan}
+  {#table
+    + 個体ID | + カード番号 | + レアリティ | + メモ | + 操作
+    #1234 | 123 | R | Default Deck A / main | [ 編集 ] [ 削除 ]
+    #1235 | 124 | R | Foil / 未使用 | [ 編集 ] [ 削除 ]
+  }
+  {T セット: Unknown Set}
+  {#table
+    + 個体ID | + カード番号 | + レアリティ | + メモ | + 操作
+    #1250 | - | - | メモなし | [ 編集 ] [ 削除 ]
+  }
+  {#
+    ・行タップでも編集ダイアログを起動
+    ・[ 削除 ] で確認ダイアログ→削除実行
+  }
+}
+
+salt
+{
+  {T 個体編集ダイアログ}
+  名前 (参照)    | [ Lightning Bolt ] (読み取り専用)
+  レアリティ      | [ Rare ]
+  セット名        | [ Lost Caverns of Ixalan ]
+  カード番号      | [ 123 ]
+  メモ            |
+                  | {#
+                      Default Deck A main
+                      Sleeve: Red
+                    }
+  [ Cancel ] | [ Save ]
+  {# レアリティ/セット名/番号の更新にも対応。メモのみ保存も可能 }
+}
+
+@enduml
