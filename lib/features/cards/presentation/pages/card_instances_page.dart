@@ -5,6 +5,7 @@ import 'package:cardpro/features/cards/presentation/widgets/card_list_item.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+//カード個体一覧画面
 class CardInstancesPage extends StatelessWidget {
   final String title;
   final List<CardWithInstance> instances;
@@ -13,7 +14,7 @@ class CardInstancesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Group by set name (null -> "Unknown Set")
+    //「セット名ごとに個体をグルーピング（null は『不明なセット』扱い）
     final Map<String, List<CardWithInstance>> bySet = {};
     for (final it in instances) {
       final key = it.card.setName?.trim().isNotEmpty == true
@@ -45,7 +46,7 @@ class CardInstancesPage extends StatelessWidget {
               for (final item in group)
                 CardListItem(
                   card: item,
-                  // Hide both name and set inside grouped list
+                  // 「グループ表示ではカード名とセット名を非表示にする」
                   showCardName: false,
                   showSetName: false,
                   onDelete: () {
