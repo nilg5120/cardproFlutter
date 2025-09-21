@@ -178,13 +178,13 @@ class _ContainerDetailPageState extends State<ContainerDetailPage> {
       return;
     }
 
-    // Dispatch edit via BLoC if available
+    // 可能であれば BLoC を通じて更新をディスパッチする
     try {
       // ignore: use_build_context_synchronously
-      // Accessing bloc to trigger update and then show feedback
-      // We don't wait for completion here; the list page will refresh when re-entered.
-      // In a more advanced setup, we could listen to state changes.
-      // This keeps it simple and consistent with DeckDetail.
+      // BLoC にアクセスして更新を発火させ、フィードバックを表示する
+      // ここでは完了を待たず、一覧ページに戻った際に再読み込みされる想定
+      // さらに高度な構成では、状態変化を監視する実装も可能
+      // DeckDetail と同じ方針でシンプルさを維持する
       // ignore: cascade_invocations
       context.read<ContainerBloc>().add(EditContainerEvent(
             id: widget.container.id,
@@ -193,7 +193,7 @@ class _ContainerDetailPageState extends State<ContainerDetailPage> {
             containerType: type,
           ));
     } catch (_) {
-      // no bloc found; ignore
+      // BLoC が見つからない場合は無視する
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
