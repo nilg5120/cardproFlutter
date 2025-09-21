@@ -10,9 +10,9 @@ class CardListItem extends StatelessWidget {
   final bool showDelete;
   final bool showSetName;
   final bool showCardName;
-  // Optional override for the title widget (e.g., localized name)
+  // タイトルウィジェットを任意に差し替える（例: ローカライズされた名前）
   final Widget? title;
-  // Optional count badge for grouped views
+  // グループ表示用の任意のカウントバッジ
   final int? count;
 
   const CardListItem({
@@ -69,7 +69,7 @@ class CardListItem extends StatelessWidget {
                             child: title!,
                           ),
                         if (showCardName) const SizedBox(width: 12),
-                        // Set name (optional)
+                        // セット名（任意）
                         if (showSetName && card.card.setName != null)
                           Flexible(
                             child: Text(
@@ -103,7 +103,7 @@ class CardListItem extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(right: 4),
                       child: Chip(
-                        label: Text('$count��'),
+                        label: Text('$count枚'),
                         visualDensity: VisualDensity.compact,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
