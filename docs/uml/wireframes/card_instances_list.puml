@@ -1,4 +1,4 @@
-@startuml card_instances_page
+@startuml card_instances_list
 title カード個体一覧画面
 
 salt
