@@ -91,7 +91,7 @@ class CardListPage extends StatelessWidget {
       itemCount: grouped.length,
       itemBuilder: (context, index) {
         final group = grouped[index];
-        final representative = group.first; // use first instance for display
+        final representative = group.first; // 表示には先頭のインスタンスを代表として使う
         // タイトルは代表カードの名前
         final titleWidget = _LocalizedCardTitle(
           fallback: representative.card.name,
@@ -109,7 +109,7 @@ class CardListPage extends StatelessWidget {
           card: representative,
           title: titleWidget,
           count: group.length,
-          // Navigate to instances list when tapped
+          // タップでインスタンス一覧へ遷移
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -123,11 +123,11 @@ class CardListPage extends StatelessWidget {
               ),
             );
           },
-          // Hide delete button on grouped list
+          // グループ表示では削除ボタンを隠す
           showDelete: false,
           // セット名は一覧では非表示（セットが混在するため）
           showSetName: false,
-          // Keep handlers to satisfy constructor but won't be visible/used
+          // コンストラクタ要件を満たすためのハンドラーで、表示も使用もされない
           onDelete: () {},
           onEdit: (_, {String? rarity, String? setName, int? cardNumber}) {},
         );
@@ -162,7 +162,7 @@ class _LocalizedCardTitle extends StatelessWidget {
     String? nameEn,
     String? nameJa,
   }) {
-    // Prefer DB stored names if available; no network fetch here.
+    // 利用可能であれば DB に保存された名称を優先し、ここではネットワーク取得は行わない。
     final en = nameEn?.trim();
     final ja = nameJa?.trim();
     String display = fallback;
