@@ -1,6 +1,8 @@
-import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
+﻿import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
 import 'package:flutter/material.dart';
 
+
+/// カードリストの各アイテムを表示するウィジェット
 class CardListItem extends StatelessWidget {
   final CardWithInstance card;
   final VoidCallback onDelete;
@@ -10,9 +12,9 @@ class CardListItem extends StatelessWidget {
   final bool showDelete;
   final bool showSetName;
   final bool showCardName;
-  // Allows overriding the title widget (e.g. localized name)
+  // タイトルウィジェットの上書きを許可（例: ローカライズ済み名称）
   final Widget? title;
-  // Optional count badge for grouped view
+  // グループ表示用の任意カウントバッジ
   final int? count;
 
   const CardListItem({
@@ -69,7 +71,7 @@ class CardListItem extends StatelessWidget {
                             child: title!,
                           ),
                         if (showCardName) const SizedBox(width: 12),
-                        // Optional set name
+                        // 任意のセット名
                         if (showSetName && card.card.setName != null)
                           Flexible(
                             child: Text(
@@ -179,4 +181,6 @@ class CardListItem extends StatelessWidget {
     );
   }
 }
+
+
 
