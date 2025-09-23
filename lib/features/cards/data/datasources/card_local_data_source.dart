@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:developer' as developer;
 
 import 'package:cardpro/db/database.dart';
@@ -9,10 +8,10 @@ import 'package:cardpro/features/cards/domain/entities/card_instance_location.da
 import 'package:drift/drift.dart';
 
 abstract class CardLocalDataSource {
-  /// カード一覧�E�カード定義 + 個体）を取征E
+  /// カード一覧�E�カード定義 + 個体）を取征E
   Future<List<CardWithInstanceModel>> getCards();
 
-  /// カードを追加�E�忁E��に応じてマスタ新規作�Eし、個体を数量�E作�E�E�E
+  /// カードを追加�E�忁E��に応じてマスタ新規作�Eし、個体を数量�E作�E�E�E
   Future<CardWithInstanceModel> addCard({
     required String name,
     String? nameEn,
@@ -29,10 +28,10 @@ abstract class CardLocalDataSource {
   /// 個体を1件削除
   Future<void> deleteCard(CardInstanceModel instance);
 
-  /// 個体�Eメモのみ更新
+  /// 個体�Eメモのみ更新
   Future<void> editCard(CardInstanceModel instance, String description);
 
-  /// カード�E印刷惁E���E�Earity/Set/Card No.�E�と個体�Eメモを更新
+  /// カード�E印刷惁E���E�Earity/Set/Card No.�E�と個体�Eメモを更新
   Future<void> editCardFull({
     required CardModel card,
     required CardInstanceModel instance,
@@ -103,10 +102,10 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     required String? description,
     required int quantity,
   }) async {
-    // 重褁E��除方釁E
-    // 1) oracle_id で一意判定（コード生成に依存せぁEraw SQL を使用�E�E
-    // 2) 互換: oracle_id が不�Eな場合�E name + setName + cardnumber で突合し、E
-    //    既存行が見つかれば oracle_id を後追ぁE��補宁E
+    // 重褁E��除方釁E
+    // 1) oracle_id で一意判定（コード生成に依存せぁEraw SQL を使用�E�E
+    // 2) 互換: oracle_id が不�Eな場合�E name + setName + cardnumber で突合し、E
+    //    既存行が見つかれば oracle_id を後追ぁE��補宁E
     final byOracle = await database
         .customSelect(
           'SELECT id FROM mtg_cards WHERE oracle_id = ? LIMIT 1',
@@ -122,7 +121,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     }
 
     // レガシー照吁E name/setName/cardnumber でも一致を確認し、E
-    // oracle_id 未設定�E既存行があれば oracle_id を補宁E
+    // oracle_id 未設定�E既存行があれば oracle_id を補宁E
     if (existingCard == null) {
       final legacy = await (database.select(database.mtgCards)
             ..where((tbl) =>
@@ -131,15 +130,15 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
                 tbl.cardnumber.equals(cardNumber ?? 0)))
           .getSingleOrNull();
       if (legacy != null) {
-        // 現在 NULL の場合�Eみ oracle_id を後追ぁE��埋めめE
+        // 現在 NULL の場合�Eみ oracle_id を後追ぁE��埋めめE
         await database.customStatement(
           'UPDATE mtg_cards SET oracle_id = ? WHERE id = ? AND oracle_id IS NULL',
           [oracleId, legacy.id],
         );
         existingCard = legacy;
       } else {
-        // 既存名のみで一意に特定できる場合�E oracle_id を補宁E
-        // 同名が褁E��ある場合�Eユニ�Eク制紁E�E都合でスキチE�E
+        // 既存名のみで一意に特定できる場合�E oracle_id を補宁E
+        // 同名が褁E��ある場合�Eユニ�Eク制紁E�E都合でスキチE�E
         final sameName = await (database.select(database.mtgCards)
               ..where((t) => t.name.equals(name)))
             .get();
@@ -154,7 +153,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
       }
     }
 
-    // 新規カードを挿入、もしくは既存カード�E ID を流用
+    // 新規カードを挿入、もしくは既存カード�E ID を流用
     final cardId = existingCard?.id ??
         (await database.into(database.mtgCards).insertReturning(
           MtgCardsCompanion.insert(
@@ -169,7 +168,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
           ),
         )).id;
 
-    // 生�EされぁECompanion に依存せず、カード�E oracle_id を確実に設宁E
+    // 生�EされぁECompanion に依存せず、カード�E oracle_id を確実に設宁E
     if (existingCard == null) {
       await database.customStatement(
         'UPDATE mtg_cards SET oracle_id = ? WHERE id = ?',
@@ -191,7 +190,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
       }
     }
 
-    // カード個体を数量�E挿入�E�Euantity <= 0 の場合�E 1�E�E
+    // カード個体を数量�E挿入�E�Euantity <= 0 の場合�E 1�E�E
     CardInstance? lastInstance;
     final insertCount = (quantity <= 0) ? 1 : quantity;
     for (var i = 0; i < insertCount; i++) {
@@ -211,7 +210,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
           ..where((tbl) => tbl.id.equals(cardId)))
         .getSingle();
 
-    // 最後に挿入した個体とカード定義を結合したモチE��を返す
+    // 最後に挿入した個体とカード定義を結合したモチE��を返す
     return CardWithInstanceModel.fromDrift(card, lastInstance!);
   }
 
@@ -243,7 +242,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     required int? cardNumber,
     required String? description,
   }) async {
-    // カード（�Eスタ�E��E印刷惁E��を更新
+    // カード（�Eスタ�E��E印刷惁E��を更新
     await (database.update(database.mtgCards)
           ..where((tbl) => tbl.id.equals(card.id)))
         .write(
@@ -254,7 +253,7 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
       ),
     );
 
-    // 個体（インスタンス�E��Eメモ・更新日時を更新
+    // 個体（インスタンス�E��Eメモ・更新日時を更新
     await (database.update(database.cardInstances)
           ..where((tbl) => tbl.id.equals(instance.id)))
         .write(
