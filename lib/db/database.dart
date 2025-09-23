@@ -94,16 +94,29 @@ LazyDatabase _openConnection() {
 // 初期データ投入などの seeding 関連は seed_data.dart に定義
 
 extension CardQueries on AppDatabase {
-  Future<List<(MtgCard, CardInstance)>> getCardWithMaster() {
+  Future<List<(MtgCard, CardInstance, ContainerCardLocation?, Container?)>>
+      getCardWithMaster() {
     final query = select(cardInstances).join([
       innerJoin(mtgCards, mtgCards.id.equalsExp(cardInstances.cardId)),
+      leftOuterJoin(
+        containerCardLocations,
+        containerCardLocations.cardInstanceId.equalsExp(cardInstances.id),
+      ),
+      leftOuterJoin(
+        containers,
+        containers.id.equalsExp(containerCardLocations.containerId),
+      ),
     ]);
 
     return query
-        .map((row) => (
-              row.readTable(mtgCards),
-              row.readTable(cardInstances),
-            ))
+        .map(
+          (row) => (
+            row.readTable(mtgCards),
+            row.readTable(cardInstances),
+            row.readTableOrNull(containerCardLocations),
+            row.readTableOrNull(containers),
+          ),
+        )
         .get();
   }
 

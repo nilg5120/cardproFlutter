@@ -1,9 +1,12 @@
+import 'dart:collection';
+import 'dart:developer' as developer;
+
 import 'package:cardpro/db/database.dart';
 import 'package:cardpro/features/cards/data/models/card_instance_model.dart';
 import 'package:cardpro/features/cards/data/models/card_model.dart';
 import 'package:cardpro/features/cards/data/models/card_with_instance_model.dart';
+import 'package:cardpro/features/cards/domain/entities/card_instance_location.dart';
 import 'package:drift/drift.dart';
-import 'dart:developer' as developer;
 
 abstract class CardLocalDataSource {
   /// カード一覧（カード定義 + 個体）を取得
@@ -51,8 +54,36 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
     final results = await database.getCardWithMaster();
     developer.log('Fetched cards: ${results.length}', name: 'CardLocalDataSource');
 
-    final cardModels = results
-        .map((tuple) => CardWithInstanceModel.fromDrift(tuple.$1, tuple.$2))
+    final grouped = LinkedHashMap<int, _CardInstanceGroup>();
+
+    for (final (card, instance, location, container) in results) {
+      final group = grouped.putIfAbsent(
+        instance.id,
+        () => _CardInstanceGroup(card: card, instance: instance),
+      );
+
+      if (location != null) {
+        group.placements.add(
+          CardInstanceLocation(
+            containerId: location.containerId,
+            location: location.location,
+            containerName: container?.name,
+            containerDescription: container?.description,
+            containerType: container?.containerType,
+            isActive: container?.isActive,
+          ),
+        );
+      }
+    }
+
+    final cardModels = grouped.values
+        .map(
+          (group) => CardWithInstanceModel.fromDrift(
+            group.card,
+            group.instance,
+            placements: List.unmodifiable(group.placements),
+          ),
+        )
         .toList();
 
     developer.log('Converted to models: ${cardModels.length}', name: 'CardLocalDataSource');
@@ -233,4 +264,15 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
       ),
     );
   }
+}
+
+class _CardInstanceGroup {
+  final MtgCard card;
+  final CardInstance instance;
+  final List<CardInstanceLocation> placements;
+
+  _CardInstanceGroup({
+    required this.card,
+    required this.instance,
+  }) : placements = [];
 }

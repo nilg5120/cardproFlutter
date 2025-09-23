@@ -46,8 +46,72 @@ void main() {
     // 検証
     final results = await db.getCardWithMaster();
     expect(results.length, 1);
-    final (fetchedCard, instance) = results.first;
+    final (fetchedCard, instance, location, container) = results.first;
     expect(fetchedCard.name, 'Test Card');
     expect(instance.description, 'This is a test instance');
+    expect(location, isNull);
+    expect(container, isNull);
+  });
+
+  test('getCardWithMaster includes container placements via left join', () async {
+    final effect = await db.into(db.cardEffects).insertReturning(
+          CardEffectsCompanion.insert(
+            name: 'Basic',
+            description: 'No special effect',
+          ),
+        );
+
+    final card = await db.into(db.mtgCards).insertReturning(
+          MtgCardsCompanion.insert(
+            name: 'Test Card',
+            rarity: const Value('R'),
+            setName: const Value('Sample'),
+            cardnumber: const Value(123),
+            effectId: effect.id,
+          ),
+        );
+
+    final instance = await db.into(db.cardInstances).insertReturning(
+          CardInstancesCompanion.insert(
+            cardId: card.id,
+            description: const Value('Instance with placement'),
+          ),
+        );
+
+    final container = await db.into(db.containers).insertReturning(
+          ContainersCompanion.insert(
+            containerType: 'deck',
+          ).copyWith(
+            name: const Value('Test Deck'),
+            description: const Value('Deck description'),
+            isActive: const Value(true),
+          ),
+        );
+
+    await db.into(db.containerCardLocations).insert(
+          ContainerCardLocationsCompanion.insert(
+            containerId: container.id,
+            cardInstanceId: instance.id,
+            location: 'main',
+          ),
+        );
+
+    final results = await db.getCardWithMaster();
+    expect(results.length, 1);
+    final (
+      fetchedCard,
+      fetchedInstance,
+      fetchedLocation,
+      fetchedContainer,
+    ) = results.first;
+
+    expect(fetchedCard.id, card.id);
+    expect(fetchedInstance.id, instance.id);
+    expect(fetchedLocation, isNotNull);
+    expect(fetchedLocation!.containerId, container.id);
+    expect(fetchedLocation.location, 'main');
+    expect(fetchedContainer, isNotNull);
+    expect(fetchedContainer!.name, 'Test Deck');
+    expect(fetchedContainer.containerType, 'deck');
   });
 }
