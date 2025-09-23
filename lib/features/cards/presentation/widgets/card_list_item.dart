@@ -34,6 +34,9 @@ class CardListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final description = card.instance.description?.trim();
     final hasDescription = description != null && description.isNotEmpty;
+    final placementSummary = _buildPlacementSummary();
+    final hasPlacementSummary = placementSummary.isNotEmpty;
+    final showHeaderRow = showCardName || showSetName || title != null;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -49,45 +52,59 @@ class CardListItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (showCardName)
-                          Flexible(
-                            fit: FlexFit.tight,
-                            child: title ??
-                                Text(
-                                  card.card.name,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                    if (showHeaderRow)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (showCardName)
+                            Flexible(
+                              fit: FlexFit.tight,
+                              child: title ??
+                                  Text(
+                                    card.card.name,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                          )
-                        else if (title != null)
-                          Flexible(
-                            fit: FlexFit.tight,
-                            child: title!,
-                          ),
-                        if (showCardName) const SizedBox(width: 12),
-                        // 任意のセット名
-                        if (showSetName && card.card.setName != null)
-                          Flexible(
-                            child: Text(
-                              card.card.setName!,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(color: Colors.grey[700]),
+                            )
+                          else if (title != null)
+                            Flexible(
+                              fit: FlexFit.tight,
+                              child: title!,
                             ),
-                          ),
-                      ],
-                    ),
+                          if (showCardName) const SizedBox(width: 12),
+                          // 任意のセット名
+                          if (showSetName && card.card.setName != null)
+                            Flexible(
+                              child: Text(
+                                card.card.setName!,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(color: Colors.grey[700]),
+                              ),
+                            ),
+                        ],
+                      ),
+                    if (hasPlacementSummary)
+                      Padding(
+                        padding: EdgeInsets.only(top: showHeaderRow ? 8 : 0),
+                        child: Text(
+                          placementSummary,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: Colors.grey[600]),
+                        ),
+                      ),
                     if (hasDescription)
                       Padding(
-                        padding: const EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.only(
+                          top: (hasPlacementSummary || showHeaderRow) ? 8 : 0,
+                        ),
                         child: Text(
                           description,
                           style: Theme.of(context)
@@ -179,6 +196,23 @@ class CardListItem extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _buildPlacementSummary() {
+    if (card.placements.isEmpty) {
+      return '未割り当て';
+    }
+
+    return card.placements.map((placement) {
+      final name = (placement.containerName != null &&
+              placement.containerName!.trim().isNotEmpty)
+          ? placement.containerName!.trim()
+          : (placement.containerType != null &&
+                  placement.containerType!.trim().isNotEmpty)
+              ? placement.containerType!.trim()
+              : '不明なコンテナ';
+      return '$name (${placement.location})';
+    }).join(', ');
   }
 }
 
