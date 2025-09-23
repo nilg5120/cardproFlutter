@@ -1,5 +1,5 @@
 {
     "dart.flutterSdkPath": "K:\\sdk\\flutter",
     "java.configuration.updateBuildConfiguration": "automatic",
-    "cmake.ignoreCMakeListsMissing": true
+    "cmake.ignoreCMakeListsMissing": true,
 }
