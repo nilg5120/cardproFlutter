@@ -203,18 +203,15 @@ class CardListItem extends StatelessWidget {
       return '未割り当て';
     }
 
-    return card.placements.map((placement) {
-      final name = (placement.containerName != null &&
-              placement.containerName!.trim().isNotEmpty)
-          ? placement.containerName!.trim()
-          : (placement.containerType != null &&
-                  placement.containerType!.trim().isNotEmpty)
-              ? placement.containerType!.trim()
-              : '不明なコンテナ';
-      return '$name (${placement.location})';
-    }).join(', ');
+    final summary = card.placements
+        .map((placement) => placement.location.trim())
+        .where((location) => location.isNotEmpty)
+        .join(', ');
+
+    return summary.isNotEmpty ? summary : '未割り当て';
   }
 }
+
 
 
 

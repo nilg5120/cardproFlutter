@@ -3,7 +3,6 @@ import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
 import 'package:cardpro/features/cards/presentation/widgets/add_card_dialog.dart';
-import 'package:cardpro/features/cards/presentation/widgets/card_list_item.dart';
 import 'package:cardpro/features/cards/presentation/pages/card_instances_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -105,31 +104,32 @@ class CardListPage extends StatelessWidget {
           nameJa: representative.card.nameJa,
         );
 
-        return CardListItem(
-          card: representative,
-          title: titleWidget,
-          count: group.length,
-          // タップでインスタンス一覧へ遷移
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => BlocProvider.value(
-                  value: context.read<CardBloc>(),
-                  child: CardInstancesPage(
-                    title: displayTitle,
-                    instances: group,
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: ListTile(
+            title: titleWidget,
+            trailing: Text(
+              '${group.length}枚',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            // Open instance list on tap
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: context.read<CardBloc>(),
+                    child: CardInstancesPage(
+                      title: displayTitle,
+                      instances: group,
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-          // グループ表示では削除ボタンを隠す
-          showDelete: false,
-          // セット名は一覧では非表示（セットが混在するため）
-          showSetName: false,
-          // コンストラクタ要件を満たすためのハンドラーで、表示も使用もされない
-          onDelete: () {},
-          onEdit: (_, {String? rarity, String? setName, int? cardNumber}) {},
+              );
+            },
+          ),
         );
       },
     );

@@ -52,7 +52,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Deck Alpha (main), Binder Beta (side)'), findsOneWidget);
+    expect(find.text('main, side'), findsOneWidget);
   });
 
   testWidgets('falls back to 未割り当て when there is no placement', (tester) async {
