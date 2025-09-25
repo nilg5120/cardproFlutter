@@ -29,7 +29,11 @@ abstract class CardLocalDataSource {
   Future<void> deleteCard(CardInstanceModel instance);
 
   /// 個体のメモのみを更新する。
-  Future<void> editCard(CardInstanceModel instance, String description);
+  Future<void> editCard(
+    CardInstanceModel instance,
+    String description, {
+    int? containerId,
+  });
 
   /// カードの印刷情報（レアリティ/セット/カードNo.）と個体のメモを更新する。
   Future<void> editCardFull({
@@ -222,15 +226,69 @@ class CardLocalDataSourceImpl implements CardLocalDataSource {
   }
 
   @override
-  Future<void> editCard(CardInstanceModel instance, String description) async {
-    await (database.update(database.cardInstances)
-          ..where((tbl) => tbl.id.equals(instance.id)))
-        .write(
-      CardInstancesCompanion(
-        description: Value(description),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
+  Future<void> editCard(
+    CardInstanceModel instance,
+    String description, {
+    int? containerId,
+  }) async {
+    await database.transaction(() async {
+      await (database.update(database.cardInstances)
+            ..where((tbl) => tbl.id.equals(instance.id)))
+          .write(
+        CardInstancesCompanion(
+          description: Value(description),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+
+      final existingPlacements = await (database.select(database.containerCardLocations)
+            ..where((tbl) => tbl.cardInstanceId.equals(instance.id)))
+          .get();
+
+      if (containerId == null) {
+        if (existingPlacements.isNotEmpty) {
+          await (database.delete(database.containerCardLocations)
+                ..where((tbl) => tbl.cardInstanceId.equals(instance.id)))
+              .go();
+        }
+        return;
+      }
+
+      String? preservedLocation;
+      for (final placement in existingPlacements) {
+        if (placement.containerId == containerId) {
+          preservedLocation = placement.location;
+          break;
+        }
+      }
+
+      if (existingPlacements.isNotEmpty) {
+        await (database.delete(database.containerCardLocations)
+              ..where((tbl) => tbl.cardInstanceId.equals(instance.id)))
+            .go();
+      }
+
+      final location = preservedLocation ?? await _defaultLocationForContainer(containerId);
+
+      await database.into(database.containerCardLocations).insert(
+            ContainerCardLocationsCompanion.insert(
+              containerId: containerId,
+              cardInstanceId: instance.id,
+              location: location,
+            ),
+            mode: InsertMode.insertOrReplace,
+          );
+    });
+  }
+
+  Future<String> _defaultLocationForContainer(int containerId) async {
+    final container = await (database.select(database.containers)
+          ..where((tbl) => tbl.id.equals(containerId)))
+        .getSingleOrNull();
+    if (container == null) {
+      return 'storage';
+    }
+    return container.containerType == 'deck' ? 'main' : 'storage';
   }
 
   @override

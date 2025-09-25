@@ -19,7 +19,11 @@ abstract class CardRepository {
     required int quantity,
   });
   Future<Either<Failure, void>> deleteCard(CardInstance instance);
-  Future<Either<Failure, void>> editCard(CardInstance instance, String description);
+  Future<Either<Failure, void>> editCard(
+    CardInstance instance,
+    String description, {
+    int? containerId,
+  });
   Future<Either<Failure, void>> editCardFull({
     required Card card,
     required CardInstance instance,

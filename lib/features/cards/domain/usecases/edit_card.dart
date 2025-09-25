@@ -10,19 +10,25 @@ class EditCard {
   EditCard(this.repository);
 
   Future<Either<Failure, void>> call(EditCardParams params) async {
-    return await repository.editCard(params.instance, params.description);
+    return await repository.editCard(
+      params.instance,
+      params.description,
+      containerId: params.containerId,
+    );
   }
 }
 
 class EditCardParams extends Equatable {
   final CardInstance instance;
   final String description;
+  final int? containerId;
 
   const EditCardParams({
     required this.instance,
     required this.description,
+    this.containerId,
   });
 
   @override
-  List<Object> get props => [instance, description];
+  List<Object?> get props => [instance, description, containerId];
 }

@@ -1,4 +1,4 @@
-﻿import 'package:bloc_test/bloc_test.dart';
+import 'package:bloc_test/bloc_test.dart';
 import 'package:cardpro/core/error/failures.dart';
 import 'package:cardpro/features/cards/domain/entities/card.dart' as card_entity;
 import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
@@ -188,6 +188,7 @@ void main() {
     final editCardEvent = EditCardEvent(
       instance: testCardWithInstance.instance,
       description: 'New description',
+      containerId: 42,
     );
 
     blocTest<CardBloc, CardState>(
@@ -205,7 +206,11 @@ void main() {
         CardLoaded([testCardWithInstance]),
       ],
       verify: (_) {
-        verify(mockEditCard(any));
+        verify(mockEditCard(EditCardParams(
+          instance: testCardWithInstance.instance,
+          description: 'New description',
+          containerId: 42,
+        )));
         verify(mockGetCards());
       },
     );

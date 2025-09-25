@@ -46,7 +46,7 @@ void main() {
           body: CardListItem(
             card: cardWithInstance,
             onDelete: () {},
-            onEdit: (_, {rarity, setName, cardNumber}) {},
+            onEdit: (_, {containerId, rarity, setName, cardNumber}) {},
           ),
         ),
       ),
@@ -77,7 +77,7 @@ void main() {
           body: CardListItem(
             card: cardWithInstance,
             onDelete: () {},
-            onEdit: (_, {rarity, setName, cardNumber}) {},
+            onEdit: (_, {containerId, rarity, setName, cardNumber}) {},
           ),
         ),
       ),

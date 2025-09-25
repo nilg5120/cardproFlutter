@@ -110,11 +110,12 @@ class MockCardLocalDataSource extends _i1.Mock
 
   @override
   _i4.Future<void> editCard(
-    _i5.CardInstanceModel? instance,
-    String? description,
-  ) =>
+    _i5.CardInstanceModel instance,
+    String description, {
+    int? containerId,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#editCard, [instance, description]),
+            Invocation.method(#editCard, [instance, description], {#containerId: containerId}),
             returnValue: _i4.Future<void>.value(),
             returnValueForMissingStub: _i4.Future<void>.value(),
           )

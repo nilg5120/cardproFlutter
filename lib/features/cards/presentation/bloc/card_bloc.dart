@@ -114,6 +114,7 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     final params = EditCardParams(
       instance: event.instance,
       description: event.description,
+      containerId: event.containerId,
     );
     final result = await editCard(params);
     result.fold(

@@ -1,4 +1,4 @@
-﻿import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
+import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_bloc.dart';
 import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
 import 'package:cardpro/features/cards/presentation/widgets/card_list_item.dart';
@@ -80,11 +80,12 @@ class _CardInstancesPageState extends State<CardInstancesPage> {
                 showCardName: false,
                 showSetName: false,
                 onDelete: () => _handleDelete(item),
-                onEdit: (description, {String? rarity, String? setName, int? cardNumber}) {
+                onEdit: (description, {int? containerId, String? rarity, String? setName, int? cardNumber}) {
                   context.read<CardBloc>().add(
                         EditCardEvent(
                           instance: item.instance,
                           description: description,
+                          containerId: containerId,
                         ),
                       );
                 },

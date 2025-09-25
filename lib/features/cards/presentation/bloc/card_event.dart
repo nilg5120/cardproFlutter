@@ -56,14 +56,16 @@ class DeleteCardEvent extends CardEvent {
 class EditCardEvent extends CardEvent {
   final CardInstance instance;
   final String description;
+  final int? containerId;
 
   const EditCardEvent({
     required this.instance,
     required this.description,
+    this.containerId,
   });
 
   @override
-  List<Object> get props => [instance, description];
+  List<Object?> get props => [instance, description, containerId];
 }
 
 /// カードマスター情報も含めて編集するイベント
