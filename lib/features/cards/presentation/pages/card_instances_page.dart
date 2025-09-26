@@ -40,11 +40,38 @@ class _CardInstancesPageState extends State<CardInstancesPage> {
         ? const Center(child: Text('カードインスタンスはまだありません'))
         : _buildGroupedList();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
+    return BlocListener<CardBloc, CardState>(
+      listener: (context, state) {
+        if (state is CardLoaded) {
+          final ids = widget.instances.map((it) => it.instance.id).toList();
+          final List<CardWithInstance> reordered = [];
+
+          for (final id in ids) {
+            CardWithInstance? match;
+            for (final card in state.cards) {
+              if (card.instance.id == id) {
+                match = card;
+                break;
+              }
+            }
+            if (match != null) {
+              reordered.add(match);
+            }
+          }
+
+          if (!listEquals(_instances, reordered)) {
+            setState(() {
+              _instances = reordered;
+            });
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: widgetBody,
       ),
-      body: widgetBody,
     );
   }
 
