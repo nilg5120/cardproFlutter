@@ -12,7 +12,7 @@ void main() {
   late MockCardRepository mockRepository;
 
   setUp(() {
-    // 各テスト前にモックとUseCaseを初期化
+    // 吁E��スト前にモチE��とUseCaseを�E期化
     mockRepository = MockCardRepository();
     usecase = EditCard(mockRepository);
   });
@@ -20,6 +20,7 @@ void main() {
   final testCardInstance = CardInstance(
     id: 1,
     cardId: 1,
+    lang: 'en',
     updatedAt: DateTime(2025, 5, 29),
     description: 'Test description',
   );
@@ -29,7 +30,7 @@ void main() {
     description: 'New description',
   );
 
-  test('リポジトリ経由でカード個体を編集できる', () async {
+  test('リポジトリ経由でカード個体を編雁E��きる', () async {
     when(mockRepository.editCard(testCardInstance, 'New description'))
         .thenAnswer((_) async => const Right(null));
 
@@ -40,7 +41,7 @@ void main() {
     verifyNoMoreInteractions(mockRepository);
   });
 
-  test('リポジトリの失敗をそのまま伝播する', () async {
+  test('リポジトリの失敗をそ�Eまま伝播する', () async {
     final failure = DatabaseFailure(message: 'DB error');
     when(mockRepository.editCard(testCardInstance, 'New description'))
         .thenAnswer((_) async => Left(failure));

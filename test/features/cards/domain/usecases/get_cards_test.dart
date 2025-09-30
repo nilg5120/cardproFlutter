@@ -17,7 +17,7 @@ void main() {
   late MockCardRepository mockRepository;
 
   setUp(() {
-    // 各テスト前にモックとUseCaseを初期化
+    // 吁E��スト前にモチE��とUseCaseを�E期化
     mockRepository = MockCardRepository();
     usecase = GetCards(mockRepository);
   });
@@ -34,6 +34,7 @@ void main() {
   final testCardInstance = CardInstance(
     id: 1,
     cardId: 1,
+    lang: 'en',
     updatedAt: DateTime(2025, 5, 29),
     description: 'Test description',
   );
@@ -55,7 +56,7 @@ void main() {
     verifyNoMoreInteractions(mockRepository);
   });
 
-  test('リポジトリの失敗をそのまま伝播する', () async {
+  test('リポジトリの失敗をそ�Eまま伝播する', () async {
     final failure = DatabaseFailure(message: 'DB error');
     when(mockRepository.getCards()).thenAnswer((_) async => Left(failure));
 

@@ -18,7 +18,7 @@ void main() {
   late MockCardLocalDataSource mockLocalDataSource;
 
   setUp(() {
-    // 各テスト前にモックとリポジトリを初期化
+    // 吁E��スト前にモチE��とリポジトリを�E期化
     mockLocalDataSource = MockCardLocalDataSource();
     repository = CardRepositoryImpl(localDataSource: mockLocalDataSource);
   });
@@ -35,6 +35,7 @@ void main() {
   final testCardInstanceModel = CardInstanceModel(
     id: 1,
     cardId: 1,
+    lang: 'en',
     updatedAt: DateTime(2025, 5, 29),
     description: 'Test description',
   );
@@ -44,8 +45,8 @@ void main() {
     instance: testCardInstanceModel,
   );
 
-  group('getCards（取得）', () {
-    test('ローカルデータソースからカード一覧を返す', () async {
+  group('getCards�E�取得！E, () {
+    test('ローカルチE�Eタソースからカード一覧を返す', () async {
       when(mockLocalDataSource.getCards())
           .thenAnswer((_) async => [testCardWithInstanceModel]);
 
@@ -57,7 +58,7 @@ void main() {
       verifyNoMoreInteractions(mockLocalDataSource);
     });
 
-    test('データソース例外時はDatabaseFailureを返す', () async {
+    test('チE�Eタソース例外時はDatabaseFailureを返す', () async {
       when(mockLocalDataSource.getCards()).thenThrow(Exception('DB error'));
 
       final result = await repository.getCards();
@@ -73,7 +74,7 @@ void main() {
     });
   });
 
-  group('addCard（追加）', () {
+  group('addCard�E�追加�E�E, () {
     test('カードを追加できる', () async {
       when(mockLocalDataSource.addCard(
         name: 'Test Card',
@@ -81,6 +82,7 @@ void main() {
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
+        lang: 'en',
         effectId: 1,
         description: 'Test description',
         quantity: 1,
@@ -92,6 +94,7 @@ void main() {
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
+        lang: 'en',
         effectId: 1,
         description: 'Test description',
         quantity: 1,
@@ -104,6 +107,7 @@ void main() {
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
+        lang: 'en',
         effectId: 1,
         description: 'Test description',
         quantity: 1,
@@ -111,13 +115,14 @@ void main() {
       verifyNoMoreInteractions(mockLocalDataSource);
     });
 
-    test('データソース例外時はDatabaseFailureを返す', () async {
+    test('チE�Eタソース例外時はDatabaseFailureを返す', () async {
       when(mockLocalDataSource.addCard(
         name: 'Test Card',
         oracleId: '0000-ORACLE-TEST',
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
+        lang: 'en',
         effectId: 1,
         description: 'Test description',
         quantity: 1,
@@ -129,6 +134,7 @@ void main() {
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
+        lang: 'en',
         effectId: 1,
         description: 'Test description',
         quantity: 1,
@@ -146,6 +152,7 @@ void main() {
         rarity: 'R',
         setName: 'Sample',
         cardNumber: 123,
+        lang: 'en',
         effectId: 1,
         description: 'Test description',
         quantity: 1,
@@ -154,7 +161,7 @@ void main() {
     });
   });
 
-  group('deleteCard（削除）', () {
+  group('deleteCard�E�削除�E�E, () {
     test('カード個体を削除できる', () async {
       when(mockLocalDataSource.deleteCard(testCardInstanceModel))
           .thenAnswer((_) async => {});
@@ -166,7 +173,7 @@ void main() {
       verifyNoMoreInteractions(mockLocalDataSource);
     });
 
-    test('データソース例外時はDatabaseFailureを返す', () async {
+    test('チE�Eタソース例外時はDatabaseFailureを返す', () async {
       when(mockLocalDataSource.deleteCard(testCardInstanceModel))
           .thenThrow(Exception('DB error'));
 
@@ -181,8 +188,8 @@ void main() {
     });
   });
 
-  group('editCard（編集）', () {
-    test('カード個体の説明文を編集できる', () async {
+  group('editCard�E�編雁E��E, () {
+    test('カード個体�E説明文を編雁E��きる', () async {
       when(mockLocalDataSource.editCard(testCardInstanceModel, 'New description'))
           .thenAnswer((_) async => {});
 
@@ -193,7 +200,7 @@ void main() {
       verifyNoMoreInteractions(mockLocalDataSource);
     });
 
-    test('データソース例外時はDatabaseFailureを返す', () async {
+    test('チE�Eタソース例外時はDatabaseFailureを返す', () async {
       when(mockLocalDataSource.editCard(testCardInstanceModel, 'New description'))
           .thenThrow(Exception('DB error'));
 

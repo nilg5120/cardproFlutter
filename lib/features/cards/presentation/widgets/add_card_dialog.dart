@@ -17,7 +17,7 @@ class AddCardDialog extends StatefulWidget {
 }
 
 class _AddCardDialogState extends State<AddCardDialog> {
-  // テキストコントローラー
+  // チE��ストコントローラー
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final rarityController = TextEditingController();
@@ -30,13 +30,13 @@ class _AddCardDialogState extends State<AddCardDialog> {
 
   late Future<List<CardEffect>> cardEffectsFuture;
 
-  // Scryfall関連の設定
+  // Scryfall関連の設宁E
   final _scryfall = sl<ScryfallApi>();
   Timer? _debounce;
   List<String> _nameOptions = [];
   bool _isSuggestLoading = false;
   String? _suggestError;
-  TextEditingController? _acController; // Autocompleteウィジェット内部のコントローラー
+  TextEditingController? _acController; // AutocompleteウィジェチE��冁E��のコントローラー
   String? _selectedOracleId; // 選択済みのScryfall oracle ID
   String? _selectedNameEn; // Scryfallから取得した英語名
   String? _selectedNameJa; // Scryfallから取得した日本語表記名
@@ -61,8 +61,9 @@ class _AddCardDialogState extends State<AddCardDialog> {
   }
 
   void _onNameChanged(String value) {
-    // 名前が手動で変更された場合は選択済みoracle IDをリセット
+    // 名前が手動で変更された場合�E選択済みoracle IDをリセチE��
     _selectedOracleId = null;
+    _selectedLang = null;
     _debounce?.cancel();
     final q = value.trim();
     if (q.length < 2) {
@@ -84,11 +85,11 @@ class _AddCardDialogState extends State<AddCardDialog> {
           _nameOptions = list;
           _isSuggestLoading = false;
         });
-        // コントローラーを操作してAutocompleteに候補の再評価を促す
+        // コントローラーを操作してAutocompleteに候補�E再評価を俁E��
         final c = _acController;
         if (c != null && c.text.isNotEmpty) {
           final t = c.text;
-          // 文字を変えずにリスナーを動かすため零幅スペースを一度追加してから削除する
+          // 斁E��を変えずにリスナ�Eを動かすため零幁E��ペ�Eスを一度追加してから削除する
           c.text = '$t\u200b';
           c.selection = TextSelection.collapsed(offset: c.text.length);
           Future.microtask(() {
@@ -99,7 +100,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
       } catch (e) {
         setState(() {
           _nameOptions = [];
-          _suggestError = '候補の取得に失敗しました';
+          _suggestError = '候補�E取得に失敗しました';
           _isSuggestLoading = false;
         });
       }
@@ -127,9 +128,10 @@ class _AddCardDialogState extends State<AddCardDialog> {
         }
         _selectedNameEn = fallbackName;
         _selectedNameJa = hasPrinted ? printed : fallbackName;
+        _selectedLang = c.lang;
       });
     } catch (_) {
-      // UI上では失敗を通知せずに無視する
+      // UI上では失敗を通知せずに無視すめE
     }
   }
 
@@ -185,6 +187,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
           final n = selected.collectorNumberInt;
           cardNumberController.text = n != null ? '$n' : '';
           _selectedOracleId = selected.oracleId;
+          _selectedLang = selected.lang;
         });
       }
     } catch (_) {
@@ -220,7 +223,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
                       optionsBuilder: (TextEditingValue tev) {
                         final text = tev.text.trim();
                         if (text.length < 2) return const Iterable<String>.empty();
-                        // ここでは現在のリストを返す（非同期で更新）
+                        // ここでは現在のリストを返す�E�非同期で更新�E�E
                         return _nameOptions.where((o) => o.toLowerCase().contains(text.toLowerCase()));
                       },
                       displayStringForOption: (s) => s,
@@ -275,7 +278,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
                           child: Material(
                             elevation: 4,
                             child: SizedBox(
-                              width: MediaQuery.of(context).size.width - 96, // ダイアログ内での想定幅
+                              width: MediaQuery.of(context).size.width - 96, // ダイアログ冁E��の想定幁E
                               child: ListView.builder(
                                 padding: EdgeInsets.zero,
                                 shrinkWrap: true,
@@ -369,15 +372,16 @@ class _AddCardDialogState extends State<AddCardDialog> {
                   onPressed: () {
                     final name = nameController.text;
                     if (name.isNotEmpty) {
-                      // oracleIdが存在するか確認し、無い場合は取得を試みる
+                      // oracleIdが存在するか確認し、無ぁE��合�E取得を試みめE
                       if (_selectedOracleId == null || _selectedOracleId!.isEmpty) {
                         // 正確な名前で取得し、だめなら検索にフォールバックする
-                        // UI応答性を保つためここではawaitせず非同期処理として実行する
+                        // UI応答性を保つためここではawaitせず非同期�E琁E��して実行すめE
                       }
                       () async {
                         String? oracleId = _selectedOracleId;
                         String? nameEn = _selectedNameEn;
                         String? nameJa = _selectedNameJa;
+                        String? lang = _selectedLang;
                         if (oracleId == null || oracleId.isEmpty) {
                           final c = await _scryfall.getCardByExactName(name);
                           if (c != null) {
@@ -392,13 +396,14 @@ class _AddCardDialogState extends State<AddCardDialog> {
                             }
                             nameEn ??= fallbackName;
                             nameJa ??= hasPrinted ? printed : fallbackName;
+                            lang ??= c.lang;
                           }
                         }
                         if (!dialogContext.mounted) return;
                         if (oracleId == null || oracleId.isEmpty) {
                           if (dialogContext.mounted) {
                             ScaffoldMessenger.of(dialogContext).showSnackBar(
-                              const SnackBar(content: Text('カードの識別子(oracle_id)を取得できません。候補から選択してください。')),
+                              const SnackBar(content: Text('カード�E識別孁Eoracle_id)を取得できません。候補から選択してください、E)),
                             );
                           }
                           return;
@@ -414,6 +419,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
                           rarity: rarityController.text.isNotEmpty ? rarityController.text : null,
                           setName: setNameController.text.isNotEmpty ? setNameController.text : null,
                           cardNumber: int.tryParse(cardNumberController.text),
+                          lang: lang,
                           effectId: selectedEffectId,
                           description: descriptionController.text.isNotEmpty
                               ? descriptionController.text

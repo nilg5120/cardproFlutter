@@ -14,6 +14,7 @@ abstract class CardRepository {
     required String? rarity,
     required String? setName,
     required int? cardNumber,
+    String? lang,
     required int effectId,
     required String? description,
     required int quantity,

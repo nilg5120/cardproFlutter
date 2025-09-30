@@ -34,7 +34,14 @@ class CardListItem extends StatelessWidget {
     final hasDescription = description != null && description.isNotEmpty;
     final placementSummary = _buildPlacementSummary();
     final hasPlacementSummary = placementSummary.isNotEmpty;
+    final languageLabel = _formatLanguageLabel(card.instance.lang);
+    final showLanguage = languageLabel != null;
     final showHeaderRow = showCardName || showSetName || title != null;
+    final double languageTopPadding = showHeaderRow ? 4.0 : 0.0;
+    final double placementTopPadding = showLanguage ? 4.0 : (showHeaderRow ? 8.0 : 0.0);
+    final double descriptionTopPadding =
+        (hasPlacementSummary || showLanguage || showHeaderRow) ? 8.0 : 0.0;
+
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -86,9 +93,20 @@ class CardListItem extends StatelessWidget {
                             ),
                         ],
                       ),
+                    if (showLanguage)
+                      Padding(
+                        padding: EdgeInsets.only(top: languageTopPadding),
+                        child: Text(
+                          'Language: ${languageLabel!}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: Colors.grey[600]),
+                        ),
+                      ),
                     if (hasPlacementSummary)
                       Padding(
-                        padding: EdgeInsets.only(top: showHeaderRow ? 8 : 0),
+                        padding: EdgeInsets.only(top: placementTopPadding),
                         child: Text(
                           placementSummary,
                           style: Theme.of(context)
@@ -100,7 +118,7 @@ class CardListItem extends StatelessWidget {
                     if (hasDescription)
                       Padding(
                         padding: EdgeInsets.only(
-                          top: (hasPlacementSummary || showHeaderRow) ? 8 : 0,
+                          top: descriptionTopPadding,
                         ),
                         child: Text(
                           description,
@@ -288,6 +306,31 @@ class CardListItem extends StatelessWidget {
     return '$displayName ($type)';
   }
 
+  String? _formatLanguageLabel(String? langCode) {
+    if (langCode == null) {
+      return null;
+    }
+    final code = langCode.trim().toLowerCase();
+    if (code.isEmpty) {
+      return null;
+    }
+    const labels = <String, String>{
+      'en': 'English',
+      'ja': 'Japanese',
+      'de': 'German',
+      'fr': 'French',
+      'it': 'Italian',
+      'es': 'Spanish',
+      'pt': 'Portuguese',
+      'ru': 'Russian',
+      'ko': 'Korean',
+      'zhs': 'Chinese (Simplified)',
+      'zht': 'Chinese (Traditional)',
+    };
+    final label = labels[code];
+    final upper = code.toUpperCase();
+    return label != null ? '$label ($upper)' : upper;
+  }
   String _buildPlacementSummary() {
     if (card.placements.isEmpty) {
       return '\u672a\u5272\u308a\u5f53\u3066';
@@ -301,3 +344,5 @@ class CardListItem extends StatelessWidget {
     return summary.isNotEmpty ? summary : '\u672a\u5272\u308a\u5f53\u3066';
   }
 }
+
+

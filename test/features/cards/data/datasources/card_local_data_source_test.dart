@@ -38,6 +38,7 @@ void main() {
     final firstInstance = await db.into(db.cardInstances).insertReturning(
           CardInstancesCompanion.insert(
             cardId: card.id,
+            lang: const Value('en'),
             description: const Value('First instance'),
           ),
         );
@@ -45,6 +46,7 @@ void main() {
     final secondInstance = await db.into(db.cardInstances).insertReturning(
           CardInstancesCompanion.insert(
             cardId: card.id,
+            lang: const Value('en'),
             description: const Value('Second instance'),
           ),
         );
@@ -99,3 +101,4 @@ void main() {
     expect(second.placements, isEmpty);
   });
 }
+

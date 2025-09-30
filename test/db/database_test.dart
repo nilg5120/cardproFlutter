@@ -7,7 +7,7 @@ void main() {
   late AppDatabase db;
 
   ft.setUp(() {
-    // 各テストはメモリDBでクリーンに開始する
+    // 吁E��スト�EメモリDBでクリーンに開始すめE
     db = AppDatabase.test(NativeDatabase.memory());
   });
 
@@ -15,8 +15,8 @@ void main() {
     await db.close();
   });
 
-  ft.test('カードのマスタと個体を挿入して取得できる', () async {
-    // 外部キー用に効果を1件作成
+  ft.test('カード�Eマスタと個体を挿入して取得できる', () async {
+    // 外部キー用に効果を1件作�E
     final effect = await db.into(db.cardEffects).insertReturning(
           CardEffectsCompanion.insert(
             name: 'Basic',
@@ -39,6 +39,7 @@ void main() {
     await db.into(db.cardInstances).insert(
           CardInstancesCompanion.insert(
             cardId: card.id,
+            lang: const Value('en'),
             description: const drift.Value('This is a test instance'),
           ),
         );

@@ -14,7 +14,7 @@ void main() {
   late MockCardRepository mockRepository;
 
   setUp(() {
-    // 各テスト前にモックとUseCaseを初期化
+    // 吁E��スト前にモチE��とUseCaseを�E期化
     mockRepository = MockCardRepository();
     usecase = AddCard(mockRepository);
   });
@@ -31,6 +31,7 @@ void main() {
   final testCardInstance = CardInstance(
     id: 1,
     cardId: 1,
+    lang: 'en',
     updatedAt: DateTime(2025, 5, 29),
     description: 'Test description',
   );
@@ -46,6 +47,7 @@ void main() {
     rarity: 'R',
     setName: 'Sample',
     cardNumber: 123,
+    lang: 'en',
     effectId: 1,
     description: 'Test description',
     quantity: 1,
@@ -58,6 +60,7 @@ void main() {
       rarity: 'R',
       setName: 'Sample',
       cardNumber: 123,
+      lang: 'en',
       effectId: 1,
       description: 'Test description',
       quantity: 1,
@@ -72,6 +75,7 @@ void main() {
       rarity: 'R',
       setName: 'Sample',
       cardNumber: 123,
+      lang: 'en',
       effectId: 1,
       description: 'Test description',
       quantity: 1,
@@ -79,7 +83,7 @@ void main() {
     verifyNoMoreInteractions(mockRepository);
   });
 
-  test('リポジトリの失敗をそのまま伝播する', () async {
+  test('リポジトリの失敗をそ�Eまま伝播する', () async {
     final failure = DatabaseFailure(message: 'DB error');
     when(mockRepository.addCard(
       name: 'Test Card',
@@ -87,6 +91,7 @@ void main() {
       rarity: 'R',
       setName: 'Sample',
       cardNumber: 123,
+      lang: 'en',
       effectId: 1,
       description: 'Test description',
       quantity: 1,
@@ -101,6 +106,7 @@ void main() {
       rarity: 'R',
       setName: 'Sample',
       cardNumber: 123,
+      lang: 'en',
       effectId: 1,
       description: 'Test description',
       quantity: 1,
