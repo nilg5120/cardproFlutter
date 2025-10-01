@@ -1,20 +1,18 @@
-﻿import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
+import 'package:cardpro/features/cards/domain/entities/card_with_instance.dart';
+import 'package:cardpro/core/di/injection_container.dart';
+import 'package:cardpro/db/database.dart' as db;
 import 'package:flutter/material.dart';
 
-
-/// カードリストの各アイテムを表示するウィジェット
+/// Renders a single row in the card instance list.
 class CardListItem extends StatelessWidget {
   final CardWithInstance card;
   final VoidCallback onDelete;
-  final Function(String, {String? rarity, String? setName, int? cardNumber})
-      onEdit;
+  final void Function(String, {int? containerId, String? rarity, String? setName, int? cardNumber}) onEdit;
   final VoidCallback? onTap;
   final bool showDelete;
   final bool showSetName;
   final bool showCardName;
-  // タイトルウィジェットの上書きを許可（例: ローカライズ済み名称）
   final Widget? title;
-  // グループ表示用の任意カウントバッジ
   final int? count;
 
   const CardListItem({
@@ -36,7 +34,14 @@ class CardListItem extends StatelessWidget {
     final hasDescription = description != null && description.isNotEmpty;
     final placementSummary = _buildPlacementSummary();
     final hasPlacementSummary = placementSummary.isNotEmpty;
+    final languageLabel = _formatLanguageLabel(card.instance.lang);
+    final showLanguage = languageLabel != null;
     final showHeaderRow = showCardName || showSetName || title != null;
+    final double languageTopPadding = showHeaderRow ? 4.0 : 0.0;
+    final double placementTopPadding = showLanguage ? 4.0 : (showHeaderRow ? 8.0 : 0.0);
+    final double descriptionTopPadding =
+        (hasPlacementSummary || showLanguage || showHeaderRow) ? 8.0 : 0.0;
+
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -75,7 +80,6 @@ class CardListItem extends StatelessWidget {
                               child: title!,
                             ),
                           if (showCardName) const SizedBox(width: 12),
-                          // 任意のセット名
                           if (showSetName && card.card.setName != null)
                             Flexible(
                               child: Text(
@@ -89,9 +93,20 @@ class CardListItem extends StatelessWidget {
                             ),
                         ],
                       ),
+                    if (showLanguage)
+                      Padding(
+                        padding: EdgeInsets.only(top: languageTopPadding),
+                        child: Text(
+                          'Language: ${languageLabel!}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: Colors.grey[600]),
+                        ),
+                      ),
                     if (hasPlacementSummary)
                       Padding(
-                        padding: EdgeInsets.only(top: showHeaderRow ? 8 : 0),
+                        padding: EdgeInsets.only(top: placementTopPadding),
                         child: Text(
                           placementSummary,
                           style: Theme.of(context)
@@ -103,7 +118,7 @@ class CardListItem extends StatelessWidget {
                     if (hasDescription)
                       Padding(
                         padding: EdgeInsets.only(
-                          top: (hasPlacementSummary || showHeaderRow) ? 8 : 0,
+                          top: descriptionTopPadding,
                         ),
                         child: Text(
                           description,
@@ -122,7 +137,7 @@ class CardListItem extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(right: 4),
                       child: Chip(
-                        label: Text('$count枚'),
+                        label: Text('$count\u679a'),
                         visualDensity: VisualDensity.compact,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
@@ -167,40 +182,158 @@ class CardListItem extends StatelessWidget {
   void _showEditDialog(BuildContext context) {
     final controller =
         TextEditingController(text: card.instance.description ?? '');
+    final initialPlacement =
+        card.placements.isNotEmpty ? card.placements.first : null;
+    int? selectedContainerId = initialPlacement?.containerId;
+    final database = sl<db.AppDatabase>();
+    final containerFuture =
+        database.select(database.containers).get();
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Memo'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Memo',
-            border: OutlineInputBorder(),
-            hintText: 'Enter a note',
-          ),
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              onEdit(controller.text);
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+      builder: (dialogContext) {
+        return FutureBuilder<List<db.Container>>(
+          future: containerFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const AlertDialog(
+                title: Text('Edit Card'),
+                content: SizedBox(
+                  height: 80,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              );
+            }
+
+            final containers = snapshot.data ?? <db.Container>[];
+            final availableIds = containers.map((c) => c.id).toSet();
+            if (selectedContainerId != null &&
+                !availableIds.contains(selectedContainerId)) {
+              selectedContainerId = null;
+            }
+
+            final loadError = snapshot.error;
+
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return AlertDialog(
+                  title: const Text('Edit Card'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: controller,
+                        decoration: const InputDecoration(
+                          labelText: 'Memo',
+                          border: OutlineInputBorder(),
+                          hintText: 'Enter a note',
+                        ),
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<int?>(
+                        initialValue: selectedContainerId,
+                        decoration: const InputDecoration(
+                          labelText: 'Container',
+                          border: OutlineInputBorder(),
+                        ),
+                        items: [
+                          const DropdownMenuItem<int?>(
+                            value: null,
+                            child:
+                                Text('\u672a\u5272\u308a\u5f53\u3066'),
+                          ),
+                          ...containers.map(
+                            (container) => DropdownMenuItem<int?>(
+                              value: container.id,
+                              child: Text(_formatContainerLabel(container)),
+                            ),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            selectedContainerId = value;
+                          });
+                        },
+                      ),
+                      if (loadError != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            '\u30b3\u30f3\u30c6\u30ca\u4e00\u89a7\u306e\u53d6\u5f97\u306b\u5931\u6557\u3057\u307e\u3057\u307e\u3057\u305f',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop();
+                        onEdit(
+                          controller.text,
+                          containerId: selectedContainerId,
+                        );
+                      },
+                      child: const Text('Save'),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 
+  String _formatContainerLabel(db.Container container) {
+    final rawName = container.name?.trim();
+    final displayName = (rawName != null && rawName.isNotEmpty)
+        ? rawName
+        : 'Container ${container.id}';
+    final type = container.containerType.trim();
+    return '$displayName ($type)';
+  }
+
+  String? _formatLanguageLabel(String? langCode) {
+    if (langCode == null) {
+      return null;
+    }
+    final code = langCode.trim().toLowerCase();
+    if (code.isEmpty) {
+      return null;
+    }
+    const labels = <String, String>{
+      'en': 'English',
+      'ja': 'Japanese',
+      'de': 'German',
+      'fr': 'French',
+      'it': 'Italian',
+      'es': 'Spanish',
+      'pt': 'Portuguese',
+      'ru': 'Russian',
+      'ko': 'Korean',
+      'zhs': 'Chinese (Simplified)',
+      'zht': 'Chinese (Traditional)',
+    };
+    final label = labels[code];
+    final upper = code.toUpperCase();
+    return label != null ? '$label ($upper)' : upper;
+  }
   String _buildPlacementSummary() {
     if (card.placements.isEmpty) {
-      return '未割り当て';
+      return '\u672a\u5272\u308a\u5f53\u3066';
     }
 
     final summary = card.placements
@@ -208,10 +341,8 @@ class CardListItem extends StatelessWidget {
         .where((location) => location.isNotEmpty)
         .join(', ');
 
-    return summary.isNotEmpty ? summary : '未割り当て';
+    return summary.isNotEmpty ? summary : '\u672a\u5272\u308a\u5f53\u3066';
   }
 }
-
-
 
 

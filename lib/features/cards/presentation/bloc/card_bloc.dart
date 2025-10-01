@@ -9,7 +9,7 @@ import 'package:cardpro/features/cards/domain/usecases/edit_card_full.dart';
 // ignore_for_file: avoid_print
 import 'package:cardpro/features/cards/presentation/bloc/card_event.dart';
 
-/// --- ステート定義 ---
+/// --- スチE�Eト定義 ---
 
 abstract class CardState extends Equatable {
   const CardState();
@@ -39,7 +39,7 @@ class CardError extends CardState {
   List<Object> get props => [message];
 }
 
-/// --- BLoC本体 ---
+/// --- BLoC本佁E---
 
 class CardBloc extends Bloc<CardEvent, CardState> {
   final GetCards getCards;
@@ -69,11 +69,11 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     final result = await getCards();
     result.fold(
       (failure) {
-        print('❌ CardBloc: エラー発生 - ${failure.message}');
+        print('❁ECardBloc: エラー発甁E- ${failure.message}');
         emit(CardError(failure.message));
       },
       (cards) {
-        print('✅ CardBloc: カード取得成功 - ${cards.length}件');
+        print('✁ECardBloc: カード取得�E劁E- ${cards.length}件');
         emit(CardLoaded(cards));
       },
     );
@@ -89,6 +89,7 @@ class CardBloc extends Bloc<CardEvent, CardState> {
       rarity: event.rarity,
       setName: event.setName,
       cardNumber: event.cardNumber,
+      lang: event.lang,
       effectId: event.effectId,
       description: event.description,
       quantity: event.quantity,
@@ -114,6 +115,7 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     final params = EditCardParams(
       instance: event.instance,
       description: event.description,
+      containerId: event.containerId,
     );
     final result = await editCard(params);
     result.fold(

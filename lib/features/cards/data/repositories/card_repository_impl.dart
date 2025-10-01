@@ -32,6 +32,7 @@ class CardRepositoryImpl implements CardRepository {
     required String? rarity,
     required String? setName,
     required int? cardNumber,
+    String? lang,
     required int effectId,
     required String? description,
     required int quantity,
@@ -45,6 +46,7 @@ class CardRepositoryImpl implements CardRepository {
         rarity: rarity,
         setName: setName,
         cardNumber: cardNumber,
+        lang: lang,
         effectId: effectId,
         description: description,
         quantity: quantity,
@@ -66,9 +68,17 @@ class CardRepositoryImpl implements CardRepository {
   }
 
   @override
-  Future<Either<Failure, void>> editCard(CardInstance instance, String description) async {
+  Future<Either<Failure, void>> editCard(
+    CardInstance instance,
+    String description, {
+    int? containerId,
+  }) async {
     try {
-      await localDataSource.editCard(instance as CardInstanceModel, description);
+      await localDataSource.editCard(
+        instance as CardInstanceModel,
+        description,
+        containerId: containerId,
+      );
       return const Right(null);
     } catch (e) {
       return Left(DatabaseFailure(message: e.toString()));

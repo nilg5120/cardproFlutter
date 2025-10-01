@@ -53,6 +53,7 @@ extension SeedData on AppDatabase {
                   .map(
                     (c) => CardInstancesCompanion.insert(
                       cardId: c.id,
+                      lang: const Value('en'),
                       description: const Value('Initial card'),
                       updatedAt: Value(now),
                     ),
@@ -79,6 +80,7 @@ extension SeedData on AppDatabase {
                   .map(
                     (c) => CardInstancesCompanion.insert(
                       cardId: c.id,
+                      lang: const Value('en'),
                       description: const Value('Initial card'),
                       updatedAt: Value(now),
                     ),

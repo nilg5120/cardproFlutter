@@ -2,17 +2,17 @@ import 'package:equatable/equatable.dart';
 import 'package:cardpro/features/cards/domain/entities/card.dart';
 import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
 
-/// カード関連イベントの基底クラス
+/// カード関連イベント�E基底クラス
 abstract class CardEvent extends Equatable {
   const CardEvent();
   @override
   List<Object?> get props => [];
 }
 
-/// カード一覧を取得するイベント
+/// カード一覧を取得するイベンチE
 class GetCardsEvent extends CardEvent {}
 
-/// 新しいカードを追加するイベント
+/// 新しいカードを追加するイベンチE
 class AddCardEvent extends CardEvent {
   final String name;
   final String? nameEn;
@@ -21,6 +21,7 @@ class AddCardEvent extends CardEvent {
   final String? rarity;
   final String? setName;
   final int? cardNumber;
+  final String? lang;
   final int effectId;
   final String? description;
   final int quantity;
@@ -33,16 +34,17 @@ class AddCardEvent extends CardEvent {
     this.rarity,
     this.setName,
     this.cardNumber,
+    this.lang,
     required this.effectId,
     this.description,
     this.quantity = 1,
   });
 
   @override
-  List<Object?> get props => [name, nameEn, nameJa, oracleId, rarity, setName, cardNumber, effectId, description, quantity];
+  List<Object?> get props => [name, nameEn, nameJa, oracleId, rarity, setName, cardNumber, lang, effectId, description, quantity];
 }
 
-/// カード個体を削除するイベント
+/// カード個体を削除するイベンチE
 class DeleteCardEvent extends CardEvent {
   final CardInstance instance;
 
@@ -52,21 +54,23 @@ class DeleteCardEvent extends CardEvent {
   List<Object> get props => [instance];
 }
 
-/// カード個体の説明を更新するイベント
+/// カード個体�E説明を更新するイベンチE
 class EditCardEvent extends CardEvent {
   final CardInstance instance;
   final String description;
+  final int? containerId;
 
   const EditCardEvent({
     required this.instance,
     required this.description,
+    this.containerId,
   });
 
   @override
-  List<Object> get props => [instance, description];
+  List<Object?> get props => [instance, description, containerId];
 }
 
-/// カードマスター情報も含めて編集するイベント
+/// カード�Eスター惁E��も含めて編雁E��るイベンチE
 class EditCardFullEvent extends CardEvent {
   final Card card;
   final CardInstance instance;
@@ -87,3 +91,4 @@ class EditCardFullEvent extends CardEvent {
   @override
   List<Object?> get props => [card, instance, rarity, setName, cardNumber, description];
 }
+

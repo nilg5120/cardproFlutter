@@ -46,7 +46,7 @@ void main() {
           body: CardListItem(
             card: cardWithInstance,
             onDelete: () {},
-            onEdit: (_, {rarity, setName, cardNumber}) {},
+            onEdit: (_, {containerId, rarity, setName, cardNumber}) {},
           ),
         ),
       ),
@@ -77,7 +77,7 @@ void main() {
           body: CardListItem(
             card: cardWithInstance,
             onDelete: () {},
-            onEdit: (_, {rarity, setName, cardNumber}) {},
+            onEdit: (_, {containerId, rarity, setName, cardNumber}) {},
           ),
         ),
       ),
@@ -86,3 +86,34 @@ void main() {
     expect(find.text('未割り当て'), findsOneWidget);
   });
 }
+  testWidgets('shows language label when available', (tester) async {
+    final card = CardModel(
+      id: 3,
+      name: 'Language Card',
+      effectId: 1,
+    );
+    final instance = CardInstanceModel(
+      id: 3,
+      cardId: 3,
+      lang: 'ja',
+      updatedAt: DateTime(2024, 3, 3),
+    );
+    final cardWithInstance = CardWithInstanceModel(
+      card: card,
+      instance: instance,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CardListItem(
+            card: cardWithInstance,
+            onDelete: () {},
+            onEdit: (_, {containerId, rarity, setName, cardNumber}) {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Language: Japanese (JA)'), findsOneWidget);
+  });

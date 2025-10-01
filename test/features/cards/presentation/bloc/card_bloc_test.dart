@@ -1,4 +1,4 @@
-﻿import 'package:bloc_test/bloc_test.dart';
+import 'package:bloc_test/bloc_test.dart';
 import 'package:cardpro/core/error/failures.dart';
 import 'package:cardpro/features/cards/domain/entities/card.dart' as card_entity;
 import 'package:cardpro/features/cards/domain/entities/card_instance.dart';
@@ -52,6 +52,8 @@ void main() {
       rarity: 'R',
       setName: 'Sample',
       cardNumber: 123,
+      lang: 'en',
+      lang: 'en',
       effectId: 1,
     ),
     instance: CardInstance(
@@ -62,13 +64,13 @@ void main() {
     ),
   );
 
-  group('GetCardsEvent（一覧取得）', () {
-    test('初期状態は CardInitial', () {
+  group('GetCardsEvent�E�一覧取得！E, () {
+    test('初期状態�E CardInitial', () {
       expect(bloc.state, CardInitial());
     });
 
     blocTest<CardBloc, CardState>(
-      '成功時は CardLoaded を出す',
+      '成功時�E CardLoaded を�EぁE,
       build: () {
         when(mockGetCards())
             .thenAnswer((_) async => Right([testCardWithInstance]));
@@ -83,7 +85,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      '失敗時は CardError を出す',
+      '失敗時は CardError を�EぁE,
       build: () {
         when(mockGetCards())
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
@@ -98,13 +100,14 @@ void main() {
     );
   });
 
-  group('AddCardEvent（追加）', () {
+  group('AddCardEvent�E�追加�E�E, () {
     final addCardEvent = AddCardEvent(
       name: 'Test Card',
       oracleId: '0000-ORACLE-TEST',
       rarity: 'R',
       setName: 'Sample',
       cardNumber: 123,
+      lang: 'en',
       effectId: 1,
       description: 'Test description',
     );
@@ -130,7 +133,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      '失敗時は CardError を出す',
+      '失敗時は CardError を�EぁE,
       build: () {
         when(mockAddCard(any))
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
@@ -145,7 +148,7 @@ void main() {
     );
   });
 
-  group('DeleteCardEvent（削除）', () {
+  group('DeleteCardEvent�E�削除�E�E, () {
     final deleteCardEvent = DeleteCardEvent(testCardWithInstance.instance);
 
     blocTest<CardBloc, CardState>(
@@ -169,7 +172,7 @@ void main() {
     );
 
     blocTest<CardBloc, CardState>(
-      '失敗時は CardError を出す',
+      '失敗時は CardError を�EぁE,
       build: () {
         when(mockDeleteCard(any))
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));
@@ -184,10 +187,11 @@ void main() {
     );
   });
 
-  group('EditCardEvent（変更）', () {
+  group('EditCardEvent�E�変更�E�E, () {
     final editCardEvent = EditCardEvent(
       instance: testCardWithInstance.instance,
       description: 'New description',
+      containerId: 42,
     );
 
     blocTest<CardBloc, CardState>(
@@ -205,13 +209,17 @@ void main() {
         CardLoaded([testCardWithInstance]),
       ],
       verify: (_) {
-        verify(mockEditCard(any));
+        verify(mockEditCard(EditCardParams(
+          instance: testCardWithInstance.instance,
+          description: 'New description',
+          containerId: 42,
+        )));
         verify(mockGetCards());
       },
     );
 
     blocTest<CardBloc, CardState>(
-      '失敗時は CardError を出す',
+      '失敗時は CardError を�EぁE,
       build: () {
         when(mockEditCard(any))
             .thenAnswer((_) async => Left(DatabaseFailure(message: 'Error')));

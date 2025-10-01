@@ -62,6 +62,7 @@ class MockCardLocalDataSource extends _i1.Mock
     required String? rarity,
     required String? setName,
     required int? cardNumber,
+    String? lang,
     required int? effectId,
     required String? description,
     required int? quantity,
@@ -75,6 +76,7 @@ class MockCardLocalDataSource extends _i1.Mock
               #rarity: rarity,
               #setName: setName,
               #cardNumber: cardNumber,
+                  #lang: lang,
               #effectId: effectId,
               #description: description,
               #quantity: quantity,
@@ -90,6 +92,7 @@ class MockCardLocalDataSource extends _i1.Mock
                   #rarity: rarity,
                   #setName: setName,
                   #cardNumber: cardNumber,
+                  #lang: lang,
                   #effectId: effectId,
                   #description: description,
                   #quantity: quantity,
@@ -110,11 +113,12 @@ class MockCardLocalDataSource extends _i1.Mock
 
   @override
   _i4.Future<void> editCard(
-    _i5.CardInstanceModel? instance,
-    String? description,
-  ) =>
+    _i5.CardInstanceModel instance,
+    String description, {
+    int? containerId,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#editCard, [instance, description]),
+            Invocation.method(#editCard, [instance, description], {#containerId: containerId}),
             returnValue: _i4.Future<void>.value(),
             returnValueForMissingStub: _i4.Future<void>.value(),
           )
@@ -136,6 +140,7 @@ class MockCardLocalDataSource extends _i1.Mock
               #rarity: rarity,
               #setName: setName,
               #cardNumber: cardNumber,
+                  #lang: lang,
               #description: description,
             }),
             returnValue: _i4.Future<void>.value(),

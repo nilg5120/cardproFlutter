@@ -1,15 +1,16 @@
 import 'package:drift/drift.dart';
 
 class CardInstances extends Table {
-  // ä¸»ã‚­ãƒ¼
+  // ŽåƒL[
   IntColumn get id => integer().autoIncrement()();
-  // å‚ç…§: MtgCards.idï¼ˆã‚«ãƒ¼ãƒ‰ãƒžã‚¹ã‚¿ï¼‰
+  // ŽQÆ: MtgCards.id ‚Ö‚ÌƒJ[ƒhƒ}ƒXƒ^
   IntColumn get cardId => integer()();
+  // Scryfall ‚ÌŒ¾ŒêƒR[ƒh (—á: en, ja)
+  TextColumn get lang => text().nullable()();
 
-  // ä»»æ„é …ç›®
-  // æœ€çµ‚æ›´æ–°æ—¥æ™‚
+  // ”CˆÓ€–Ú
+  // ÅIXV“úŽž
   DateTimeColumn get updatedAt => dateTime().nullable()();
-  // ãƒ¡ãƒ¢/çŠ¶æ…‹ãªã©ã®è‡ªç”±è¨˜è¿°
+  // ƒƒ‚/ó‘Ô‚È‚Ç‚ÌŽ©—R‹Lq
   TextColumn get description => text().nullable()();
 }
-

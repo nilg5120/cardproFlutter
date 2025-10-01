@@ -4,6 +4,7 @@ class CardInstanceModel extends CardInstance {
   const CardInstanceModel({
     required super.id,
     required super.cardId,
+    super.lang,
     super.updatedAt,
     super.description,
   });
@@ -12,6 +13,7 @@ class CardInstanceModel extends CardInstance {
     return CardInstanceModel(
       id: driftInstance.id,
       cardId: driftInstance.cardId,
+      lang: driftInstance.lang,
       updatedAt: driftInstance.updatedAt,
       description: driftInstance.description,
     );
@@ -21,6 +23,7 @@ class CardInstanceModel extends CardInstance {
     return {
       'id': id,
       'cardId': cardId,
+      'lang': lang,
       'updatedAt': updatedAt?.toIso8601String(),
       'description': description,
     };
@@ -30,10 +33,11 @@ class CardInstanceModel extends CardInstance {
     return CardInstanceModel(
       id: json['id'],
       cardId: json['cardId'],
+      lang: json['lang'] as String?,
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'])
           : null,
-      description: json['description'],
+      description: json['description'] as String?,
     );
   }
 }

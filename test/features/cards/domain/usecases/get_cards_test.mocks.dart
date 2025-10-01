@@ -122,15 +122,20 @@ class MockCardRepository extends _i1.Mock implements _i3.CardRepository {
 
   @override
   _i4.Future<_i2.Either<_i5.Failure, void>> editCard(
-    _i7.CardInstance? instance,
-    String? description,
-  ) =>
+    _i7.CardInstance instance,
+    String description, {
+    int? containerId,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#editCard, [instance, description]),
+            Invocation.method(#editCard, [instance, description], {
+              #containerId: containerId,
+            }),
             returnValue: _i4.Future<_i2.Either<_i5.Failure, void>>.value(
               _FakeEither_0<_i5.Failure, void>(
                 this,
-                Invocation.method(#editCard, [instance, description]),
+                Invocation.method(#editCard, [instance, description], {
+                  #containerId: containerId,
+                }),
               ),
             ),
           )
